@@ -68,7 +68,7 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        create_pie_chart(config)
+        # create_pie_chart(config)
         create_stacked_bar(config)
 
         logging.info('END')

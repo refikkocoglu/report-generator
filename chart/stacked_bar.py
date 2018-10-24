@@ -18,6 +18,18 @@
 #
 
 
+from dataset.dataset_handler import get_top_group_list
+from lfs.retrieve_quota import retrieve_group_quota
+
+
 def create_stacked_bar(config):
 
-    pass
+    filesystem = config.get('lustre', 'filesystem')
+
+    group_info_list = get_top_group_list(config)
+
+    for group_info in group_info_list:
+
+        print "gid: %s - quota: %s" % \
+              (group_info.gid, retrieve_group_quota(group_info.gid, filesystem))
+
