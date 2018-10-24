@@ -31,6 +31,33 @@ class GroupInfo:
         self.count = count
 
 
+def retrieve_group_names(config):
+    group_names = list()
+
+    rbh_acct_table = config.get('robinhood', 'acct_stat_table')
+
+    with closing(MySQLdb.connect(host=config.get('mysqld', 'host'),
+                                 user=config.get('mysqld', 'user'),
+                                 passwd=config.get('mysqld', 'password'),
+                                 db=config.get('robinhood', 'database'))) \
+            as conn:
+
+        with closing(conn.cursor()) as cur:
+
+            sql = "SELECT gid FROM %s GROUP BY 1" % rbh_acct_table
+
+            cur.execute(sql)
+
+            if not cur.rowcount:
+                raise RuntimeError("No rows returned from query: %s" % sql)
+
+            for gid in cur.fetchall():
+                logging.debug("Found GID: %s" % gid[0])
+                group_names.append(str(gid[0]))
+
+    return group_names
+
+
 def get_total_size(config):
 
     with closing(MySQLdb.connect(host=config.get('mysqld', 'host'),
