@@ -108,13 +108,13 @@ def cleanup_files(dir_path, pattern):
 
 def create_pie_chart(config):
 
-    chart_filetype = config.get('chart', 'filetype')
-    chart_report_dir = config.get('chart', 'report_dir')
+    chart_filetype = config.get('base_chart', 'filetype')
+    chart_report_dir = config.get('base_chart', 'report_dir')
+    num_top_groups = config.get('base_chart', 'num_top_groups')
 
-    num_top_groups = config.get('pie_chart_disk_used', 'num_top_groups')
     chart_pie_filename = config.get('pie_chart_disk_used', 'filename')
 
-    filesystem = config.get('storage', 'filesystem')
+    filesystem = config.get('lustre', 'filesystem')
 
     logging.debug("Number of top group: %s" % num_top_groups)
 

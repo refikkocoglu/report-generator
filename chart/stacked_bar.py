@@ -18,3 +18,6 @@
 #
 
 
+def create_stacked_bar(config):
+
+    pass

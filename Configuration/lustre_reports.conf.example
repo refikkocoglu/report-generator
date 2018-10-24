@@ -1,0 +1,25 @@
+[lustre]
+filesystem = /lustre/fs
+
+[mysqld]
+host =
+user =
+password =
+
+[robinhood]
+database = robinhood_fs
+acct_stat_table = ACCT_STAT
+
+[base_chart]
+save_dir = /home/data/chart
+num_top_groups = 8
+filetype = svg
+
+[pie_chart_disk_used]
+filename = disk_usage_lustre_fs
+
+[stacked_bar_quota_disk_used]
+filename = quota_with_disk_usage_lustre_fs
+
+[bar_chart_quota_used]
+filename = quota_usage_lustre_fs

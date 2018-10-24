@@ -20,11 +20,13 @@
 
 import ConfigParser
 import argparse
+import sys
 import os
 import re
 
 from dataset.dataset_handler import *
 from chart.pie_chart import *
+from chart.stacked_bar import *
 
 
 def raise_option_not_found( section, option ):
@@ -67,6 +69,7 @@ def main():
         config.read(args.config_file)
 
         create_pie_chart(config)
+        create_stacked_bar(config)
 
         logging.info('END')
 
@@ -74,9 +77,11 @@ def main():
    
     except Exception as e:
 
-        error_msg = str(e)
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-        logging.error(error_msg)
+        logging.error("Caught exception (%s): %s - %s (line: %s)"
+                      % (exc_type, str(e), filename, exc_tb.tb_lineno))
 
 
 if __name__ == '__main__':

@@ -91,7 +91,7 @@ def get_top_group_list(config):
         with closing(conn.cursor()) as cur:
 
             sql = "SELECT gid, SUM(size) as group_size FROM %s GROUP BY gid ORDER BY group_size DESC LIMIT %s" % \
-                  (config.get('robinhood', 'acct_stat_table'), config.get('pie_chart_disk_used', 'num_top_groups'))
+                  (config.get('robinhood', 'acct_stat_table'), config.get('base_chart', 'num_top_groups'))
 
             logging.debug(sql)
             cur.execute(sql)
