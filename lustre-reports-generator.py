@@ -20,13 +20,14 @@
 
 import ConfigParser
 import argparse
+import logging
 import sys
 import os
 import re
 
-from dataset.dataset_handler import *
-from chart.pie_chart import *
-from chart.stacked_bar import *
+from dataset import dataset_handler
+from chart import pie_chart
+from chart import stacked_bar
 
 
 def raise_option_not_found( section, option ):
@@ -68,8 +69,10 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        # create_pie_chart(config)
-        create_stacked_bar(config)
+        dataset_handler.CONFIG = config
+
+        # pie_chart.create_pie_chart(config)
+        stacked_bar.create_stacked_bar(config)
 
         logging.info('END')
 
