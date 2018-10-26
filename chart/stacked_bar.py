@@ -38,8 +38,11 @@ def draw(group_info_list):
     top_bar_list_values = list()
     bottom_bar_list_values = list()
 
-    max_sum_quota_and_disk = 5000
-    tick_width_y = max_sum_quota_and_disk / 10
+    max_sum_quota_and_disk = float(
+        (group_info_list[0].size + group_info_list[0].quota)
+        / number_format.TIB_DIVISIOR)
+
+    tick_width_y = 200
 
     for group_info in group_info_list:
         logging.debug("%s - %s - %s" % (
@@ -98,14 +101,14 @@ def create_stacked_bar(config):
                                  chart_filename + "_" + snapshot_date + "." +
                                  chart_filetype)
 
-    plt.savefig(chart_path, format=chart_filetype, dpi=200)
+    plt.savefig(chart_path, format=chart_filetype, dpi=300)
 
     logging.debug("Saved stacked bar chart under: %s" % chart_path)
 
 
 def create_stacked_bar_dev():
 
-    group_info_list = create_dummy_group_info_list(20)
+    group_info_list = create_dummy_group_info_list(8)
 
     draw(group_info_list)
 

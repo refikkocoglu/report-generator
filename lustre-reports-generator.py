@@ -71,7 +71,7 @@ def main():
 
         dataset_handler.CONFIG = config
 
-        # pie_chart.create_pie_chart(config)
+        #pie_chart.create_pie_chart(config)
         stacked_bar.create_stacked_bar(config)
 
         logging.info('END')
