@@ -106,16 +106,12 @@ def create_stacked_bar(config):
     logging.debug("Saved stacked bar chart under: %s" % chart_path)
 
 
-def create_stacked_bar_dev():
+def create_stacked_bar_dev(file_path, num_groups=None):
 
-    group_info_list = ds.create_dummy_group_info_list(8)
+    group_info_list = ds.create_dummy_group_info_list(num_groups)
 
     draw(group_info_list)
 
-    plt.savefig('/home/iannetti/tmp/stacked_bar.svg', format='svg', dpi=300)
+    plt.savefig(file_path, format='svg', dpi=300)
 
     plt.show()
-
-
-create_stacked_bar_dev()
-
