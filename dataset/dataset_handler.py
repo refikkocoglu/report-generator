@@ -26,6 +26,11 @@ from decimal import Decimal
 from lfs.retrieve_quota import retrieve_group_quota
 
 
+# TODO:
+# DATASOURCE SHOULD NOT KNOW ANYTHING ABOUT TOP GROUPS!!!
+# JUST PROVIDE GROUP INFORMATION AND RETURN NUMBER OF GROUP ITEMS!!!
+
+
 # TODO: Make Singleton Class?!
 
 # Data structures are initialized on demand if necessary.
@@ -130,17 +135,17 @@ def get_group_sizes():
     return GROUP_SIZES_LIST
 
 
-def get_total_size():
+def get_groups_total_size():
 
-    total_size = 0
+    groups_total_size = 0
 
     for group_size_item in get_group_sizes():
-        total_size += group_size_item.size
+        groups_total_size += group_size_item.size
 
-    if not total_size:
+    if not groups_total_size:
         raise RuntimeError("Total Size is 0!")
 
-    return total_size
+    return groups_total_size
 
 
 def get_group_info_list():

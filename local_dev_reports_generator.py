@@ -20,12 +20,17 @@
 
 from chart import stacked_bar
 from chart import bar_chart
+from chart import pie_chart
 
 
-stacked_bar.create_stacked_bar_dev(
-    '/home/iannetti/tmp/quota_and_disk_usage_report.svg'
-)
+# stacked_bar.create_stacked_bar_dev(
+#     '/home/iannetti/tmp/quota_and_disk_usage_report.svg'
+# )
+#
+# bar_chart.create_bar_chart_dev(
+#     '/home/iannetti/tmp/quota_pct_usage_report.svg'
+# )
 
-bar_chart.create_bar_chart_dev(
-    '/home/iannetti/tmp/quota_pct_usage_report.svg'
+pie_chart.create_pie_chart_dev(
+    '/home/iannetti/tmp/disk_space_usage_report.svg'
 )
