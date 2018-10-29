@@ -27,7 +27,7 @@ import re
 
 from dataset import dataset_handler
 from chart import pie_chart
-from chart import stacked_bar
+from chart import multiple_x_bar
 
 
 def raise_option_not_found( section, option ):
@@ -72,7 +72,7 @@ def main():
         dataset_handler.CONFIG = config
 
         pie_chart.create_pie_chart(config)
-        # stacked_bar.create_stacked_bar(config)
+        # stacked_bar.create_multiple_x_bar(config)
 
         logging.info('END')
 

@@ -78,7 +78,7 @@ def draw(group_info_list):
     plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
 
 
-def create_stacked_bar(config):
+def create_multiple_x_bar(config):
 
     logging.debug('Creating stacked bar for quota and disk usage per group...')
 
@@ -105,7 +105,7 @@ def create_stacked_bar(config):
     logging.debug("Saved stacked bar chart under: %s" % chart_path)
 
 
-def create_stacked_bar_dev(file_path, num_groups=None):
+def create_multiple_x_bar_dev(file_path, num_groups=None):
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
 
