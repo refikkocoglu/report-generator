@@ -35,8 +35,8 @@ def draw(group_info_list):
     logging.debug("Number of Groups: %s" % num_groups)
 
     group_names = list()
-    top_bar_list_values = list()
-    bottom_bar_list_values = list()
+    quota_list_values = list()
+    size_list_values = list()
 
     max_sum_quota_and_disk = float(
         (group_info_list[0].size + group_info_list[0].quota)
@@ -50,10 +50,10 @@ def draw(group_info_list):
 
         group_names.append(group_info.gid)
 
-        top_bar_list_values.append(
+        quota_list_values.append(
             int(group_info.quota / number_format.TIB_DIVISIOR))
 
-        bottom_bar_list_values.append(
+        size_list_values.append(
             int(group_info.size / number_format.TIB_DIVISIOR))
 
     ind = np.arange(num_groups)  # the x locations for the groups
@@ -65,15 +65,14 @@ def draw(group_info_list):
 
     plt.figure(figsize=(fig_width, fig_height))
 
-    p1 = plt.bar(ind, bottom_bar_list_values, bar_width, color='blue')
-    p2 = plt.bar(ind, top_bar_list_values, bar_width, color='orange',
-                 bottom=bottom_bar_list_values)
+    p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
+    p2 = plt.bar(ind + bar_width, quota_list_values, bar_width, color='orange')
 
     plt.title('Quota and Disk Space Used')
     plt.xlabel('Group')
     plt.ylabel('Disk Space Used (TiB)')
 
-    plt.xticks(ind, group_names)
+    plt.xticks(ind + bar_width / 2, group_names)
 
     plt.yticks(np.arange(0, max_sum_quota_and_disk, tick_width_y))
     plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
