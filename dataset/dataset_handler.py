@@ -107,7 +107,7 @@ def get_group_names():
     return GROUP_NAMES_LIST
 
 
-def get_group_sizes():
+def get_group_sizes_list():
 
     if not GROUP_SIZES_LIST:
 
@@ -139,7 +139,7 @@ def get_groups_total_size():
 
     groups_total_size = 0
 
-    for group_size_item in get_group_sizes():
+    for group_size_item in get_group_sizes_list():
         groups_total_size += group_size_item.size
 
     if not groups_total_size:
@@ -155,7 +155,7 @@ def get_group_info_list():
     filesystem = CONFIG.get('lustre', 'filesystem')
 
     # TODO: Get quota for group list...
-    for item in get_group_sizes():
+    for item in get_group_sizes_list():
 
         quota = None
 
@@ -185,7 +185,7 @@ def get_top_group_sizes():
 
     num_top_groups = int(CONFIG.get('base_chart', 'num_top_groups'))
 
-    top_group_sizes_list = get_group_sizes()[:num_top_groups]
+    top_group_sizes_list = get_group_sizes_list()[:num_top_groups]
 
     if not top_group_sizes_list:
         raise RuntimeError('No top groups could be retrieved!')
