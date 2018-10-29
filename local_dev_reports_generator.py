@@ -24,7 +24,7 @@ from chart import pie_chart
 
 
 multiple_x_bar.create_multiple_x_bar_dev(
-    '/home/iannetti/tmp/quota_and_disk_usage_report.svg', 10
+    '/home/iannetti/tmp/quota_and_disk_usage_report.svg'
 )
 
 # bar_chart.create_bar_chart_dev(
