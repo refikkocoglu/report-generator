@@ -154,7 +154,6 @@ def get_group_info_list():
 
     filesystem = CONFIG.get('lustre', 'filesystem')
 
-    # TODO: Get quota for group list...
     for item in get_group_sizes_list():
 
         quota = None
