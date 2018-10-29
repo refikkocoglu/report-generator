@@ -38,11 +38,10 @@ def draw(group_info_list):
     quota_list_values = list()
     size_list_values = list()
 
-    max_sum_quota_and_disk = float(
-        (group_info_list[0].size + group_info_list[0].quota)
-        / number_format.TIB_DIVISIOR)
-
     tick_width_y = 200
+
+    max_y = float(group_info_list[0].quota /
+                  number_format.TIB_DIVISIOR) + tick_width_y
 
     for group_info in group_info_list:
         logging.debug("%s - %s - %s" % (
@@ -74,7 +73,7 @@ def draw(group_info_list):
 
     plt.xticks(ind + bar_width / 2, group_names)
 
-    plt.yticks(np.arange(0, max_sum_quota_and_disk, tick_width_y))
+    plt.yticks(np.arange(0, max_y, tick_width_y))
     plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
 
 
