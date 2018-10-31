@@ -29,7 +29,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import dataset.dataset_handler as ds
-from filter import getent_handler
+import filter.group_filter_handler as gf
 from format import number_format
 
 
@@ -99,7 +99,8 @@ def create_multiple_x_bar(config):
     group_info_list = ds.get_group_info_list()
     #group_info_list = ds.get_top_group_info_list()
 
-    group_info_list = getent_handler.filter_system_groups(group_info_list)
+    group_info_list = gf.filter_system_groups(group_info_list)
+    group_info_list = gf.filter_group_info_items(group_info_list)
 
     draw(group_info_list)
 
@@ -115,8 +116,6 @@ def create_multiple_x_bar(config):
 def create_multiple_x_bar_dev(file_path, num_groups=None):
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
-
-    getent_handler.filter_system_groups(group_info_list)
 
     draw(group_info_list)
 

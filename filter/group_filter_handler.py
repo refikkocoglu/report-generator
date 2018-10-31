@@ -17,9 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
-import getent
 import logging
+import getent
 
 
 GID_CACHE_DICT = dict()
@@ -67,3 +66,23 @@ def filter_system_groups(group_list):
 
     return non_system_group_list
 
+
+def filter_group_info_items(group_info_list, size=0, quota=0):
+
+    new_group_info_list = list()
+
+    if group_info_list is None or len(group_info_list) == 0:
+        raise RuntimeError("Empty group_info_list found!")
+
+    for group_info_item in group_info_list:
+
+        # TODO: Check list if contains instances of GorupInfoItem class.
+
+        if group_info_item.size <= size and group_info_item.quota <= quota:
+            logging.debug("Filtered group_info_item for group: %s"
+                          % group_info_item.name)
+            continue
+
+        new_group_info_list.append(group_info_item)
+
+    return new_group_info_list

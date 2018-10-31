@@ -23,7 +23,7 @@ import dataset.dataset_handler as ds
 import logging
 import datetime
 import os
-from filter import getent_handler
+import filter.group_filter_handler as gf
 
 # Force matplotlib to not use any X window backend.
 import matplotlib
@@ -96,7 +96,8 @@ def create_bar_chart(config):
     group_info_list = ds.get_group_info_list()
     #group_info_list = ds.get_top_group_info_list()
 
-    group_info_list = getent_handler.filter_system_groups(group_info_list)
+    group_info_list = gf.filter_system_groups(group_info_list)
+    group_info_list = gf.filter_group_info_items(group_info_list)
 
     draw(group_info_list)
 
