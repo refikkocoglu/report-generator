@@ -100,6 +100,7 @@ def create_multiple_x_bar(config):
 
     group_info_list = gf.filter_system_groups(group_info_list)
     group_info_list = gf.filter_group_info_items(group_info_list)
+    ds.sort_group_info_list_by_quota(group_info_list)
 
     draw(group_info_list)
 
@@ -115,6 +116,8 @@ def create_multiple_x_bar(config):
 def create_multiple_x_bar_dev(file_path, num_groups=None):
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
+
+    ds.sort_group_info_list_by_quota(group_info_list)
 
     draw(group_info_list)
 

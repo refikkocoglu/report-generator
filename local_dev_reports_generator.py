@@ -34,11 +34,11 @@ def main():
     logging.debug("START")
 
     multiple_x_bar.create_multiple_x_bar_dev(
-        '/home/iannetti/tmp/quota_and_disk_usage_report.svg'
+        '/home/iannetti/tmp/quota_and_disk_usage_report.svg', 20
     )
 
     bar_chart.create_bar_chart_dev(
-        '/home/iannetti/tmp/quota_pct_usage_report.svg'
+        '/home/iannetti/tmp/quota_pct_usage_report.svg', 20
     )
 
     pie_chart.create_pie_chart_dev(

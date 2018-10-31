@@ -114,6 +114,8 @@ def create_bar_chart_dev(file_path, num_groups=None):
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
 
+    ds.sort_group_info_list_by_name(group_info_list)
+
     draw(group_info_list)
 
     plt.savefig(file_path, format='svg', dpi=300)
