@@ -43,31 +43,31 @@ CONFIG = None
 
 class GroupNameItem:
 
-    def __init__(self, gid, size):
-        self.gid = gid
+    def __init__(self, name):
+        self.name = name
 
 
 class GroupSizeItem:
 
-    def __init__(self, gid, size):
+    def __init__(self, name, size):
 
-        self.gid = gid
+        self.name = name
         self.size = Decimal(size)
 
 
 class GroupQuotaItem:
 
-    def __init__(self, gid, size):
+    def __init__(self, name, size):
 
-        self.gid = gid
+        self.name = name
         self.size = Decimal(size)
 
 
 class GroupInfoItem:
 
-    def __init__(self, gid, size, quota):
+    def __init__(self, name, size, quota):
 
-        self.gid = gid
+        self.name = name
         self.size = Decimal(size)
         self.quota = Decimal(quota)
 
@@ -158,21 +158,21 @@ def get_group_info_list():
 
         quota = None
 
-        if item.gid in GROUP_QUOTA_DICT:
-            quota = GROUP_QUOTA_DICT[item.gid]
+        if item.name in GROUP_QUOTA_DICT:
+            quota = GROUP_QUOTA_DICT[item.name]
 
         else:
 
-            logging.debug("Retrieving Quota for GID: %s" % item.gid)
+            logging.debug("Retrieving Quota for Group: %s" % item.name)
 
-            quota = retrieve_group_quota(item.gid, filesystem)
+            quota = retrieve_group_quota(item.name, filesystem)
 
-            GROUP_QUOTA_DICT[item.gid] = quota
+            GROUP_QUOTA_DICT[item.name] = quota
 
         if quota is None:
-            raise RuntimeError('No quota retrieved for gid: %s' % item.gid)
+            raise RuntimeError('No quota retrieved for Group: %s' % item.name)
 
-        group_info_list.append(GroupInfoItem(item.gid, item.size, quota))
+        group_info_list.append(GroupInfoItem(item.name, item.size, quota))
 
     if not group_info_list:
         raise RuntimeError('Empty group_info_list!')
@@ -284,7 +284,6 @@ def create_dummy_group_info_list(number=None):
         GroupInfoItem('tpcdata', '6090686094889', '27487790694400'))
     group_info_list.append(
         GroupInfoItem('kp2', '6086615963545', '6873068560384'))
-    group_info_list.append(GroupInfoItem('ufk', '5180489216282', '0'))
     group_info_list.append(
         GroupInfoItem('ul', '5157645070220', '6597069766656'))
     group_info_list.append(
@@ -299,13 +298,8 @@ def create_dummy_group_info_list(number=None):
         GroupInfoItem('fairgsi', '2440403339127', '5497558138880'))
     group_info_list.append(
         GroupInfoItem('radprot', '2181051911650', '76965813944320'))
-    group_info_list.append(GroupInfoItem('root', '790829819336', '0'))
-    group_info_list.append(GroupInfoItem('thd', '346240925999', '0'))
-    group_info_list.append(GroupInfoItem('rzgast', '133203420737', '0'))
     group_info_list.append(
         GroupInfoItem('hht', '130642827472', '21990232555520'))
-    group_info_list.append(GroupInfoItem('ee', '58032178677', '0'))
-    group_info_list.append(GroupInfoItem('su', '27676842674', '0'))
     group_info_list.append(
         GroupInfoItem('htit', '16930263228', '42949672960'))
     group_info_list.append(
@@ -313,25 +307,9 @@ def create_dummy_group_info_list(number=None):
     group_info_list.append(
         GroupInfoItem('nustar', '5637091577', '107374182400'))
     group_info_list.append(GroupInfoItem('vw', '24472895', '576716800'))
-    group_info_list.append(GroupInfoItem('staff', '3846924', '0'))
-    group_info_list.append(GroupInfoItem('fat', '2265308', '0'))
-    group_info_list.append(GroupInfoItem('997', '939808', '0'))
-    group_info_list.append(GroupInfoItem('99', '764464', '0'))
-    group_info_list.append(GroupInfoItem('81', '636848', '0'))
-    group_info_list.append(GroupInfoItem('156', '441904', '0'))
     group_info_list.append(
         GroupInfoItem('astrum', '125315', '1099511627776'))
-    group_info_list.append(GroupInfoItem('tty', '39072', '0'))
-    group_info_list.append(GroupInfoItem('rzg-int', '23638', '0'))
-    group_info_list.append(GroupInfoItem('utmp', '22384', '0'))
-    group_info_list.append(GroupInfoItem('systemd-bus-proxy', '17346', '0'))
-    group_info_list.append(GroupInfoItem('120', '12288', '0'))
-    group_info_list.append(GroupInfoItem('man', '8192', '0'))
-    group_info_list.append(GroupInfoItem('mail', '8192', '0'))
-    group_info_list.append(GroupInfoItem('35', '8192', '0'))
     group_info_list.append(GroupInfoItem('bel', '4096', '10995116277760'))
-    group_info_list.append(GroupInfoItem('adm', '1192', '0'))
-    group_info_list.append(GroupInfoItem('fsr', '0', '576716800'))
 
     if number:
         return group_info_list[:number]

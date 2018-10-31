@@ -22,14 +22,12 @@ import datetime
 import format.number_format as nf
 import dataset.dataset_handler as ds
 
-from matplotlib import cm
 from decimal import Decimal
 from lfs import disk_usage_info
 
 # Force matplotlib to not use any X window backend.
-# import matplotlib as mpl
-# mpl.use('Agg')
-
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
@@ -56,7 +54,7 @@ def draw(top_group_sizes, others_size, snapshot_timestamp, title,
     sizes = []
 
     for item in top_group_sizes:
-        label_text = item.gid + " (" + nf.number_to_base_2(item.size) + ")"
+        label_text = item.name + " (" + nf.number_to_base_2(item.size) + ")"
 
         labels.append(label_text)
         sizes.append(item.size)
@@ -175,5 +173,3 @@ def create_pie_chart_dev(file_path):
          groups_total_size, ost_total_size)
 
     fig.savefig(file_path, format='svg', dpi=300)
-
-    fig.show()
