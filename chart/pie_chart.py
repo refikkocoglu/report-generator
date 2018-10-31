@@ -128,6 +128,7 @@ def create_pie_chart(config):
 
     groups_total_size = ds.get_groups_total_size()
 
+    #TODO: Get groups, filter relevant groups and get the top groups of it!
     top_group_sizes = ds.get_top_group_sizes()
 
     others_size = ds.calc_others_size(top_group_sizes, groups_total_size)
