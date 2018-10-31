@@ -99,7 +99,7 @@ def create_multiple_x_bar(config):
     group_info_list = ds.get_group_info_list()
     #group_info_list = ds.get_top_group_info_list()
 
-    getent_handler.filter_system_groups(group_info_list)
+    group_info_list = getent_handler.filter_system_groups(group_info_list)
 
     draw(group_info_list)
 
