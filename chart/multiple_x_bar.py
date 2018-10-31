@@ -22,9 +22,14 @@ import os
 import logging
 import datetime
 import numpy as np
+
+# Force matplotlib to not use any X window backend.
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import dataset.dataset_handler as ds
+from filter import getent_handler
 from format import number_format
 
 
@@ -46,9 +51,9 @@ def draw(group_info_list):
 
     for group_info in group_info_list:
         logging.debug("%s - %s - %s" % (
-            group_info.gid, group_info.size, group_info.quota))
+            group_info.name, group_info.size, group_info.quota))
 
-        group_names.append(group_info.gid)
+        group_names.append(group_info.name)
 
         quota_list_values.append(
             int(group_info.quota / number_format.TIB_DIVISIOR))
@@ -80,7 +85,7 @@ def draw(group_info_list):
 
 def create_multiple_x_bar(config):
 
-    logging.debug('Creating stacked bar for quota and disk usage per group...')
+    logging.debug('Creating multi-x bar for quota and disk usage per group...')
 
     chart_report_dir = config.get('base_chart', 'report_dir')
     chart_filetype = config.get('base_chart', 'filetype')
@@ -91,8 +96,10 @@ def create_multiple_x_bar(config):
     snapshot_date = now.strftime('%Y-%m-%d')
     snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
 
-    # group_info_list = ds.get_group_info_list()
-    group_info_list = ds.get_top_group_info_list()
+    group_info_list = ds.get_group_info_list()
+    #group_info_list = ds.get_top_group_info_list()
+
+    getent_handler.filter_system_groups(group_info_list)
 
     draw(group_info_list)
 
@@ -109,8 +116,8 @@ def create_multiple_x_bar_dev(file_path, num_groups=None):
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
 
+    getent_handler.filter_system_groups(group_info_list)
+
     draw(group_info_list)
 
     plt.savefig(file_path, format='svg', dpi=300)
-
-    plt.show()

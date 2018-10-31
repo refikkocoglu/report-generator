@@ -27,6 +27,7 @@ import re
 
 from dataset import dataset_handler
 from chart import pie_chart
+from chart import bar_chart
 from chart import multiple_x_bar
 
 
@@ -71,8 +72,9 @@ def main():
 
         dataset_handler.CONFIG = config
 
-        pie_chart.create_pie_chart(config)
-        # stacked_bar.create_multiple_x_bar(config)
+        # pie_chart.create_pie_chart(config)
+        # bar_chart.create_bar_chart(config)
+        multiple_x_bar.create_multiple_x_bar(config)
 
         logging.info('END')
 

@@ -43,31 +43,31 @@ CONFIG = None
 
 class GroupNameItem:
 
-    def __init__(self, gid, size):
-        self.gid = gid
+    def __init__(self, name):
+        self.name = name
 
 
 class GroupSizeItem:
 
-    def __init__(self, gid, size):
+    def __init__(self, name, size):
 
-        self.gid = gid
+        self.name = name
         self.size = Decimal(size)
 
 
 class GroupQuotaItem:
 
-    def __init__(self, gid, size):
+    def __init__(self, name, size):
 
-        self.gid = gid
+        self.name = name
         self.size = Decimal(size)
 
 
 class GroupInfoItem:
 
-    def __init__(self, gid, size, quota):
+    def __init__(self, name, size, quota):
 
-        self.gid = gid
+        self.name = name
         self.size = Decimal(size)
         self.quota = Decimal(quota)
 
@@ -158,21 +158,21 @@ def get_group_info_list():
 
         quota = None
 
-        if item.gid in GROUP_QUOTA_DICT:
-            quota = GROUP_QUOTA_DICT[item.gid]
+        if item.name in GROUP_QUOTA_DICT:
+            quota = GROUP_QUOTA_DICT[item.name]
 
         else:
 
-            logging.debug("Retrieving Quota for GID: %s" % item.gid)
+            logging.debug("Retrieving Quota for Group: %s" % item.name)
 
-            quota = retrieve_group_quota(item.gid, filesystem)
+            quota = retrieve_group_quota(item.name, filesystem)
 
-            GROUP_QUOTA_DICT[item.gid] = quota
+            GROUP_QUOTA_DICT[item.name] = quota
 
         if quota is None:
-            raise RuntimeError('No quota retrieved for gid: %s' % item.gid)
+            raise RuntimeError('No quota retrieved for Group: %s' % item.name)
 
-        group_info_list.append(GroupInfoItem(item.gid, item.size, quota))
+        group_info_list.append(GroupInfoItem(item.name, item.size, quota))
 
     if not group_info_list:
         raise RuntimeError('Empty group_info_list!')

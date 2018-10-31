@@ -40,31 +40,30 @@ def filter_system_groups(group_list):
 
         group_id = None
 
-        if group_item.gid in GID_CACHE_DICT:
-            group_id = GID_CACHE_DICT[group_item.gid]
+        if group_item.name in GID_CACHE_DICT:
+            group_id = GID_CACHE_DICT[group_item.name]
         else:
 
-            group_info = getent.group(group_item.gid)
+            group_info = getent.group(group_item.name)
 
-            if group_info:
+            if group_info is not None:
 
-                GID_CACHE_DICT[group_item.gid] = group_info.gid
+                GID_CACHE_DICT[group_item.name] = group_info.gid
 
                 group_id = group_info.gid
 
             else:
-
                 group_id = None
 
-        if group_id and group_id > 999:
+        if group_id is not None and group_id > 999:
 
             non_system_group_list.append(group_item)
 
-            logging.debug("Found GID: %s for Group: %s" %
-                          (group_id, group_item.gid))
+            logging.debug("Found non-system GID: %s for Group: %s" %
+                          (group_id, group_item.name))
 
         else:
-            logging.debug("Ignoring System Group: %s" % group_item.gid)
+            logging.debug("Ignoring System Group: %s" % group_item.name)
 
     return non_system_group_list
 
