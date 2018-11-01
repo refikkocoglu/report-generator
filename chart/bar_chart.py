@@ -93,10 +93,12 @@ def create_bar_chart(config):
     snapshot_date = now.strftime('%Y-%m-%d')
     snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
 
-    group_info_list = ds.get_group_info_list()
-    #group_info_list = ds.get_top_group_info_list()
+    group_names = ds.get_group_names()
 
-    group_info_list = gf.filter_system_groups(group_info_list)
+    non_system_group_names = gf.filter_system_groups(group_names)
+
+    group_info_list = ds.get_group_info_list(non_system_group_names)
+
     group_info_list = gf.filter_group_info_items(group_info_list)
 
     draw(group_info_list)

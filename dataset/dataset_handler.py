@@ -33,18 +33,7 @@ from lfs.retrieve_quota import retrieve_group_quota
 
 # TODO: Make Singleton Class?!
 
-# Data structures are initialized on demand if necessary.
-GROUP_NAMES_LIST = list()
-GROUP_SIZES_LIST = list()
-GROUP_QUOTA_DICT = dict()
-
 CONFIG = None
-
-
-class GroupNameItem:
-
-    def __init__(self, name):
-        self.name = name
 
 
 class GroupSizeItem:
@@ -53,14 +42,6 @@ class GroupSizeItem:
 
         self.name = name
         self.size = Decimal(size)
-
-
-class GroupQuotaItem:
-
-    def __init__(self, name, quota):
-
-        self.name = name
-        self.quota = Decimal(quota)
 
 
 class GroupInfoItem:
@@ -74,100 +55,106 @@ class GroupInfoItem:
 
 def get_group_names():
 
-    global GROUP_NAMES_LIST
+    group_names = list()
 
-    if not GROUP_NAMES_LIST:
+    rbh_acct_table = CONFIG.get('robinhood', 'acct_stat_table')
 
-        rbh_acct_table = CONFIG.get('robinhood', 'acct_stat_table')
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('robinhood', 'database'))) \
+            as conn:
 
-        with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
-                                     user=CONFIG.get('mysqld', 'user'),
-                                     passwd=CONFIG.get('mysqld', 'password'),
-                                     db=CONFIG.get('robinhood', 'database'))) \
-                as conn:
+        with closing(conn.cursor()) as cur:
 
-            with closing(conn.cursor()) as cur:
+            sql = "SELECT DISTINCT gid FROM %s ORDER BY gid" % rbh_acct_table
 
-                sql = "SELECT DISTINCT gid FROM %s ORDER BY gid" \
-                      % rbh_acct_table
+            cur.execute(sql)
 
-                cur.execute(sql)
+            if not cur.rowcount:
+                raise RuntimeError("No rows returned from query: %s" % sql)
 
-                if not cur.rowcount:
-                    raise RuntimeError("No rows returned from query: %s" % sql)
+            for group_name in cur.fetchall():
 
-                logging.debug("Initializing GROUP_NAMES_LIST ...")
+                logging.debug("Retrieved Group Name: %s" % group_name[0])
 
-                for gid in cur.fetchall():
+                group_names.append(str(group_name[0]))
 
-                    logging.debug("Found GID: %s" % gid[0])
-
-                    GROUP_NAMES_LIST.append(str(gid[0]))
-
-    return GROUP_NAMES_LIST
+    return group_names
 
 
-def get_group_sizes_list():
+def get_group_sizes(group_names):
 
-    if not GROUP_SIZES_LIST:
+    group_sizes = list()
 
-        with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
-                                     user=CONFIG.get('mysqld', 'user'),
-                                     passwd=CONFIG.get('mysqld', 'password'),
-                                     db=CONFIG.get('robinhood', 'database'))) \
-                    as conn:
+    acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
 
-            with closing(conn.cursor()) as cur:
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('robinhood', 'database'))) \
+            as conn:
 
-                sql = "SELECT gid, SUM(size) as group_size FROM %s " \
-                      "GROUP BY gid ORDER BY group_size DESC" % \
-                      (CONFIG.get('robinhood', 'acct_stat_table'))
+        with closing(conn.cursor()) as cur:
 
-                logging.debug(sql)
-                cur.execute(sql)
+            group_names_string = str(group_names).strip('[]')
 
-                for item in cur.fetchall():
-                    GROUP_SIZES_LIST.append(GroupSizeItem(item[0], item[1]))
+            sql = "SELECT gid, SUM(size) FROM %s WHERE gid IN (%s) " \
+                  "GROUP BY gid" % (acct_stat_table, group_names_string)
 
-                if not GROUP_SIZES_LIST:
-                    raise RuntimeError("Empty GROUP_SIZES_LIST!")
+            logging.debug(sql)
+            cur.execute(sql)
 
-    return GROUP_SIZES_LIST
+            for item in cur.fetchall():
+                group_sizes.append(GroupSizeItem(item[0], item[1]))
+
+            if not group_sizes:
+                raise RuntimeError("Empty Group Sizes List!")
+
+    return group_sizes
 
 
 def get_groups_total_size():
 
-    groups_total_size = 0
+    total_size = None
 
-    for group_size_item in get_group_sizes_list():
-        groups_total_size += group_size_item.size
+    acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
 
-    if not groups_total_size:
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('robinhood', 'database'))) \
+            as conn:
+
+        with closing(conn.cursor()) as cur:
+
+            sql = "SELECT SUM(size) FROM %s" % acct_stat_table
+
+            logging.debug(sql)
+            cur.execute(sql)
+
+            total_size = cur.fetchone()[0]
+
+    if total_size is None:
+        raise RuntimeError("Total Size was not retrieved from Database!")
+
+    if total_size == 0:
         raise RuntimeError("Total Size is 0!")
 
-    return groups_total_size
+    return total_size
 
 
-def get_group_info_list():
+def get_group_info_list(group_names):
 
     group_info_list = list()
 
     filesystem = CONFIG.get('lustre', 'filesystem')
 
-    for item in get_group_sizes_list():
+    for item in get_group_sizes(group_names):
 
-        quota = None
+        logging.debug("Retrieving Quota for Group: %s" % item.name)
 
-        if item.name in GROUP_QUOTA_DICT:
-            quota = GROUP_QUOTA_DICT[item.name]
-
-        else:
-
-            logging.debug("Retrieving Quota for Group: %s" % item.name)
-
-            quota = retrieve_group_quota(item.name, filesystem)
-
-            GROUP_QUOTA_DICT[item.name] = quota
+        quota = retrieve_group_quota(item.name, filesystem)
 
         if quota is None:
             raise RuntimeError('No quota retrieved for Group: %s' % item.name)
@@ -182,28 +169,33 @@ def get_group_info_list():
 
 def get_top_group_sizes():
 
+    acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
     num_top_groups = int(CONFIG.get('base_chart', 'num_top_groups'))
 
-    top_group_sizes_list = get_group_sizes_list()[:num_top_groups]
+    top_group_sizes = list()
 
-    if not top_group_sizes_list:
-        raise RuntimeError('No top groups could be retrieved!')
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('robinhood', 'database'))) \
+            as conn:
 
-    return top_group_sizes_list
+        with closing(conn.cursor()) as cur:
 
+            sql = "SELECT gid, SUM(size) as group_size FROM %s " \
+                  "GROUP BY gid ORDER BY group_size DESC LIMIT %s" % \
+                  (acct_stat_table, num_top_groups)
 
-def get_top_group_info_list():
+            logging.debug(sql)
+            cur.execute(sql)
 
-    num_top_groups = int(CONFIG.get('base_chart', 'num_top_groups'))
+            for item in cur.fetchall():
+                top_group_sizes.append(GroupSizeItem(item[0], item[1]))
 
-    # TODO: Convinient but slow to call lfs on each group!
-    # Better pass a group for retrieving lfs quota..
-    top_group_info_list = get_group_info_list()[:num_top_groups]
+            if not top_group_sizes:
+                raise RuntimeError("Empty Group Sizes List!")
 
-    if not top_group_info_list:
-        raise RuntimeError('No top groups could be retrieved!')
-
-    return top_group_info_list
+    return top_group_sizes
 
 
 def calc_others_size(group_size_list, total_size):

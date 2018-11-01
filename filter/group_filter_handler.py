@@ -21,13 +21,14 @@ import logging
 import getent
 
 
+# TODO: Check neccessary...
 GID_CACHE_DICT = dict()
 
 
-def filter_system_groups(group_list):
+def filter_system_groups(group_names):
     """
     Filters system groups from given list.
-    :param group_list: Group list which should at least contain field gid.
+    :param group_names: A list of strings containing the group names.
     :return: A new list without system groups.
     """
 
@@ -35,19 +36,19 @@ def filter_system_groups(group_list):
 
     non_system_group_list = list()
 
-    for group_item in group_list:
+    for group_name in group_names:
 
         group_id = None
 
-        if group_item.name in GID_CACHE_DICT:
-            group_id = GID_CACHE_DICT[group_item.name]
+        if group_name in GID_CACHE_DICT:
+            group_id = GID_CACHE_DICT[group_name]
         else:
 
-            group_info = getent.group(group_item.name)
+            group_info = getent.group(group_name)
 
             if group_info is not None:
 
-                GID_CACHE_DICT[group_item.name] = group_info.gid
+                GID_CACHE_DICT[group_name] = group_info.gid
 
                 group_id = group_info.gid
 
@@ -56,13 +57,13 @@ def filter_system_groups(group_list):
 
         if group_id is not None and group_id > 999:
 
-            non_system_group_list.append(group_item)
+            non_system_group_list.append(group_name)
 
             logging.debug("Found non-system GID: %s for Group: %s" %
-                          (group_id, group_item.name))
+                          (group_id, group_name))
 
         else:
-            logging.debug("Ignoring System Group: %s" % group_item.name)
+            logging.debug("Ignoring System Group: %s" % group_name)
 
     return non_system_group_list
 
