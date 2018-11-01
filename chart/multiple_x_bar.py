@@ -84,8 +84,8 @@ def create_multiple_x_bar(config, group_info_list):
 
     logging.debug('Creating multi-x bar for quota and disk usage per group...')
 
-    chart_report_dir = config.get('base_chart', 'report_dir')
-    chart_filetype = config.get('base_chart', 'filetype')
+    chart_report_dir = config.get('base_chart', 'reports_dir')
+    chart_filetype = config.get('base_chart', 'file_type')
 
     chart_filename = config.get('stacked_bar_quota_disk_used', 'filename')
 

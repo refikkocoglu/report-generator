@@ -82,8 +82,8 @@ def create_bar_chart(config, group_info_list):
     # TODO: Remove redundancies with a Superclass!
     logging.debug('Creating bar chart for quota used percentage per group...')
 
-    chart_report_dir = config.get('base_chart', 'report_dir')
-    chart_filetype = config.get('base_chart', 'filetype')
+    chart_report_dir = config.get('base_chart', 'reports_dir')
+    chart_filetype = config.get('base_chart', 'file_type')
 
     chart_filename = config.get('bar_chart_quota_used', 'filename')
 

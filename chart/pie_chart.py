@@ -31,22 +31,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-# TODO: Remove this. do not remove files from file system. just overwrite.
-def cleanup_files(dir_path, pattern):
-    if not os.path.isdir(dir_path):
-        raise RuntimeError("Directory does not exist under: %s" % dir_path)
-
-    file_list = os.listdir(dir_path)
-
-    for filename in file_list:
-
-        if pattern in filename:
-
-            file_path = os.path.join(dir_path, filename)
-
-            os.remove(file_path)
-
-
 def draw(top_group_sizes, others_size, snapshot_timestamp, title,
          groups_total_size, ost_total_size):
 
@@ -101,8 +85,8 @@ def create_pie_chart(config):
 
     filesystem = config.get('lustre', 'filesystem')
 
-    chart_report_dir = config.get('base_chart', 'report_dir')
-    chart_filetype = config.get('base_chart', 'filetype')
+    chart_report_dir = config.get('base_chart', 'reports_dir')
+    chart_filetype = config.get('base_chart', 'file_type')
     num_top_groups = config.get('base_chart', 'num_top_groups')
 
     chart_pie_filename = config.get('pie_chart_disk_used', 'filename')
@@ -117,8 +101,6 @@ def create_pie_chart(config):
     snapshot_date = now.strftime('%Y-%m-%d')
     snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
 
-    cleanup_files(chart_report_dir, chart_pie_filename)
-
     title = "Storage Report of " + filesystem
 
     # TODO: Must be an attribute of the future class of base chart.
@@ -132,12 +114,12 @@ def create_pie_chart(config):
 
     others_size = ds.calc_others_size(top_group_sizes, groups_total_size)
 
-    filetype = os.path.split(chart_path)[1].split('.')[1]
+    file_type = os.path.split(chart_path)[1].split('.')[1]
 
     fig = draw(top_group_sizes, others_size, snapshot_timestamp, title,
                groups_total_size, ost_total_size)
 
-    fig.savefig(chart_path, format=filetype, dpi=300)
+    fig.savefig(chart_path, format=file_type, dpi=300)
 
 
 # TODO: Move to develop file.
@@ -171,6 +153,6 @@ def create_pie_chart_dev(file_path):
     snapshot_timestamp = '2018-10-10 00:00:00'
 
     fig = draw(top_group_info_list, others_size, snapshot_timestamp, title,
-         groups_total_size, ost_total_size)
+               groups_total_size, ost_total_size)
 
     fig.savefig(file_path, format='svg', dpi=300)

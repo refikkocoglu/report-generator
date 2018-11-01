@@ -47,6 +47,27 @@ def validate_date(date):
          raise RuntimeError("No valid date format for date: %s" % date)
 
 
+def purge_old_report_files(config):
+
+    reports_dir = config.get('base_chart', 'reports_dir')
+    pattern = "." + config.get('base_chart', 'file_type')
+
+    if not os.path.isdir(reports_dir):
+        raise RuntimeError("Directory does not exist under: %s" % reports_dir)
+
+    file_list = os.listdir(reports_dir)
+
+    for filename in file_list:
+
+        if pattern in filename:
+
+            file_path = os.path.join(reports_dir, filename)
+
+            logging.debug("Removed old report file: %s" % file_path)
+
+            os.remove(file_path)
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='Creates Lustre reports.')
@@ -73,15 +94,19 @@ def main():
         config.read(args.config_file)
 
         ds.CONFIG = config
+
+        purge_old_report_files(config)
         
         group_info_list = \
             gf.filter_group_info_items(
                 ds.get_group_info_list(
                     gf.filter_system_groups(ds.get_group_names())))
 
-        pie_chart.create_pie_chart(config)
         multiple_x_bar.create_multiple_x_bar(config, group_info_list)
+
         bar_chart.create_bar_chart(config, group_info_list)
+
+        pie_chart.create_pie_chart(config)
 
         logging.info('END')
 
