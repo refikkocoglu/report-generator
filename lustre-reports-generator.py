@@ -25,7 +25,9 @@ import sys
 import os
 import re
 
-from dataset import dataset_handler
+import dataset.dataset_handler as ds
+import filter.group_filter_handler as gf
+
 from chart import pie_chart
 from chart import bar_chart
 from chart import multiple_x_bar
@@ -70,11 +72,16 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        dataset_handler.CONFIG = config
+        ds.CONFIG = config
+        
+        group_info_list = \
+            gf.filter_group_info_items(
+                ds.get_group_info_list(
+                    gf.filter_system_groups(ds.get_group_names())))
 
         pie_chart.create_pie_chart(config)
-        bar_chart.create_bar_chart(config)
-        multiple_x_bar.create_multiple_x_bar(config)
+        multiple_x_bar.create_multiple_x_bar(config, group_info_list)
+        bar_chart.create_bar_chart(config, group_info_list)
 
         logging.info('END')
 

@@ -140,6 +140,7 @@ def create_pie_chart(config):
     fig.savefig(chart_path, format=filetype, dpi=300)
 
 
+# TODO: Move to develop file.
 def create_pie_chart_dev(file_path):
 
     title = 'Disk Usage Report'
@@ -150,15 +151,15 @@ def create_pie_chart_dev(file_path):
 
     groups_total_size = 0
 
-    # TODO: Refactor, get group total size...
     for group_size_item in groups_info_list:
         groups_total_size += group_size_item.size
+
+    # TODO: Sort by size in list first and slice the num_top_groups.
 
     top_group_info_list = groups_info_list[:num_top_groups]
 
     top_group_total_size = 0
 
-    # TODO: Refactor, get group total size...
     for group_size_item in top_group_info_list:
         top_group_total_size += group_size_item.size
 

@@ -307,19 +307,3 @@ def create_dummy_group_info_list(number=None):
         return group_info_list[:number]
     else:
         return group_info_list
-
-
-def sort_group_info_list_by_quota(group_info_list):
-    """
-    Inplace sort of the given group_info_list in descending order by quota.
-    """
-
-    group_info_list.sort(key=lambda group_info: group_info.quota, reverse=True)
-
-
-def sort_group_info_list_by_name(group_info_list):
-    """
-    Inplace sort of the given group_info_list in ascending order by name.
-    """
-
-    group_info_list.sort(key=lambda group_info: group_info.name)

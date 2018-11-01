@@ -19,11 +19,9 @@
 
 
 import numpy as np
-import dataset.dataset_handler as ds
 import logging
 import datetime
 import os
-import filter.group_filter_handler as gf
 
 # Force matplotlib to not use any X window backend.
 import matplotlib
@@ -79,7 +77,7 @@ def draw(group_info_list):
     plt.legend()
 
 
-def create_bar_chart(config):
+def create_bar_chart(config, group_info_list):
 
     # TODO: Remove redundancies with a Superclass!
     logging.debug('Creating bar chart for quota used percentage per group...')
@@ -93,15 +91,10 @@ def create_bar_chart(config):
     snapshot_date = now.strftime('%Y-%m-%d')
     snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
 
-    group_names = ds.get_group_names()
+    sorted_group_info_list = \
+        sorted(group_info_list, key=lambda group_info: group_info.name)
 
-    non_system_group_names = gf.filter_system_groups(group_names)
-
-    group_info_list = ds.get_group_info_list(non_system_group_names)
-
-    group_info_list = gf.filter_group_info_items(group_info_list)
-
-    draw(group_info_list)
+    draw(sorted_group_info_list)
 
     chart_path = os.path.abspath(chart_report_dir + os.path.sep +
                                  chart_filename + "_" + snapshot_date + "." +
@@ -112,12 +105,16 @@ def create_bar_chart(config):
     logging.debug("Saved bar chart under: %s" % chart_path)
 
 
+# TODO: Move to develop file.
 def create_bar_chart_dev(file_path, num_groups=None):
+
+    import dataset.dataset_handler as ds
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
 
-    ds.sort_group_info_list_by_name(group_info_list)
+    sorted_group_info_list = \
+        sorted(group_info_list, key=lambda group_info: group_info.name)
 
-    draw(group_info_list)
+    draw(sorted_group_info_list)
 
     plt.savefig(file_path, format='svg', dpi=300)

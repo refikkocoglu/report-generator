@@ -28,8 +28,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-import dataset.dataset_handler as ds
-import filter.group_filter_handler as gf
 from format import number_format
 
 
@@ -82,7 +80,7 @@ def draw(group_info_list):
     plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
 
 
-def create_multiple_x_bar(config):
+def create_multiple_x_bar(config, group_info_list):
 
     logging.debug('Creating multi-x bar for quota and disk usage per group...')
 
@@ -95,17 +93,11 @@ def create_multiple_x_bar(config):
     snapshot_date = now.strftime('%Y-%m-%d')
     snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
 
-    group_names = ds.get_group_names()
+    sorted_group_info_list = sorted(group_info_list,
+                                    key=lambda group_info: group_info.quota,
+                                    reverse=True)
 
-    non_system_group_names = gf.filter_system_groups(group_names)
-
-    group_info_list = ds.get_group_info_list(non_system_group_names)
-
-    group_info_list = gf.filter_group_info_items(group_info_list)
-
-    ds.sort_group_info_list_by_quota(group_info_list)
-
-    draw(group_info_list)
+    draw(sorted_group_info_list)
 
     chart_path = os.path.abspath(chart_report_dir + os.path.sep +
                                  chart_filename + "_" + snapshot_date + "." +
@@ -116,12 +108,17 @@ def create_multiple_x_bar(config):
     logging.debug("Saved stacked bar chart under: %s" % chart_path)
 
 
+# TODO: Move to develop file.
 def create_multiple_x_bar_dev(file_path, num_groups=None):
+
+    import dataset.dataset_handler as ds
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
 
-    ds.sort_group_info_list_by_quota(group_info_list)
+    sorted_group_info_list = sorted(group_info_list,
+                                    key=lambda group_info: group_info.quota,
+                                    reverse=True)
 
-    draw(group_info_list)
+    draw(sorted_group_info_list)
 
     plt.savefig(file_path, format='svg', dpi=300)
