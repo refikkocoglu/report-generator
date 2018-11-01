@@ -19,6 +19,7 @@
 
 
 import ConfigParser
+import datetime
 import argparse
 import logging
 import sys
@@ -28,8 +29,9 @@ import re
 import dataset.dataset_handler as ds
 import filter.group_filter_handler as gf
 
+from chart.quota_usage_chart import QuotaUsageChart
+
 from chart import pie_chart
-from chart import bar_chart
 from chart import multiple_x_bar
 
 
@@ -68,6 +70,31 @@ def purge_old_report_files(config):
             os.remove(file_path)
 
 
+def create_quota_usage_chart(config, group_info_list):
+
+    # TODO: Remove redundancies with a Superclass!
+    logging.debug('Creating bar chart for quota used percentage per group...')
+
+    chart_report_dir = config.get('base_chart', 'reports_dir')
+    chart_filename = config.get('bar_chart_quota_used', 'filename')
+
+    now = datetime.datetime.now()
+    snapshot_date = now.strftime('%Y-%m-%d')
+    snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
+
+    chart = QuotaUsageChart()
+
+    chart.draw(group_info_list)
+
+    chart_path = os.path.abspath(chart_report_dir + os.path.sep +
+                                 chart_filename + "_" + snapshot_date + "." +
+                                 chart.file_type)
+
+    chart.save(chart_path)
+
+    logging.debug("Saved bar chart under: %s" % chart_path)
+
+
 def main():
 
     parser = argparse.ArgumentParser(description='Creates Lustre reports.')
@@ -102,11 +129,11 @@ def main():
                 ds.get_group_info_list(
                     gf.filter_system_groups(ds.get_group_names())))
 
-        multiple_x_bar.create_multiple_x_bar(config, group_info_list)
+        # multiple_x_bar.create_multiple_x_bar(config, group_info_list)
 
-        bar_chart.create_bar_chart(config, group_info_list)
+        create_quota_usage_chart(config, group_info_list)
 
-        pie_chart.create_pie_chart(config)
+        # pie_chart.create_pie_chart(config)
 
         logging.info('END')
 

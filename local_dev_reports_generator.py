@@ -20,9 +20,22 @@
 
 import logging
 
+from chart.base_chart import BaseChart
 from chart import multiple_x_bar
-from chart import bar_chart
+import dataset.dataset_handler as ds
+from chart.quota_usage_chart import QuotaUsageChart
 from chart import pie_chart
+
+
+def create_bar_chart_dev(file_path, num_groups=None):
+
+    group_info_list = ds.create_dummy_group_info_list(num_groups)
+
+    chart = QuotaUsageChart()
+
+    chart.draw(group_info_list)
+
+    chart.save(file_path)
 
 
 def main():
@@ -33,17 +46,17 @@ def main():
 
     logging.debug("START")
 
-    multiple_x_bar.create_multiple_x_bar_dev(
-        '/home/iannetti/tmp/quota_and_disk_usage_report.svg', 20
+    # multiple_x_bar.create_multiple_x_bar_dev(
+    #     '/home/iannetti/tmp/quota_and_disk_usage_report.svg', 20
+    # )
+    #
+    create_bar_chart_dev(
+        '/home/iannetti/tmp/quota_pct_usage_report.svg', 10
     )
 
-    bar_chart.create_bar_chart_dev(
-        '/home/iannetti/tmp/quota_pct_usage_report.svg', 20
-    )
-
-    pie_chart.create_pie_chart_dev(
-        '/home/iannetti/tmp/disk_space_usage_report.svg'
-    )
+    # pie_chart.create_pie_chart_dev(
+    #     '/home/iannetti/tmp/disk_space_usage_report.svg'
+    # )
 
     logging.debug("END")
 

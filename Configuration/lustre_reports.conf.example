@@ -13,7 +13,6 @@ acct_stat_table = ACCT_STAT
 [base_chart]
 reports_dir = /home/data/reports
 num_top_groups = 8
-file_type = svg
 
 [pie_chart_disk_used]
 filename = disk_usage_lustre_fs
