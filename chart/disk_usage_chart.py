@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from base_chart import BaseChart
+
 import os
 import datetime
 import format.number_format as nf
@@ -25,60 +27,76 @@ import dataset.dataset_handler as ds
 from decimal import Decimal
 from lfs import disk_usage_info
 
+# TODO: Check imports into base class...
 # Force matplotlib to not use any X window backend.
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-def draw(top_group_sizes, others_size, snapshot_timestamp, title,
-         groups_total_size, ost_total_size):
+class DiskUsageChart(BaseChart):
 
-    labels = []
-    sizes = []
+    def __init__(self, title='', sub_title='', file_path='', dataset=None):
 
-    for item in top_group_sizes:
-        label_text = item.name + " (" + nf.number_to_base_2(item.size) + ")"
+        x_label = 'Group'
+        y_label = 'Quota Usage (%)'
 
-        labels.append(label_text)
-        sizes.append(item.size)
+        super(DiskUsageChart, self).__init__(title, x_label, y_label,
+                                             file_path, dataset)
 
-    labels.append("others (" + nf.number_to_base_2(others_size) + ")")
+        self.sub_title = "Procedural Usage per Group"
 
-    sizes.append(others_size)
+        self.top_group_sizes = 0
+        self.others_size = 0
+        self.groups_total_size = 0
+        self.ost_total_size = 0
+        self.snapshot_timestamp = ""
 
-    creation_timestamp_text = "Timestamp: " + snapshot_timestamp
+    def _draw(self):
 
-    fig, ax = plt.subplots()
+        labels = []
+        sizes = []
 
-    fig.suptitle(title, fontsize=18, fontweight='bold')
-    fig.subplots_adjust(top=0.80)
+        for item in self.dataset:
+            label_text = item.name + " (" + nf.number_to_base_2(item.size) + ")"
 
-    patches, texts, auto_texts = \
-        ax.pie(sizes, labels=labels, autopct='%1.2f%%', pctdistance=0.8,
-               shadow=False, startangle=90)
+            labels.append(label_text)
+            sizes.append(item.size)
 
-    # Equal aspect ratio ensures that pie is drawn as a circle.
-    ax.axis('equal')
+        labels.append("others (" + nf.number_to_base_2(self.others_size) + ")")
 
-    for auto_text_item in auto_texts:
-        auto_text_item.set_fontsize(10)
+        sizes.append(self.others_size)
 
-    pct_used_total_size = int((groups_total_size / ost_total_size) * Decimal(100))
+        creation_timestamp_text = "Timestamp: " + self.snapshot_timestamp
 
-    size_info = "Used " + nf.number_to_base_2(groups_total_size) + \
-                " of " + nf.number_to_base_2(ost_total_size) + \
-                " Volume (" + str(pct_used_total_size) + "%)"
+        self._fig, ax = plt.subplots()
 
-    ax.set_title(size_info, y=1.125, fontsize=14)
+        self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
+        self._fig.subplots_adjust(top=0.80)
 
-    ax.text(0, 0, creation_timestamp_text, fontsize=8,
-            verticalalignment='bottom', horizontalalignment='left',
-            transform=fig.transFigure)
+        patches, texts, auto_texts = \
+            ax.pie(sizes, labels=labels, autopct='%1.2f%%', pctdistance=0.8,
+                   shadow=False, startangle=90)
 
-    fig.set_size_inches(10, 8)
+        # Equal aspect ratio ensures that pie is drawn as a circle.
+        ax.axis('equal')
 
-    return fig
+        for auto_text_item in auto_texts:
+            auto_text_item.set_fontsize(10)
+
+        pct_used_total_size = int((self.groups_total_size / self.ost_total_size) * Decimal(100))
+
+        size_info = "Used " + nf.number_to_base_2(self.groups_total_size) + \
+                    " of " + nf.number_to_base_2(self.ost_total_size) + \
+                    " Volume (" + str(pct_used_total_size) + "%)"
+
+        ax.set_title(size_info, y=1.125, fontsize=14)
+
+        ax.text(0, 0, creation_timestamp_text, fontsize=8,
+                verticalalignment='bottom', horizontalalignment='left',
+                transform=self._fig.transFigure)
+
+        self._fig.set_size_inches(10, 8)
 
 
 def create_pie_chart(config):
@@ -120,39 +138,3 @@ def create_pie_chart(config):
                groups_total_size, ost_total_size)
 
     fig.savefig(chart_path, format=file_type, dpi=300)
-
-
-# TODO: Move to develop file.
-def create_pie_chart_dev(file_path):
-
-    title = 'Disk Usage Report'
-
-    num_top_groups = 8
-
-    groups_info_list = ds.create_dummy_group_info_list()
-
-    groups_total_size = 0
-
-    for group_size_item in groups_info_list:
-        groups_total_size += group_size_item.size
-
-    # TODO: Sort by size in list first and slice the num_top_groups.
-
-    top_group_info_list = groups_info_list[:num_top_groups]
-
-    top_group_total_size = 0
-
-    for group_size_item in top_group_info_list:
-        top_group_total_size += group_size_item.size
-
-    # TODO: Why passing list instead of size itself?
-    others_size = ds.calc_others_size(top_group_info_list, groups_total_size)
-
-    ost_total_size = 18458963071860736
-
-    snapshot_timestamp = '2018-10-10 00:00:00'
-
-    fig = draw(top_group_info_list, others_size, snapshot_timestamp, title,
-               groups_total_size, ost_total_size)
-
-    fig.savefig(file_path, format='svg', dpi=300)
