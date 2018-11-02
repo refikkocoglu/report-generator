@@ -30,9 +30,8 @@ import dataset.dataset_handler as ds
 import filter.group_filter_handler as gf
 
 from chart.quota_usage_chart import QuotaUsageChart
-
-from chart import pie_chart
-from chart import multiple_x_bar
+from chart.disk_quota_usage_chart import DiskQuotaUsageChart
+from chart import disk_usage_chart
 
 
 def raise_option_not_found( section, option ):
@@ -93,6 +92,36 @@ def create_quota_usage_chart(config, group_info_list):
     chart.save(chart_path)
 
     logging.debug("Saved bar chart under: %s" % chart_path)
+
+
+def create_disk_quota_usage_chart(config, group_info_list):
+
+    logging.debug('Creating multi-x bar for quota and disk usage per group...')
+
+    chart_report_dir = config.get('base_chart', 'reports_dir')
+    chart_filetype = config.get('base_chart', 'file_type')
+
+    chart_filename = config.get('stacked_bar_quota_disk_used', 'filename')
+
+    now = datetime.datetime.now()
+    snapshot_date = now.strftime('%Y-%m-%d')
+    snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
+
+    sorted_group_info_list = sorted(group_info_list,
+                                    key=lambda group_info: group_info.quota,
+                                    reverse=True)
+
+    chart = DiskQuotaUsageChart()
+
+    chart.draw(sorted_group_info_list)
+
+    chart_path = os.path.abspath(chart_report_dir + os.path.sep +
+                                 chart_filename + "_" + snapshot_date + "." +
+                                 chart.file_type)
+
+    chart.save(chart_path)
+
+    logging.debug("Saved stacked bar chart under: %s" % chart_path)
 
 
 def main():

@@ -19,23 +19,70 @@
 
 
 import logging
-
-from chart.base_chart import BaseChart
-from chart import multiple_x_bar
 import dataset.dataset_handler as ds
+
 from chart.quota_usage_chart import QuotaUsageChart
-from chart import pie_chart
+from chart.disk_quota_usage_chart import DiskQuotaUsageChart
+from chart.disk_usage_chart import DiskUsageChart
 
 
-def create_bar_chart_dev(file_path, num_groups=None):
+def create_disk_usage_chart(file_path, num_top_groups = 8):
+
+    title = 'Disk Usage Report'
+
+    groups_info_list = ds.create_dummy_group_info_list()
+
+    groups_total_size = 0
+
+    for group_size_item in groups_info_list:
+        groups_total_size += group_size_item.size
+
+    # TODO: Sort by size in list first and slice the num_top_groups.
+
+    top_group_info_list = groups_info_list[:num_top_groups]
+
+    top_group_total_size = 0
+
+    for group_size_item in top_group_info_list:
+        top_group_total_size += group_size_item.size
+
+    # TODO: Why passing list instead of size itself?
+    others_size = ds.calc_others_size(top_group_info_list, groups_total_size)
+
+    chart = DiskUsageChart(title=title,
+                           file_path=file_path,
+                           dataset=top_group_info_list)
+
+    chart.top_group_sizes = top_group_total_size
+    chart.others_size = others_size
+    chart.groups_total_size = groups_total_size
+    chart.ost_total_size = 18458963071860736
+    chart.snapshot_timestamp = '2018-10-10 00:00:00'
+
+    chart.create()
+
+
+def create_quota_usage_chart(file_path, num_groups=10):
 
     group_info_list = ds.create_dummy_group_info_list(num_groups)
 
-    chart = QuotaUsageChart()
+    chart = QuotaUsageChart(title="Group Quota Usage of Lustre Nyx",
+                            file_path=file_path,
+                            dataset=group_info_list)
 
-    chart.draw(group_info_list)
+    chart.create()
 
-    chart.save(file_path)
+
+def create_disk_quota_usage_chart(file_path, num_groups=10):
+
+    group_info_list = ds.create_dummy_group_info_list(num_groups)
+
+    chart = DiskQuotaUsageChart(
+        title="Group Disk and Quota Usage of Lustre Nyx",
+        file_path=file_path,
+        dataset=group_info_list)
+
+    chart.create()
 
 
 def main():
@@ -46,17 +93,17 @@ def main():
 
     logging.debug("START")
 
-    # multiple_x_bar.create_multiple_x_bar_dev(
-    #     '/home/iannetti/tmp/quota_and_disk_usage_report.svg', 20
-    # )
-    #
-    create_bar_chart_dev(
-        '/home/iannetti/tmp/quota_pct_usage_report.svg', 10
+    create_disk_usage_chart(
+        '/home/iannetti/tmp/disk_usage_report.svg'
     )
 
-    # pie_chart.create_pie_chart_dev(
-    #     '/home/iannetti/tmp/disk_space_usage_report.svg'
-    # )
+    create_quota_usage_chart(
+        '/home/iannetti/tmp/quota_usage_report.svg'
+    )
+
+    create_disk_quota_usage_chart(
+        '/home/iannetti/tmp/disk_quota_usage_report.svg'
+    )
 
     logging.debug("END")
 
