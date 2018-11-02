@@ -39,9 +39,11 @@ class QuotaUsageChart(BaseChart):
         x_label = 'Group'
         y_label = 'Quota Usage (%)'
 
-        super(QuotaUsageChart, self).__init__(title, sub_title,
+        super(QuotaUsageChart, self).__init__(title,
                                               x_label, y_label,
                                               file_path, dataset)
+
+        self.sub_title = 'Procedural Usage per Group'
 
     def _draw(self):
 
@@ -93,7 +95,7 @@ class QuotaUsageChart(BaseChart):
         x = np.linspace(0, num_groups)
         y = np.linspace(100, 100)
 
-        plt.plot(x=x, y=y,
+        plt.plot(x, y,
                  linewidth=0.8, linestyle='dashed',
                  label='Quota Limit', color='red')
 
