@@ -28,26 +28,37 @@ import matplotlib.pyplot as plt
 
 class BaseChart(object):
 
-    def __init__(self):
+    def __init__(self, title='', x_label='', y_label='',
+                 file_path='', dataset=None):
 
         __metaclass__ = abc.ABCMeta
 
         super(BaseChart, self).__init__()
 
-        self.title = ""
-        self.sub_title = ""
+        self.title = title
 
-        self.x_label = ""
-        self.y_label = ""
+        self.x_label = x_label
+        self.y_label = y_label
 
-        self.file_type = 'svg'
+        self.file_path = file_path
 
-    def draw(self, groups_list):
+        self.dataset = dataset
+
+        self._fig = None
+        self._file_type = 'svg'
+
+    def create(self):
+
+        self._draw()
+        self._save()
+        self._close()
+
+    def _draw(self):
         raise NotImplementedError("Implement draw method in a sub class!")
 
-    def save(self, file_path):
+    def _save(self):
+        plt.savefig(self.file_path, type=self._file_type)
 
-        # TODO: understand plt works, multiple calls???
-        # What happens without a savefig with plt object?
-        # Could plt being messed up with inconsistency?
-        plt.savefig(file_path, type=self.file_type)
+    def _close(self):
+        plt.close(self._fig)
+        self._fig = None
