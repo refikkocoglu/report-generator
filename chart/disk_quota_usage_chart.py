@@ -18,66 +18,79 @@
 #
 
 
+from base_chart import BaseChart
+
 import os
 import logging
 import datetime
 import numpy as np
+from format import number_format
 
 # Force matplotlib to not use any X window backend.
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from format import number_format
 
+class DiskQuotaUsageChart(BaseChart):
 
-def draw(group_info_list):
+    def __init__(self):
 
-    num_groups = len(group_info_list)
+        super(DiskQuotaUsageChart, self).__init__()
 
-    logging.debug("Number of Groups: %s" % num_groups)
+        self.title = "Group Disk and Quota Usage of Lustre Nyx"
+        self.sub_title = "Whatever"
 
-    group_names = list()
-    quota_list_values = list()
-    size_list_values = list()
+        self.x_label = 'Group'
+        self.y_label = 'Disk Space Used (TiB)'
 
-    tick_width_y = 200
+    def draw(self, group_info_list):
 
-    max_y = float(group_info_list[0].quota /
-                  number_format.TIB_DIVISIOR) + tick_width_y
+        num_groups = len(group_info_list)
 
-    for group_info in group_info_list:
-        logging.debug("%s - %s - %s" % (
-            group_info.name, group_info.size, group_info.quota))
+        logging.debug("Number of Groups: %s" % num_groups)
 
-        group_names.append(group_info.name)
+        group_names = list()
+        quota_list_values = list()
+        size_list_values = list()
 
-        quota_list_values.append(
-            int(group_info.quota / number_format.TIB_DIVISIOR))
+        tick_width_y = 200
 
-        size_list_values.append(
-            int(group_info.size / number_format.TIB_DIVISIOR))
+        max_y = float(group_info_list[0].quota /
+                      number_format.TIB_DIVISIOR) + tick_width_y
 
-    ind = np.arange(num_groups)  # the x locations for the groups
+        for group_info in group_info_list:
+            logging.debug("%s - %s - %s" % (
+                group_info.name, group_info.size, group_info.quota))
 
-    bar_width = 0.35  # the width of the bars: can also be len(x) sequence
+            group_names.append(group_info.name)
 
-    fig_width = num_groups
-    fig_height = 10.0
+            quota_list_values.append(
+                int(group_info.quota / number_format.TIB_DIVISIOR))
 
-    plt.figure(figsize=(fig_width, fig_height))
+            size_list_values.append(
+                int(group_info.size / number_format.TIB_DIVISIOR))
 
-    p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
-    p2 = plt.bar(ind + bar_width, quota_list_values, bar_width, color='orange')
+        ind = np.arange(num_groups)  # the x locations for the groups
 
-    plt.title('Quota and Disk Space Used')
-    plt.xlabel('Group')
-    plt.ylabel('Disk Space Used (TiB)')
+        bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 
-    plt.xticks(ind + bar_width / 2, group_names)
+        fig_width = num_groups
+        fig_height = 10.0
 
-    plt.yticks(np.arange(0, max_y, tick_width_y))
-    plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
+        plt.figure(figsize=(fig_width, fig_height))
+
+        p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
+        p2 = plt.bar(ind + bar_width, quota_list_values, bar_width, color='orange')
+
+        plt.title(self.title)
+        plt.xlabel(self.x_label)
+        plt.ylabel(self.y_label)
+
+        plt.xticks(ind + bar_width / 2, group_names)
+
+        plt.yticks(np.arange(0, max_y, tick_width_y))
+        plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
 
 
 def create_multiple_x_bar(config, group_info_list):
@@ -106,19 +119,3 @@ def create_multiple_x_bar(config, group_info_list):
     plt.savefig(chart_path, format=chart_filetype, dpi=300)
 
     logging.debug("Saved stacked bar chart under: %s" % chart_path)
-
-
-# TODO: Move to develop file.
-def create_multiple_x_bar_dev(file_path, num_groups=None):
-
-    import dataset.dataset_handler as ds
-
-    group_info_list = ds.create_dummy_group_info_list(num_groups)
-
-    sorted_group_info_list = sorted(group_info_list,
-                                    key=lambda group_info: group_info.quota,
-                                    reverse=True)
-
-    draw(sorted_group_info_list)
-
-    plt.savefig(file_path, format='svg', dpi=300)
