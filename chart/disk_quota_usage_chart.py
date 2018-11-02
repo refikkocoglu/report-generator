@@ -34,21 +34,25 @@ import matplotlib.pyplot as plt
 
 class DiskQuotaUsageChart(BaseChart):
 
-    def __init__(self):
+    def __init__(self, title='', file_path='', dataset=None):
 
-        super(DiskQuotaUsageChart, self).__init__()
+        x_label = 'Group'
+        y_label = 'Disk Space Used (TiB)'
 
-        self.title = "Group Disk and Quota Usage of Lustre Nyx"
-        self.sub_title = "Whatever"
+        super(DiskQuotaUsageChart, self).__init__(title,
+                                                  x_label, y_label,
+                                                  file_path, dataset)
 
-        self.x_label = 'Group'
-        self.y_label = 'Disk Space Used (TiB)'
+    def _draw(self):
 
-    def draw(self, group_info_list):
-
-        num_groups = len(group_info_list)
+        num_groups = len(self.dataset)
 
         logging.debug("Number of Groups: %s" % num_groups)
+
+        sorted_group_info_list = \
+            sorted(self.dataset,
+                   key=lambda group_info: group_info.quota,
+                   reverse=True)
 
         group_names = list()
         quota_list_values = list()
@@ -56,10 +60,10 @@ class DiskQuotaUsageChart(BaseChart):
 
         tick_width_y = 200
 
-        max_y = float(group_info_list[0].quota /
+        max_y = float(sorted_group_info_list[0].quota /
                       number_format.TIB_DIVISIOR) + tick_width_y
 
-        for group_info in group_info_list:
+        for group_info in sorted_group_info_list:
             logging.debug("%s - %s - %s" % (
                 group_info.name, group_info.size, group_info.quota))
 
@@ -78,7 +82,7 @@ class DiskQuotaUsageChart(BaseChart):
         fig_width = num_groups
         fig_height = 10.0
 
-        plt.figure(figsize=(fig_width, fig_height))
+        self._fig = plt.figure(figsize=(fig_width, fig_height))
 
         p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
         p2 = plt.bar(ind + bar_width, quota_list_values, bar_width, color='orange')
@@ -91,31 +95,3 @@ class DiskQuotaUsageChart(BaseChart):
 
         plt.yticks(np.arange(0, max_y, tick_width_y))
         plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
-
-
-def create_multiple_x_bar(config, group_info_list):
-
-    logging.debug('Creating multi-x bar for quota and disk usage per group...')
-
-    chart_report_dir = config.get('base_chart', 'reports_dir')
-    chart_filetype = config.get('base_chart', 'file_type')
-
-    chart_filename = config.get('stacked_bar_quota_disk_used', 'filename')
-
-    now = datetime.datetime.now()
-    snapshot_date = now.strftime('%Y-%m-%d')
-    snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
-
-    sorted_group_info_list = sorted(group_info_list,
-                                    key=lambda group_info: group_info.quota,
-                                    reverse=True)
-
-    draw(sorted_group_info_list)
-
-    chart_path = os.path.abspath(chart_report_dir + os.path.sep +
-                                 chart_filename + "_" + snapshot_date + "." +
-                                 chart_filetype)
-
-    plt.savefig(chart_path, format=chart_filetype, dpi=300)
-
-    logging.debug("Saved stacked bar chart under: %s" % chart_path)
