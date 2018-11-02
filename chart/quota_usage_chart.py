@@ -34,24 +34,23 @@ import matplotlib.pyplot as plt
 
 class QuotaUsageChart(BaseChart):
 
-    def __init__(self):
+    def __init__(self, title='', sub_title='', file_path='', dataset=None):
 
-        super(QuotaUsageChart, self).__init__()
+        x_label = 'Group'
+        y_label = 'Quota Usage (%)'
 
-        self.title = "Group Quota Usage of Lustre Nyx"
-        self.sub_title = "Procedural Usage per Group"
+        super(QuotaUsageChart, self).__init__(title, sub_title,
+                                              x_label, y_label,
+                                              file_path, dataset)
 
-        self.x_label = 'Group'
-        self.y_label = 'Quota Usage (%)'
+    def _draw(self):
 
-    def draw(self, group_info_list):
-
-        num_groups = len(group_info_list)
+        num_groups = len(self.dataset)
 
         logging.debug("Number of Groups: %s" % num_groups)
 
         sorted_group_info_list = \
-            sorted(group_info_list, key=lambda group_info: group_info.name)
+            sorted(self.dataset, key=lambda group_info: group_info.name)
 
         group_names = list()
         quota_used_pct_list = list()
@@ -76,10 +75,10 @@ class QuotaUsageChart(BaseChart):
         fig_width = num_groups
         fig_height = 10.0
 
-        fig = plt.figure(figsize=(fig_width, fig_height))
+        self._fig = plt.figure(figsize=(fig_width, fig_height))
 
-        fig.suptitle(self.title, fontsize=18, fontweight='bold')
-        fig.subplots_adjust(top=0.80)
+        self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
+        self._fig.subplots_adjust(top=0.80)
 
         plt.bar(ind, quota_used_pct_list, bar_width, color='blue')
 
@@ -94,7 +93,8 @@ class QuotaUsageChart(BaseChart):
         x = np.linspace(0, num_groups)
         y = np.linspace(100, 100)
 
-        plt.plot(x, y, linewidth=0.8, color='red', linestyle='dashed',
-                 label='Quota Limit')
+        plt.plot(x=x, y=y,
+                 linewidth=0.8, linestyle='dashed',
+                 label='Quota Limit', color='red')
 
         plt.legend()
