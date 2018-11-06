@@ -26,23 +26,19 @@ from chart.disk_quota_usage_chart import DiskQuotaUsageChart
 from chart.disk_usage_chart import DiskUsageChart
 
 
-def create_disk_usage_chart(file_path, num_top_groups=8):
+def create_disk_usage_chart(group_info_list, file_path):
 
     title = 'Disk Usage Report'
 
-    groups_info_list = ds.create_dummy_group_info_list()
-
     chart = DiskUsageChart(title=title,
                            file_path=file_path,
-                           dataset=groups_info_list,
+                           dataset=group_info_list,
                            storage_total_size=18458963071860736)
 
     chart.create()
 
 
-def create_quota_usage_chart(file_path, num_groups=10):
-
-    group_info_list = ds.create_dummy_group_info_list(num_groups)
+def create_quota_usage_chart(group_info_list, file_path):
 
     chart = QuotaUsageChart(title="Group Quota Usage of Lustre Nyx",
                             file_path=file_path,
@@ -51,10 +47,8 @@ def create_quota_usage_chart(file_path, num_groups=10):
     chart.create()
 
 
-def create_disk_quota_usage_chart(file_path, num_groups=10):
-
-    group_info_list = ds.create_dummy_group_info_list(num_groups)
-
+def create_disk_quota_usage_chart(group_info_list, file_path):
+    
     chart = DiskQuotaUsageChart(
         title="Group Disk and Quota Usage of Lustre Nyx",
         file_path=file_path,
@@ -71,15 +65,20 @@ def main():
 
     logging.debug("START")
 
+    group_info_list = ds.create_dummy_group_info_list()
+
     create_disk_usage_chart(
+        group_info_list,
         '/home/iannetti/tmp/disk_usage_report.svg'
     )
 
     create_quota_usage_chart(
+        group_info_list,
         '/home/iannetti/tmp/quota_usage_report.svg'
     )
 
     create_disk_quota_usage_chart(
+        group_info_list,
         '/home/iannetti/tmp/disk_quota_usage_report.svg'
     )
 
