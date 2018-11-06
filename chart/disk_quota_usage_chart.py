@@ -49,10 +49,8 @@ class DiskQuotaUsageChart(BaseChart):
 
         logging.debug("Number of Groups: %s" % num_groups)
 
-        sorted_group_info_list = \
-            sorted(self.dataset,
-                   key=lambda group_info: group_info.quota,
-                   reverse=True)
+        self._sort_dataset(
+            key=lambda group_info: group_info.quota, reverse=True)
 
         group_names = list()
         quota_list_values = list()
@@ -60,10 +58,10 @@ class DiskQuotaUsageChart(BaseChart):
 
         tick_width_y = 200
 
-        max_y = float(sorted_group_info_list[0].quota /
+        max_y = float(self.dataset[0].quota /
                       number_format.TIB_DIVISIOR) + tick_width_y
 
-        for group_info in sorted_group_info_list:
+        for group_info in self.dataset:
             logging.debug("%s - %s - %s" % (
                 group_info.name, group_info.size, group_info.quota))
 

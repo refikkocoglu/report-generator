@@ -51,13 +51,12 @@ class QuotaUsageChart(BaseChart):
 
         logging.debug("Number of Groups: %s" % num_groups)
 
-        sorted_dataset = \
-            self._sorted_dataset(lambda group_info: group_info.name)
+        self._sort_dataset(lambda group_info: group_info.name)
 
         group_names = list()
         quota_used_pct_list = list()
 
-        for group_info in sorted_dataset:
+        for group_info in self.dataset:
 
             group_names.append(group_info.name)
 

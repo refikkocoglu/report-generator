@@ -54,10 +54,9 @@ class DiskUsageChart(BaseChart):
         labels = []
         sizes = []
 
-        sorted_dataset = \
-            self._sorted_dataset(lambda group_info: group_info.size, True)
+        self._sort_dataset(lambda group_info: group_info.size, True)
 
-        top_groups_info_list = sorted_dataset[:self.num_top_groups]
+        top_groups_info_list = self.dataset[:self.num_top_groups]
 
         groups_total_size = \
             DiskUsageChart._calc_groups_total_size(self.dataset)

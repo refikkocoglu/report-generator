@@ -42,7 +42,7 @@ class BaseChart(object):
 
         self.file_path = file_path
 
-        self.dataset = dataset
+        self.dataset = list(dataset)
 
         self._fig = None
         self._file_type = 'svg'
@@ -53,8 +53,8 @@ class BaseChart(object):
         self._save()
         self._close()
 
-    def _sorted_dataset(self, key, reverse=False):
-        return sorted(self.dataset, key=key, reverse=reverse)
+    def _sort_dataset(self, key, reverse=False):
+        self.dataset.sort(key=key, reverse=reverse)
 
     def _draw(self):
         raise NotImplementedError("Implement draw method in a sub class!")
