@@ -26,38 +26,16 @@ from chart.disk_quota_usage_chart import DiskQuotaUsageChart
 from chart.disk_usage_chart import DiskUsageChart
 
 
-def create_disk_usage_chart(file_path, num_top_groups = 8):
+def create_disk_usage_chart(file_path, num_top_groups=8):
 
     title = 'Disk Usage Report'
 
     groups_info_list = ds.create_dummy_group_info_list()
 
-    groups_total_size = 0
-
-    for group_size_item in groups_info_list:
-        groups_total_size += group_size_item.size
-
-    # TODO: Sort by size in list first and slice the num_top_groups.
-
-    top_group_info_list = groups_info_list[:num_top_groups]
-
-    top_group_total_size = 0
-
-    for group_size_item in top_group_info_list:
-        top_group_total_size += group_size_item.size
-
-    # TODO: Why passing list instead of size itself?
-    others_size = ds.calc_others_size(top_group_info_list, groups_total_size)
-
     chart = DiskUsageChart(title=title,
                            file_path=file_path,
-                           dataset=top_group_info_list)
-
-    chart.top_group_sizes = top_group_total_size
-    chart.others_size = others_size
-    chart.groups_total_size = groups_total_size
-    chart.ost_total_size = 18458963071860736
-    chart.snapshot_timestamp = '2018-10-10 00:00:00'
+                           dataset=groups_info_list,
+                           storage_total_size=18458963071860736)
 
     chart.create()
 
