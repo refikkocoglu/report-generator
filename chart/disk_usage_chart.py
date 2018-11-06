@@ -36,7 +36,8 @@ import matplotlib.pyplot as plt
 
 class DiskUsageChart(BaseChart):
 
-    def __init__(self, title='', sub_title='', file_path='', dataset=None):
+    def __init__(self, title='', file_path='', dataset=None,
+                 storage_total_size=0, num_top_groups=8):
 
         x_label = 'Group'
         y_label = 'Quota Usage (%)'
@@ -44,30 +45,37 @@ class DiskUsageChart(BaseChart):
         super(DiskUsageChart, self).__init__(title, x_label, y_label,
                                              file_path, dataset)
 
-        self.sub_title = "Procedural Usage per Group"
+        self.num_top_groups = num_top_groups
 
-        self.top_group_sizes = 0
-        self.others_size = 0
-        self.groups_total_size = 0
-        self.ost_total_size = 0
-        self.snapshot_timestamp = ""
+        self.storage_total_size = storage_total_size
 
     def _draw(self):
 
         labels = []
         sizes = []
 
-        for item in self.dataset:
+        sorted_dataset = \
+            self._sorted_dataset(lambda group_info: group_info.size, True)
+
+        top_groups_info_list = sorted_dataset[:self.num_top_groups]
+
+        groups_total_size = \
+            DiskUsageChart._calc_groups_total_size(self.dataset)
+
+        top_groups_total_size = \
+            DiskUsageChart._calc_groups_total_size(top_groups_info_list)
+
+        others_size = groups_total_size - top_groups_total_size
+
+        for item in top_groups_info_list:
+
             label_text = item.name + " (" + nf.number_to_base_2(item.size) + ")"
 
             labels.append(label_text)
             sizes.append(item.size)
 
-        labels.append("others (" + nf.number_to_base_2(self.others_size) + ")")
-
-        sizes.append(self.others_size)
-
-        creation_timestamp_text = "Timestamp: " + self.snapshot_timestamp
+        labels.append("others (" + nf.number_to_base_2(others_size) + ")")
+        sizes.append(others_size)
 
         self._fig, ax = plt.subplots()
 
@@ -84,57 +92,31 @@ class DiskUsageChart(BaseChart):
         for auto_text_item in auto_texts:
             auto_text_item.set_fontsize(10)
 
-        pct_used_total_size = int((self.groups_total_size / self.ost_total_size) * Decimal(100))
+        total_size_pct_used = \
+            int((groups_total_size / self.storage_total_size) * Decimal(100))
 
-        size_info = "Used " + nf.number_to_base_2(self.groups_total_size) + \
-                    " of " + nf.number_to_base_2(self.ost_total_size) + \
-                    " Volume (" + str(pct_used_total_size) + "%)"
+        sub_title = "Used " + nf.number_to_base_2(groups_total_size) + \
+                    " of " + nf.number_to_base_2(self.storage_total_size) + \
+                    " Volume (" + str(total_size_pct_used) + "%)"
 
-        ax.set_title(size_info, y=1.125, fontsize=14)
+        ax.set_title(sub_title, y=1.125, fontsize=14)
 
-        ax.text(0, 0, creation_timestamp_text, fontsize=8,
-                verticalalignment='bottom', horizontalalignment='left',
-                transform=self._fig.transFigure)
+        self._add_creation_text(ax)
 
         self._fig.set_size_inches(10, 8)
 
+    def _add_creation_text(self, ax):
 
-def create_pie_chart(config):
+        ax.text(0, 0, datetime.datetime.now().strftime('%Y-%m-%d - %X'),
+                verticalalignment='bottom', horizontalalignment='left',
+                fontsize=8, transform=self._fig.transFigure)
 
-    filesystem = config.get('lustre', 'filesystem')
+    @staticmethod
+    def _calc_groups_total_size(group_info_list):
 
-    chart_report_dir = config.get('base_chart', 'reports_dir')
-    chart_filetype = config.get('base_chart', 'file_type')
-    num_top_groups = config.get('base_chart', 'num_top_groups')
+        groups_total_size = 0
 
-    chart_pie_filename = config.get('pie_chart_disk_used', 'filename')
+        for group_info_item in group_info_list:
+            groups_total_size += group_info_item.size
 
-    ost_total_size = disk_usage_info.lustre_total_ost_usage(filesystem)
-
-    if not os.path.isdir(chart_report_dir):
-        raise RuntimeError(
-            "Directory does not exist for saving charts: %s" % chart_report_dir)
-
-    now = datetime.datetime.now()
-    snapshot_date = now.strftime('%Y-%m-%d')
-    snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
-
-    title = "Storage Report of " + filesystem
-
-    # TODO: Must be an attribute of the future class of base chart.
-    chart_path = os.path.abspath(chart_report_dir + os.path.sep +
-                                 chart_pie_filename + "_" + snapshot_date +
-                                 "." + chart_filetype)
-
-    groups_total_size = ds.get_groups_total_size()
-
-    top_group_sizes = ds.get_top_group_sizes()
-
-    others_size = ds.calc_others_size(top_group_sizes, groups_total_size)
-
-    file_type = os.path.split(chart_path)[1].split('.')[1]
-
-    fig = draw(top_group_sizes, others_size, snapshot_timestamp, title,
-               groups_total_size, ost_total_size)
-
-    fig.savefig(chart_path, format=file_type, dpi=300)
+        return groups_total_size
