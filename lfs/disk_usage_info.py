@@ -11,7 +11,7 @@ import subprocess
 from decimal import Decimal
 
 
-def lustre_total_ost_usage(path):
+def lustre_total_size(path):
    
    try:
       output = subprocess.check_output( ["lfs", "df", path], stderr=subprocess.STDOUT )
