@@ -19,13 +19,9 @@
 
 from base_chart import BaseChart
 
-import os
-import datetime
-import format.number_format as nf
-import dataset.dataset_handler as ds
 
+import format.number_format as nf
 from decimal import Decimal
-from lfs import disk_usage_info
 
 # TODO: Check imports into base class...
 # Force matplotlib to not use any X window backend.

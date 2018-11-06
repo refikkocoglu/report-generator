@@ -22,8 +22,6 @@ from base_chart import BaseChart
 
 import numpy as np
 import logging
-import datetime
-import os
 
 # TODO: Check imports into base class...
 # Force matplotlib to not use any X window backend.

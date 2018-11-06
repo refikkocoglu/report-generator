@@ -20,9 +20,7 @@
 
 from base_chart import BaseChart
 
-import os
 import logging
-import datetime
 import numpy as np
 from format import number_format
 
