@@ -51,13 +51,13 @@ class QuotaUsageChart(BaseChart):
 
         logging.debug("Number of Groups: %s" % num_groups)
 
-        sorted_group_info_list = \
-            sorted(self.dataset, key=lambda group_info: group_info.name)
+        sorted_dataset = \
+            self._sorted_dataset(lambda group_info: group_info.name)
 
         group_names = list()
         quota_used_pct_list = list()
 
-        for group_info in sorted_group_info_list:
+        for group_info in sorted_dataset:
 
             group_names.append(group_info.name)
 
@@ -100,3 +100,7 @@ class QuotaUsageChart(BaseChart):
                  label='Quota Limit', color='red')
 
         plt.legend()
+
+    @staticmethod
+    def _sorted_group_info_list(group_info_list, sort_key):
+        return sorted(group_info_list, key=sort_key)
