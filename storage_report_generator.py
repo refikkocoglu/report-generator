@@ -28,6 +28,7 @@ import re
 
 import dataset.lustre_dataset_handler as ds
 import filter.group_filter_handler as gf
+from lfs.disk_usage_info import lustre_total_size
 
 from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart
@@ -143,10 +144,14 @@ def main():
 
         if args.enable_local:
 
+            logging.debug('Run Mode: LOCAL/DEV')
+
             group_info_list = ds.create_dummy_group_info_list()
             storage_total_size = 18458963071860736
 
         else:
+
+            logging.debug('Run Mode: PRODUCTIVE')
 
             ds.CONFIG = config
 
@@ -155,7 +160,8 @@ def main():
                     ds.get_group_info_list(
                         gf.filter_system_groups(ds.get_group_names())))
 
-            storage_total_size = 18458963071860736
+            storage_total_size = \
+                lustre_total_size(config.get('storage', 'filesystem'))
 
         prev_year_kw = create_prev_year_kw()
         chart_dir = config.get('base_chart', 'report_dir')
