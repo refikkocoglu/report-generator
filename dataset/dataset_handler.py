@@ -198,24 +198,6 @@ def get_top_group_sizes():
     return top_group_sizes
 
 
-def calc_others_size(group_size_list, total_size):
-
-    if not group_size_list:
-        raise RuntimeError('group_size_list is not set or empty!')
-
-    if not total_size:
-        raise RuntimeError('Total size is not set or 0!')
-
-    sum_group_size = 0
-
-    for group_size_item in group_size_list:
-        sum_group_size += group_size_item.size
-
-    logging.debug("Sum of aggregated groups: %s" % sum_group_size)
-
-    return total_size - sum_group_size
-
-
 def create_dummy_group_info_list(number=None):
 
     group_info_list = list()
