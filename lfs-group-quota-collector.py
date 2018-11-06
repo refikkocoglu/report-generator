@@ -28,7 +28,7 @@ import os
 
 from contextlib import closing
 from lfs.retrieve_quota import retrieve_group_quota
-from dataset.dataset_handler import get_group_names
+from dataset.lustre_dataset_handler import get_group_names
 
 
 def raise_option_not_found(section, option):

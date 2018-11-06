@@ -26,7 +26,7 @@ import sys
 import os
 import re
 
-import dataset.dataset_handler as ds
+import dataset.lustre_dataset_handler as ds
 import filter.group_filter_handler as gf
 
 from chart.quota_pct_bar_chart import QuotaPctBarChart
@@ -81,9 +81,10 @@ def create_chart_path(chart_dir, chart_filename,
     return chart_dir + os.path.sep + chart_filename
 
 
-def create_usage_pie_chart(group_info_list, file_path, storage_total_size):
+def create_usage_pie_chart(title, file_path,
+                           group_info_list, storage_total_size):
 
-    chart = UsagePieChart(title='Storage Report of fs',
+    chart = UsagePieChart(title=title,
                           file_path=file_path,
                           dataset=group_info_list,
                           storage_total_size=storage_total_size)
@@ -91,9 +92,9 @@ def create_usage_pie_chart(group_info_list, file_path, storage_total_size):
     chart.create()
 
 
-def create_quota_pct_bar_chart(group_info_list, file_path):
+def create_quota_pct_bar_chart(title, file_path, group_info_list):
 
-    chart = QuotaPctBarChart(title='Group Quota Usage of fs',
+    chart = QuotaPctBarChart(title=title,
                              sub_title='Procedural Usage per Group',
                              file_path=file_path,
                              dataset=group_info_list)
@@ -101,10 +102,10 @@ def create_quota_pct_bar_chart(group_info_list, file_path):
     chart.create()
 
 
-def create_usage_quota_bar_chart(group_info_list, file_path):
+def create_usage_quota_bar_chart(title, file_path, group_info_list):
 
     chart = UsageQuotaBarChart(
-        title="Group Disk and Quota Usage of fs",
+        title=title,
         file_path=file_path,
         dataset=group_info_list)
 
@@ -113,7 +114,7 @@ def create_usage_quota_bar_chart(group_info_list, file_path):
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Creates Lustre reports.')
+    parser = argparse.ArgumentParser(description='Storage Report Generator.')
     parser.add_argument('-f', '--config-file', dest='config_file', type=str, required=True, help='Path of the config file.')
     parser.add_argument('-D', '--enable-debug', dest='enable_debug', required=False, action='store_true', help='Enables logging of debug messages.')
     parser.add_argument('-L', '--enable-local', dest='enable_local', required=False, action='store_true', help='Enables local program execution.')
@@ -158,37 +159,45 @@ def main():
 
         prev_year_kw = create_prev_year_kw()
         chart_dir = config.get('base_chart', 'report_dir')
+        long_name = config.get('storage', 'long_name')
         short_name = config.get('storage', 'short_name')
 
         purge_old_report_files(chart_dir)
 
         # QUOTA-PCT-BAR-CHART
+        title = "Group Quota Usage on %s" % long_name
+
         chart_path = create_chart_path(
             chart_dir,
             config.get('quota_pct_bar_chart', 'filename'),
             short_name,
             prev_year_kw)
 
-        create_quota_pct_bar_chart(group_info_list, chart_path)
+        create_quota_pct_bar_chart(title, chart_path, group_info_list)
 
 
         # USAGE-QUOTA-BAR-CHART
+        title = "Quota and Disk Space Usage on %s" % long_name
+
         chart_path = create_chart_path(
             chart_dir,
             config.get('usage_quota_bar_chart', 'filename'),
             short_name,
             prev_year_kw)
 
-        create_usage_quota_bar_chart(group_info_list, chart_path)
+        create_usage_quota_bar_chart(title, chart_path, group_info_list)
 
         # USAGE-PIE-CHART
+        title = "Storage Usage on %s" % long_name
+
         chart_path = create_chart_path(
             chart_dir,
             config.get('usage_pie_chart', 'filename'),
             short_name,
             prev_year_kw)
 
-        create_usage_pie_chart(group_info_list, chart_path, storage_total_size)
+        create_usage_pie_chart(title, chart_path,
+                               group_info_list, storage_total_size)
 
         logging.info('END')
 
