@@ -18,8 +18,11 @@
 #
 
 
+import ConfigParser
+import argparse
 import logging
 import dataset.dataset_handler as ds
+import os
 
 from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart
@@ -58,11 +61,32 @@ def create_usage_quota_bar_chart(group_info_list, file_path):
 
 def main():
 
-    logging_level = logging.DEBUG
+    parser = argparse.ArgumentParser(description='Creates Lustre reports.')
+    parser.add_argument('-f', '--config-file', dest='config_file', type=str,
+                        required=True, help='Path of the config file.')
+    parser.add_argument('-D', '--enable-debug', dest='enable_debug',
+                        required=False, action='store_true',
+                        help='Enables logging of debug messages.')
 
-    logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
+    args = parser.parse_args()
+
+    if not os.path.isfile(args.config_file):
+        raise IOError(
+            "The config file does not exist or is not a file: " +
+            args.config_file)
+
+    logging_level = logging.INFO
+
+    if args.enable_debug:
+        logging_level = logging.DEBUG
+
+    logging.basicConfig(level=logging_level,
+                        format='%(asctime)s - %(levelname)s: %(message)s')
 
     logging.debug("START")
+
+    config = ConfigParser.ConfigParser()
+    config.read(args.config_file)
 
     group_info_list = ds.create_dummy_group_info_list()
 

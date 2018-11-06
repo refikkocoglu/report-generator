@@ -1,6 +1,3 @@
-[lustre]
-filesystem = /lustre/fs
-
 [mysqld]
 host =
 user =
@@ -10,15 +7,20 @@ password =
 database = robinhood_fs
 acct_stat_table = ACCT_STAT
 
+[storage]
+filesystem = /lustre/fs
+long_name = Lustre Nyx
+short_name = nyx
+
 [base_chart]
-report_dir = /home/data/reports
+report_dir = /home/iannetti/tmp/reports
 num_top_groups = 8
 
-[pie_chart_disk_used]
-filename = disk_usage_lustre_fs
+[usage_pie_chart]
+filename = {SHORTNAME}_usage_pie_{TIMEPOINT}.svg
 
-[stacked_bar_quota_disk_used]
-filename = quota_with_disk_usage_lustre_fs
+[usage_quota_bar_chart]
+filename = {SHORTNAME}_usage+quota_bar_{TIMEPOINT}.svg
 
-[bar_chart_quota_used]
-filename = quota_usage_lustre_fs
+[quota_pct_bar_chart]
+filename = {SHORTNAME}_soft_quota_pcnt_{TIMEPOINT}.svg

@@ -29,13 +29,9 @@ import re
 import dataset.dataset_handler as ds
 import filter.group_filter_handler as gf
 
-from chart.quota_usage_chart import QuotaUsageChart
-from chart.disk_quota_usage_chart import DiskQuotaUsageChart
-from chart import disk_usage_chart
-
-
-def raise_option_not_found( section, option ):
-   raise Exception( "Option: " + option + " was not found in section: " + section )
+from chart.quota_pct_bar_chart import QuotaPctBarChart
+from chart.usage_quota_bar_chart import UsageQuotaBarChart
+from chart.usage_pie_chart import UsagePieChart
 
 
 def validate_date(date):
@@ -48,80 +44,71 @@ def validate_date(date):
          raise RuntimeError("No valid date format for date: %s" % date)
 
 
-def purge_old_report_files(config):
+def purge_old_report_files(report_dir):
 
-    reports_dir = config.get('base_chart', 'reports_dir')
-    pattern = "." + config.get('base_chart', 'file_type')
+    pattern = ".svg"
 
-    if not os.path.isdir(reports_dir):
-        raise RuntimeError("Directory does not exist under: %s" % reports_dir)
+    if not os.path.isdir(report_dir):
+        raise RuntimeError("Directory does not exist under: %s" % report_dir)
 
-    file_list = os.listdir(reports_dir)
+    file_list = os.listdir(report_dir)
 
     for filename in file_list:
 
         if pattern in filename:
 
-            file_path = os.path.join(reports_dir, filename)
+            file_path = os.path.join(report_dir, filename)
 
             logging.debug("Removed old report file: %s" % file_path)
 
             os.remove(file_path)
 
 
-def create_quota_usage_chart(config, group_info_list):
-
-    # TODO: Remove redundancies with a Superclass!
-    logging.debug('Creating bar chart for quota used percentage per group...')
-
-    chart_report_dir = config.get('base_chart', 'reports_dir')
-    chart_filename = config.get('bar_chart_quota_used', 'filename')
+def create_prev_year_kw():
 
     now = datetime.datetime.now()
-    snapshot_date = now.strftime('%Y-%m-%d')
-    snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
-
-    chart = QuotaUsageChart()
-
-    chart.draw(group_info_list)
-
-    chart_path = os.path.abspath(chart_report_dir + os.path.sep +
-                                 chart_filename + "_" + snapshot_date + "." +
-                                 chart.file_type)
-
-    chart.save(chart_path)
-
-    logging.debug("Saved bar chart under: %s" % chart_path)
+    first = now.replace(day=1)
+    prev_month = first - datetime.timedelta(days=1)
+    return prev_month.strftime('%Y-%V')
 
 
-def create_disk_quota_usage_chart(config, group_info_list):
+def create_chart_path(chart_dir, chart_filename,
+                      short_name, prev_year_kw):
 
-    logging.debug('Creating multi-x bar for quota and disk usage per group...')
+    chart_filename = chart_filename.replace('{SHORTNAME}', short_name)
+    chart_filename = chart_filename.replace('{TIMEPOINT}', prev_year_kw)
 
-    chart_report_dir = config.get('base_chart', 'reports_dir')
-    chart_filetype = config.get('base_chart', 'file_type')
+    return chart_dir + os.path.sep + chart_filename
 
-    chart_filename = config.get('stacked_bar_quota_disk_used', 'filename')
 
-    now = datetime.datetime.now()
-    snapshot_date = now.strftime('%Y-%m-%d')
-    snapshot_timestamp = snapshot_date + " - " + now.strftime('%X')
+def create_usage_pie_chart(group_info_list, file_path, storage_total_size):
 
-    sorted_group_info_list = sorted(group_info_list,
-                                    key=lambda group_info: group_info.quota,
-                                    reverse=True)
+    chart = UsagePieChart(title='Storage Report of fs',
+                          file_path=file_path,
+                          dataset=group_info_list,
+                          storage_total_size=storage_total_size)
 
-    chart = DiskQuotaUsageChart()
+    chart.create()
 
-    chart.draw(sorted_group_info_list)
 
-    chart_path = os.path.abspath(chart_report_dir + os.path.sep +
-                                 chart_filename + "_" + snapshot_date + "." +
-                                 chart.file_type)
+def create_quota_pct_bar_chart(group_info_list, file_path):
 
-    chart.save(chart_path)
+    chart = QuotaPctBarChart(title='Group Quota Usage of fs',
+                             sub_title='Procedural Usage per Group',
+                             file_path=file_path,
+                             dataset=group_info_list)
 
-    logging.debug("Saved stacked bar chart under: %s" % chart_path)
+    chart.create()
+
+
+def create_usage_quota_bar_chart(group_info_list, file_path):
+
+    chart = UsageQuotaBarChart(
+        title="Group Disk and Quota Usage of fs",
+        file_path=file_path,
+        dataset=group_info_list)
+
+    chart.create()
 
 
 def main():
@@ -129,6 +116,7 @@ def main():
     parser = argparse.ArgumentParser(description='Creates Lustre reports.')
     parser.add_argument('-f', '--config-file', dest='config_file', type=str, required=True, help='Path of the config file.')
     parser.add_argument('-D', '--enable-debug', dest='enable_debug', required=False, action='store_true', help='Enables logging of debug messages.')
+    parser.add_argument('-L', '--enable-local', dest='enable_local', required=False, action='store_true', help='Enables local program execution.')
 
     args = parser.parse_args()
 
@@ -149,20 +137,58 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        ds.CONFIG = config
+        group_info_list = None
+        storage_total_size = 0
 
-        purge_old_report_files(config)
-        
-        group_info_list = \
-            gf.filter_group_info_items(
-                ds.get_group_info_list(
-                    gf.filter_system_groups(ds.get_group_names())))
+        if args.enable_local:
 
-        # multiple_x_bar.create_multiple_x_bar(config, group_info_list)
+            group_info_list = ds.create_dummy_group_info_list()
+            storage_total_size = 18458963071860736
 
-        create_quota_usage_chart(config, group_info_list)
+        else:
 
-        # pie_chart.create_pie_chart(config)
+            ds.CONFIG = config
+
+            group_info_list = \
+                gf.filter_group_info_items(
+                    ds.get_group_info_list(
+                        gf.filter_system_groups(ds.get_group_names())))
+
+            storage_total_size = 18458963071860736
+
+        prev_year_kw = create_prev_year_kw()
+        chart_dir = config.get('base_chart', 'report_dir')
+        short_name = config.get('storage', 'short_name')
+
+        purge_old_report_files(chart_dir)
+
+        # QUOTA-PCT-BAR-CHART
+        chart_path = create_chart_path(
+            chart_dir,
+            config.get('quota_pct_bar_chart', 'filename'),
+            short_name,
+            prev_year_kw)
+
+        create_quota_pct_bar_chart(group_info_list, chart_path)
+
+
+        # USAGE-QUOTA-BAR-CHART
+        chart_path = create_chart_path(
+            chart_dir,
+            config.get('usage_quota_bar_chart', 'filename'),
+            short_name,
+            prev_year_kw)
+
+        create_usage_quota_bar_chart(group_info_list, chart_path)
+
+        # USAGE-PIE-CHART
+        chart_path = create_chart_path(
+            chart_dir,
+            config.get('usage_pie_chart', 'filename'),
+            short_name,
+            prev_year_kw)
+
+        create_usage_pie_chart(group_info_list, chart_path, storage_total_size)
 
         logging.info('END')
 

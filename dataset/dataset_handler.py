@@ -148,7 +148,7 @@ def get_group_info_list(group_names):
 
     group_info_list = list()
 
-    filesystem = CONFIG.get('lustre', 'filesystem')
+    filesystem = CONFIG.get('storage', 'filesystem')
 
     for item in get_group_sizes(group_names):
 
