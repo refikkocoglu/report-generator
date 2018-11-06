@@ -11,7 +11,7 @@ database = robinhood_fs
 acct_stat_table = ACCT_STAT
 
 [base_chart]
-reports_dir = /home/data/reports
+report_dir = /home/data/reports
 num_top_groups = 8
 
 [pie_chart_disk_used]
