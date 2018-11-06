@@ -20,28 +20,26 @@
 
 from base_chart import BaseChart
 
-import numpy as np
 import logging
+import numpy as np
+from format import number_format
 
-# TODO: Check imports into base class...
 # Force matplotlib to not use any X window backend.
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-class QuotaUsageChart(BaseChart):
+class UsageQuotaBarChart(BaseChart):
 
     def __init__(self, title='', sub_title='', file_path='', dataset=None):
 
         x_label = 'Group'
-        y_label = 'Quota Usage (%)'
+        y_label = 'Disk Space Used (TiB)'
 
-        super(QuotaUsageChart, self).__init__(title,
-                                              x_label, y_label,
-                                              file_path, dataset)
-
-        self.sub_title = 'Procedural Usage per Group'
+        super(UsageQuotaBarChart, self).__init__(title, sub_title,
+                                                 x_label, y_label,
+                                                 file_path, dataset)
 
     def _draw(self):
 
@@ -49,23 +47,29 @@ class QuotaUsageChart(BaseChart):
 
         logging.debug("Number of Groups: %s" % num_groups)
 
-        self._sort_dataset(lambda group_info: group_info.name)
+        self._sort_dataset(
+            key=lambda group_info: group_info.quota, reverse=True)
 
         group_names = list()
-        quota_used_pct_list = list()
+        quota_list_values = list()
+        size_list_values = list()
+
+        tick_width_y = 200
+
+        max_y = float(self.dataset[0].quota /
+                      number_format.TIB_DIVISIOR) + tick_width_y
 
         for group_info in self.dataset:
+            logging.debug("%s - %s - %s" % (
+                group_info.name, group_info.size, group_info.quota))
 
             group_names.append(group_info.name)
 
-            if group_info.quota and group_info.size:
-                quota_used_pct = \
-                    round((group_info.size / group_info.quota) * 100)
+            quota_list_values.append(
+                int(group_info.quota / number_format.TIB_DIVISIOR))
 
-            else:
-                quota_used_pct = 0
-
-            quota_used_pct_list.append(quota_used_pct)
+            size_list_values.append(
+                int(group_info.size / number_format.TIB_DIVISIOR))
 
         ind = np.arange(num_groups)  # the x locations for the groups
 
@@ -77,29 +81,17 @@ class QuotaUsageChart(BaseChart):
         self._fig = plt.figure(figsize=(fig_width, fig_height))
 
         self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
-        self._fig.subplots_adjust(top=0.80)
-
-        plt.bar(ind, quota_used_pct_list, bar_width, color='blue')
-
         plt.title(self.sub_title)
+
+        p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
+        p2 = plt.bar(ind + bar_width, quota_list_values, bar_width, color='orange')
 
         plt.xlabel(self.x_label)
         plt.ylabel(self.y_label)
 
-        plt.xticks(ind, group_names)
-        plt.yticks(np.arange(0, 101, 10))
+        plt.xticks(ind + bar_width / 2, group_names)
 
-        x = np.linspace(0, num_groups)
-        y = np.linspace(100, 100)
-
-        plt.plot(x, y,
-                 linewidth=0.8, linestyle='dashed',
-                 label='Quota Limit', color='red')
-
-        plt.legend()
+        plt.yticks(np.arange(0, max_y, tick_width_y))
+        plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
 
         self._add_creation_text()
-
-    @staticmethod
-    def _sorted_group_info_list(group_info_list, sort_key):
-        return sorted(group_info_list, key=sort_key)

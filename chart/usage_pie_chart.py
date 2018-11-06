@@ -30,16 +30,18 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-class DiskUsageChart(BaseChart):
+class UsagePieChart(BaseChart):
 
-    def __init__(self, title='', file_path='', dataset=None,
+    def __init__(self, title='', sub_title='',
+                 file_path='', dataset=None,
                  storage_total_size=0, num_top_groups=8):
 
         x_label = 'Group'
         y_label = 'Quota Usage (%)'
 
-        super(DiskUsageChart, self).__init__(title, x_label, y_label,
-                                             file_path, dataset)
+        super(UsagePieChart, self).__init__(title, sub_title,
+                                            x_label, y_label,
+                                            file_path, dataset)
 
         self.num_top_groups = num_top_groups
 
@@ -55,10 +57,10 @@ class DiskUsageChart(BaseChart):
         top_groups_info_list = self.dataset[:self.num_top_groups]
 
         groups_total_size = \
-            DiskUsageChart._calc_groups_total_size(self.dataset)
+            UsagePieChart._calc_groups_total_size(self.dataset)
 
         top_groups_total_size = \
-            DiskUsageChart._calc_groups_total_size(top_groups_info_list)
+            UsagePieChart._calc_groups_total_size(top_groups_info_list)
 
         others_size = groups_total_size - top_groups_total_size
 
@@ -75,6 +77,17 @@ class DiskUsageChart(BaseChart):
         self._fig, ax = plt.subplots()
 
         self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
+
+        total_size_pct_used = \
+            int((groups_total_size / self.storage_total_size) * Decimal(100))
+
+        self.sub_title = \
+            "Used " + nf.number_to_base_2(groups_total_size) + \
+            " of " + nf.number_to_base_2(self.storage_total_size) + \
+            " Volume (" + str(total_size_pct_used) + "%)"
+
+        plt.title(self.sub_title, y=1.125, fontsize=14)
+
         self._fig.subplots_adjust(top=0.80)
 
         patches, texts, auto_texts = \
@@ -86,15 +99,6 @@ class DiskUsageChart(BaseChart):
 
         for auto_text_item in auto_texts:
             auto_text_item.set_fontsize(10)
-
-        total_size_pct_used = \
-            int((groups_total_size / self.storage_total_size) * Decimal(100))
-
-        sub_title = "Used " + nf.number_to_base_2(groups_total_size) + \
-                    " of " + nf.number_to_base_2(self.storage_total_size) + \
-                    " Volume (" + str(total_size_pct_used) + "%)"
-
-        ax.set_title(sub_title, y=1.125, fontsize=14)
 
         self._add_creation_text()
 
