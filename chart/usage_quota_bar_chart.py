@@ -35,7 +35,7 @@ class UsageQuotaBarChart(BaseChart):
     def __init__(self, title='', sub_title='', file_path='', dataset=None):
 
         x_label = 'Group'
-        y_label = 'Disk Space Used (TiB)'
+        y_label = 'Disk Space / Quota Used (TiB)'
 
         super(UsageQuotaBarChart, self).__init__(title, sub_title,
                                                  x_label, y_label,
