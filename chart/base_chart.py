@@ -19,6 +19,7 @@
 
 
 import abc
+import datetime
 
 # Force matplotlib to not use any X window backend.
 import matplotlib
@@ -55,6 +56,13 @@ class BaseChart(object):
 
     def _sort_dataset(self, key, reverse=False):
         self.dataset.sort(key=key, reverse=reverse)
+
+    def _add_creation_text(self):
+
+        self._fig.text(
+            0, 0, datetime.datetime.now().strftime('%Y-%m-%d - %X'),
+            verticalalignment='bottom', horizontalalignment='left',
+                fontsize=8, transform=self._fig.transFigure)
 
     def _draw(self):
         raise NotImplementedError("Implement draw method in a sub class!")

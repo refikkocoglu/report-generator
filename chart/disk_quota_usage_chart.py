@@ -93,3 +93,5 @@ class DiskQuotaUsageChart(BaseChart):
 
         plt.yticks(np.arange(0, max_y, tick_width_y))
         plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
+
+        self._add_creation_text()

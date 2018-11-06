@@ -100,6 +100,8 @@ class QuotaUsageChart(BaseChart):
 
         plt.legend()
 
+        self._add_creation_text()
+
     @staticmethod
     def _sorted_group_info_list(group_info_list, sort_key):
         return sorted(group_info_list, key=sort_key)

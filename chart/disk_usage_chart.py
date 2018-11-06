@@ -100,15 +100,9 @@ class DiskUsageChart(BaseChart):
 
         ax.set_title(sub_title, y=1.125, fontsize=14)
 
-        self._add_creation_text(ax)
+        self._add_creation_text()
 
         self._fig.set_size_inches(10, 8)
-
-    def _add_creation_text(self, ax):
-
-        ax.text(0, 0, datetime.datetime.now().strftime('%Y-%m-%d - %X'),
-                verticalalignment='bottom', horizontalalignment='left',
-                fontsize=8, transform=self._fig.transFigure)
 
     @staticmethod
     def _calc_groups_total_size(group_info_list):
