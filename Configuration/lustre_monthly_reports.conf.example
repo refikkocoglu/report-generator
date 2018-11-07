@@ -1,0 +1,35 @@
+[execution]
+mode = monthly
+time_format = %Y-%m
+
+[transfer]
+protocol = https
+host = www.hpc.gsi.de
+path = accounting/public
+service = nyx
+
+[mysqld]
+host =
+user =
+password =
+
+[robinhood]
+database = robinhood_fs
+acct_stat_table = ACCT_STAT
+
+[storage]
+filesystem = /lustre/fs
+long_name = Lustre Nyx
+
+[base_chart]
+report_dir = /home/iannetti/tmp/reports/monthly
+num_top_groups = 8
+
+[usage_pie_chart]
+filename = nyx_usage_pie_{TIME_FORMAT}.svg
+
+[usage_quota_bar_chart]
+filename = nyx_usage+quota_bar_{TIME_FORMAT}.svg
+
+[quota_pct_bar_chart]
+filename = nyx_soft_quota_pcnt_{TIME_FORMAT}.svg
