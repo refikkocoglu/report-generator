@@ -50,16 +50,6 @@ def check_matplotlib_version():
         raise RuntimeError("Supported major matplotlib version should be 2!")
 
 
-def validate_date(date):
-
-   if date:
-      
-      reg_exp_match = re.match(r'^\d{4}-\d{2}-\d{2}$', date)
-      
-      if not reg_exp_match:
-         raise RuntimeError("No valid date format for date: %s" % date)
-
-
 def purge_old_report_files(report_dir):
 
     pattern = ".svg"
