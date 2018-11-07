@@ -35,6 +35,21 @@ from chart.usage_quota_bar_chart import UsageQuotaBarChart
 from chart.usage_pie_chart import UsagePieChart
 
 
+def check_matplotlib_version():
+
+    import matplotlib
+
+    mplot_ver = matplotlib.__version__
+
+    logging.debug("Running with matplotlib version: %s" % mplot_ver)
+
+    major_version = int(mplot_ver.split('.')[0])
+
+    # Version of matplotlib could be extended by 3 etc., if tested!
+    if major_version != 2:
+        raise RuntimeError("Supported major matplotlib version should be 2!")
+
+
 def validate_date(date):
 
    if date:
@@ -135,6 +150,7 @@ def main():
     logging.info('START')
 
     try:
+        check_matplotlib_version()
 
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
