@@ -4,7 +4,6 @@ transfer = off
 time_format = %Y-%V
 
 [transfer]
-protocol = https
 host = www.hpc.gsi.de
 path = accounting/public
 service = nyx

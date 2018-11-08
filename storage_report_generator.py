@@ -202,14 +202,12 @@ def transfer_reports(run_mode, prev_month, config, reports_path_list):
     if not reports_path_list:
         raise RuntimeError('Input reports path list is not set!')
 
-    remote_protocol = config.get('transfer', 'protocol')
     remote_host = config.get('transfer', 'host')
     remote_path = config.get('transfer', 'path')
     service_name = config.get('transfer', 'service')
 
     remote_target = \
-        remote_protocol + "://" + remote_host + "/" + remote_path + "/" + \
-        prev_month.strftime('%Y') + "/"
+        remote_host + "::" + remote_path + "/" + prev_month.strftime('%Y') + "/"
 
     if run_mode == 'weekly':
         remote_target += run_mode + "/" + prev_month.strftime('%V') + "/"
