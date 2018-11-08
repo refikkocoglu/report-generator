@@ -30,14 +30,14 @@ LFS_BIN = '/usr/bin/lfs'
 
 def retrieve_group_quota(gid, fs):
 
-    output = subprocess.check_output([LFS_BIN, "quota", "-g", gid, fs])
+    output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-g', gid, fs])
     
     return extract_soft_quota(output)
 
 
 def retrieve_user_quota(uid, fs):
 
-    output = subprocess.check_output([LFS_BIN, "quota", "-u", uid, fs])
+    output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-u', uid, fs])
 
     return extract_soft_quota(output)
 
