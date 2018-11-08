@@ -294,7 +294,8 @@ def main():
         else:
             raise RuntimeError('Undefined run_mode detected: %s' % run_mode)
 
-        transfer_reports(run_mode, prev_month, config, reports_path_list)
+        if config.get('execution', 'transfer') == 'on':
+            transfer_reports(run_mode, prev_month, config, reports_path_list)
 
         logging.info('END')
 
