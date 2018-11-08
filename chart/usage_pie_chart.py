@@ -19,13 +19,13 @@
 
 from base_chart import BaseChart
 
-
 import format.number_format as nf
 from decimal import Decimal
 
 # TODO: Check imports into base class...
 # Force matplotlib to not use any X window backend.
 import matplotlib
+from matplotlib import cm
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -42,6 +42,8 @@ class UsagePieChart(BaseChart):
         super(UsagePieChart, self).__init__(title, sub_title,
                                             x_label, y_label,
                                             file_path, dataset)
+
+        self._colors = None
 
         self.num_top_groups = num_top_groups
 
@@ -90,9 +92,11 @@ class UsagePieChart(BaseChart):
 
         self._fig.subplots_adjust(top=0.80)
 
+        self._init_colors(len(labels))
+
         patches, texts, auto_texts = \
-            ax.pie(sizes, labels=labels, autopct='%1.2f%%', pctdistance=0.8,
-                   shadow=False, startangle=90)
+            ax.pie(sizes, labels=labels, colors=self._colors, shadow=False,
+                   autopct='%1.2f%%', pctdistance=0.8, startangle=90)
 
         # Equal aspect ratio ensures that pie is drawn as a circle.
         ax.axis('equal')
@@ -113,3 +117,10 @@ class UsagePieChart(BaseChart):
             groups_total_size += group_info_item.size
 
         return groups_total_size
+
+    def _init_colors(self, len_labels):
+
+        cmap = cm.get_cmap('Spectral', len_labels)
+
+        self._colors = \
+            [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(len_labels)]
