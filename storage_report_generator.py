@@ -69,11 +69,23 @@ def purge_old_report_files(report_dir):
             os.remove(file_path)
 
 
-def calc_prev_month_datetime():
+def calc_prev_week_date():
 
     now = datetime.datetime.now()
+
+    prev_week = now - datetime.timedelta(weeks=1)
+
+    return prev_week
+
+
+def calc_prev_month_date():
+
+    now = datetime.datetime.now()
+
     first = now.replace(day=1)
+
     prev_month = first - datetime.timedelta(days=1)
+
     return prev_month
 
 
@@ -115,7 +127,7 @@ def create_usage_quota_bar_chart(title, file_path, group_info_list):
     chart.create()
 
 
-def create_weekly_reports(local, chart_dir, long_name, time_point, config):
+def create_weekly_reports(local_mode, chart_dir, long_name, time_point, config):
 
     reports_path_list = list()
 
@@ -123,7 +135,7 @@ def create_weekly_reports(local, chart_dir, long_name, time_point, config):
     group_info_list = None
     storage_total_size = 0
 
-    if local:
+    if local_mode:
 
         logging.debug('Weekly Run Mode: LOCAL/DEV')
 
@@ -193,7 +205,7 @@ def create_monthly_reports():
     return reports_path_list
 
 
-def transfer_reports(run_mode, prev_month, config, reports_path_list):
+def transfer_reports(run_mode, time_point, reports_path_list, config):
 
     import subprocess
 
@@ -207,12 +219,12 @@ def transfer_reports(run_mode, prev_month, config, reports_path_list):
     service_name = config.get('transfer', 'service')
 
     remote_target = \
-        remote_host + "::" + remote_path + "/" + prev_month.strftime('%Y') + "/"
+        remote_host + "::" + remote_path + "/" + time_point.strftime('%Y') + "/"
 
     if run_mode == 'weekly':
-        remote_target += run_mode + "/" + prev_month.strftime('%V') + "/"
+        remote_target += run_mode + "/" + time_point.strftime('%V') + "/"
     elif run_mode == 'monthly':
-        remote_target += run_mode + "/" + prev_month.strftime('%m') + "/"
+        remote_target += run_mode + "/" + time_point.strftime('%m') + "/"
     else:
         raise RuntimeError('Undefined run_mode detected: %s' % run_mode)
 
@@ -226,7 +238,7 @@ def transfer_reports(run_mode, prev_month, config, reports_path_list):
         logging.debug('rsync %s %s' % (report_path, remote_target))
 
         try:
-
+            
             output = subprocess.check_output(
                 ["rsync", report_path, remote_target], stderr=subprocess.STDOUT)
 
@@ -241,7 +253,7 @@ def main():
     parser = argparse.ArgumentParser(description='Storage Report Generator.')
     parser.add_argument('-f', '--config-file', dest='config_file', type=str, required=True, help='Path of the config file.')
     parser.add_argument('-D', '--enable-debug', dest='enable_debug', required=False, action='store_true', help='Enables logging of debug messages.')
-    parser.add_argument('-L', '--enable-local', dest='enable_local', required=False, action='store_true', help='Enables local program execution.')
+    parser.add_argument('-L', '--enable-local_mode', dest='enable_local', required=False, action='store_true', help='Enables local_mode program execution.')
 
     args = parser.parse_args()
 
@@ -261,39 +273,39 @@ def main():
         check_matplotlib_version()
 
         # Commandline parameter.
-        local = args.enable_local
+        local_mode = args.enable_local
 
         # Config file parameter.
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
         run_mode = config.get('execution', 'mode')
+        transfer_mode = config.get('execution', 'transfer')
         time_format = config.get('execution', 'time_format')
 
         chart_dir = config.get('base_chart', 'report_dir')
         long_name = config.get('storage', 'long_name')
 
-        prev_month = calc_prev_month_datetime()
-
         reports_path_list = None
-        time_point = None
 
         if run_mode == 'weekly':
 
-            time_point = prev_month.strftime(time_format)
+            prev_week_date = calc_prev_week_date()
+            fmt_week_date = prev_week_date.strftime(time_format)
 
             reports_path_list = \
                 create_weekly_reports(
-                    local, chart_dir, long_name, time_point, config)
+                    local_mode, chart_dir, long_name, fmt_week_date, config)
+
+            if transfer_mode == 'on':
+                transfer_reports(run_mode, prev_week_date, reports_path_list,
+                                 config)
 
         elif run_mode == 'monthly':
             reports_path_list = create_monthly_reports()
 
         else:
             raise RuntimeError('Undefined run_mode detected: %s' % run_mode)
-
-        if config.get('execution', 'transfer') == 'on':
-            transfer_reports(run_mode, prev_month, config, reports_path_list)
 
         logging.info('END')
 
