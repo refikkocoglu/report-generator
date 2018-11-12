@@ -1,7 +1,6 @@
 [execution]
 mode = weekly
 transfer = off
-time_format = %Y-%V
 
 [transfer]
 host = www.hpc.gsi.de
@@ -26,10 +25,10 @@ report_dir = /home/iannetti/tmp/reports/weekly
 num_top_groups = 8
 
 [usage_pie_chart]
-filename = nyx_usage_pie_{TIME_FORMAT}.svg
+filename = usage_pie.svg
 
 [usage_quota_bar_chart]
-filename = nyx_usage+quota_bar_{TIME_FORMAT}.svg
+filename = usage+quota_bar.svg
 
 [quota_pct_bar_chart]
-filename = nyx_soft_quota_pcnt_{TIME_FORMAT}.svg
+filename = soft_quota_pcnt.svg

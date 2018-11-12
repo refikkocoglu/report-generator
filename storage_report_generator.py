@@ -69,30 +69,7 @@ def purge_old_report_files(report_dir):
             os.remove(file_path)
 
 
-def calc_prev_week_date():
-
-    now = datetime.datetime.now()
-
-    prev_week = now - datetime.timedelta(weeks=1)
-
-    return prev_week
-
-
-def calc_prev_month_date():
-
-    now = datetime.datetime.now()
-
-    first = now.replace(day=1)
-
-    prev_month = first - datetime.timedelta(days=1)
-
-    return prev_month
-
-
-def create_chart_path(chart_dir, chart_filename, time_point):
-
-    chart_filename = chart_filename.replace('{TIME_FORMAT}', time_point)
-
+def create_chart_path(chart_dir, chart_filename):
     return chart_dir + os.path.sep + chart_filename
 
 
@@ -127,7 +104,7 @@ def create_usage_quota_bar_chart(title, file_path, group_info_list):
     chart.create()
 
 
-def create_weekly_reports(local_mode, chart_dir, long_name, time_point, config):
+def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
     reports_path_list = list()
 
@@ -163,8 +140,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, time_point, config):
 
     chart_path = create_chart_path(
         chart_dir,
-        config.get('quota_pct_bar_chart', 'filename'),
-        time_point)
+        config.get('quota_pct_bar_chart', 'filename'))
 
     create_quota_pct_bar_chart(title, chart_path, group_info_list)
 
@@ -175,8 +151,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, time_point, config):
 
     chart_path = create_chart_path(
         chart_dir,
-        config.get('usage_quota_bar_chart', 'filename'),
-        time_point)
+        config.get('usage_quota_bar_chart', 'filename'))
 
     create_usage_quota_bar_chart(title, chart_path, group_info_list)
 
@@ -187,8 +162,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, time_point, config):
 
     chart_path = create_chart_path(
         chart_dir,
-        config.get('usage_pie_chart', 'filename'),
-        time_point)
+        config.get('usage_pie_chart', 'filename'))
 
     create_usage_pie_chart(title, chart_path, group_info_list,
                            storage_total_size)
@@ -238,7 +212,7 @@ def transfer_reports(run_mode, time_point, reports_path_list, config):
         logging.debug('rsync %s %s' % (report_path, remote_target))
 
         try:
-            
+
             output = subprocess.check_output(
                 ["rsync", report_path, remote_target], stderr=subprocess.STDOUT)
 
@@ -267,9 +241,12 @@ def main():
 
     logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
 
-    logging.info('START')
-
     try:
+
+        logging.info('START')
+
+        start_date = datetime.datetime.now()
+
         check_matplotlib_version()
 
         # Commandline parameter.
@@ -281,25 +258,18 @@ def main():
 
         run_mode = config.get('execution', 'mode')
         transfer_mode = config.get('execution', 'transfer')
-        time_format = config.get('execution', 'time_format')
 
         chart_dir = config.get('base_chart', 'report_dir')
         long_name = config.get('storage', 'long_name')
 
-        reports_path_list = None
-
         if run_mode == 'weekly':
 
-            prev_week_date = calc_prev_week_date()
-            fmt_week_date = prev_week_date.strftime(time_format)
-
             reports_path_list = \
-                create_weekly_reports(
-                    local_mode, chart_dir, long_name, fmt_week_date, config)
+                create_weekly_reports(local_mode, chart_dir, long_name, config)
 
             if transfer_mode == 'on':
-                transfer_reports(run_mode, prev_week_date, reports_path_list,
-                                 config)
+                transfer_reports(
+                    run_mode, start_date, reports_path_list, config)
 
         elif run_mode == 'monthly':
             reports_path_list = create_monthly_reports()
