@@ -23,3 +23,6 @@ long_name = Lustre Nyx
 [base_chart]
 report_dir = /home/iannetti/tmp/reports/monthly
 num_top_groups = 8
+
+[usage_trend_chart]
+filename = usage_trend.svg
