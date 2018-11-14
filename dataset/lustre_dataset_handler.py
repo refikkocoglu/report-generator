@@ -20,6 +20,7 @@
 
 import MySQLdb
 import logging
+import datetime
 
 from contextlib import closing
 from decimal import Decimal
@@ -51,6 +52,15 @@ class GroupInfoItem:
         self.name = name
         self.size = Decimal(size)
         self.quota = Decimal(quota)
+
+
+class GroupDateSizeItem:
+
+    def __init__(self, name, date, size, date_format='%Y-%m-%d'):
+
+        self.name = name
+        self.date = datetime.datetime.strptime(date, date_format).date()
+        self.size = int(size)
 
 
 def get_group_names():
@@ -289,3 +299,28 @@ def create_dummy_group_info_list(number=None):
         return group_info_list[:number]
     else:
         return group_info_list
+
+
+def create_dummy_group_date_size_list(num_groups=3):
+    """
+    Date interval is from 2018-12-01 to 2018-12-31.
+    :param num_groups: Optional parameter for specifiying number of groups.
+    :return: A list of GroupDataSizeItems.
+    """
+
+    import random
+
+    group_date_size_item_list = list()
+
+    for day in range(1, 31+1):
+
+        for gid in range(num_groups):
+
+            group = "grp%s" % gid
+            date = "2018-12-%s" % day
+            size = random.randint(1, 200)
+
+            group_date_size_item_list.append(
+                GroupDateSizeItem(group, date, size))
+
+    return group_date_size_item_list
