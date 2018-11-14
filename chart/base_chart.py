@@ -19,6 +19,7 @@
 
 
 import abc
+import sys
 import datetime
 
 # Force matplotlib to not use any X window backend.
@@ -45,19 +46,22 @@ class BaseChart(object):
 
         self.file_path = file_path
 
-        self.dataset = list(dataset)
+        self.dataset = dataset
 
         self._fig = None
         self._file_type = 'svg'
 
     def create(self):
 
+        self._initialize()
         self._draw()
         self._save()
         self._close()
 
     def _sort_dataset(self, key, reverse=False):
-        self.dataset.sort(key=key, reverse=reverse)
+
+        if isinstance(self.dataset, list):
+            self.dataset.sort(key=key, reverse=reverse)
 
     def _add_creation_text(self):
 
@@ -66,8 +70,17 @@ class BaseChart(object):
             verticalalignment='bottom', horizontalalignment='left',
                 fontsize=8, transform=self._fig.transFigure)
 
+    @abc.abstractmethod
+    def _initialize(self):
+        raise NotImplementedError(
+            "Not implemented method: %s.%s" %
+            (self.__class__, sys._getframe().f_code.co_name))
+
+    @abc.abstractmethod
     def _draw(self):
-        raise NotImplementedError("Implement draw method in a sub class!")
+        raise NotImplementedError(
+            "Not implemented method: %s.%s" %
+            (self.__class__, sys._getframe().f_code.co_name))
 
     def _save(self):
         plt.savefig(self.file_path, type=self._file_type)
