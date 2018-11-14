@@ -41,18 +41,11 @@ class QuotaPctBarChart(BaseChart):
                                                x_label, y_label,
                                                file_path, dataset)
 
-        self.num_groups = len(self.dataset)
-
-    def _initialize(self):
-
-        fig_width = self.num_groups
-        fig_height = 10.0
-
-        self._fig = plt.figure(figsize=(fig_width, fig_height))
-
     def _draw(self):
 
-        logging.debug("Number of Groups: %s" % self.num_groups)
+        num_groups = len(self.dataset)
+
+        logging.debug("Number of Groups: %s" % num_groups)
 
         self._sort_dataset(lambda group_info: group_info.name)
 
@@ -72,14 +65,19 @@ class QuotaPctBarChart(BaseChart):
 
             quota_used_pct_list.append(quota_used_pct)
 
-        ind = np.arange(self.num_groups)  # the x locations for the groups
+        ind = np.arange(num_groups)  # the x locations for the groups
 
         bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 
-        self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
+        fig_width = num_groups
+        fig_height = 10.0
+
+        fig = plt.figure(figsize=(fig_width, fig_height))
+
+        fig.suptitle(self.title, fontsize=18, fontweight='bold')
         plt.title(self.sub_title)
 
-        self._fig.subplots_adjust(top=0.80)
+        fig.subplots_adjust(top=0.80)
 
         plt.bar(ind, quota_used_pct_list, bar_width, color='blue')
 
@@ -89,7 +87,7 @@ class QuotaPctBarChart(BaseChart):
         plt.xticks(ind, group_names)
         plt.yticks(np.arange(0, 101, 10))
 
-        x = np.linspace(0, self.num_groups)
+        x = np.linspace(0, num_groups)
         y = np.linspace(100, 100)
 
         plt.plot(x, y,
@@ -98,7 +96,7 @@ class QuotaPctBarChart(BaseChart):
 
         plt.legend()
 
-        self._add_creation_text()
+        self._add_creation_text(fig)
 
     @staticmethod
     def _sorted_group_info_list(group_info_list, sort_key):

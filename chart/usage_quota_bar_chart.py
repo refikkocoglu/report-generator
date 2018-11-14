@@ -41,18 +41,11 @@ class UsageQuotaBarChart(BaseChart):
                                                  x_label, y_label,
                                                  file_path, dataset)
 
-        self._num_groups = len(self.dataset)
-
-    def _initialize(self):
-
-        fig_width = self._num_groups
-        fig_height = 10.0
-
-        self._fig = plt.figure(figsize=(fig_width, fig_height))
-
     def _draw(self):
 
-        logging.debug("Number of Groups: %s" % self._num_groups)
+        num_groups = len(self.dataset)
+
+        logging.debug("Number of Groups: %s" % num_groups)
 
         self._sort_dataset(
             key=lambda group_info: group_info.quota, reverse=True)
@@ -78,11 +71,16 @@ class UsageQuotaBarChart(BaseChart):
             size_list_values.append(
                 int(group_info.size / number_format.TIB_DIVISIOR))
 
-        ind = np.arange(self._num_groups)  # the x locations for the groups
+        ind = np.arange(num_groups)  # the x locations for the groups
 
         bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 
-        self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
+        fig_width = num_groups
+        fig_height = 10.0
+
+        fig = plt.figure(figsize=(fig_width, fig_height))
+
+        fig.suptitle(self.title, fontsize=18, fontweight='bold')
         plt.title(self.sub_title)
 
         p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
@@ -96,4 +94,4 @@ class UsageQuotaBarChart(BaseChart):
         plt.yticks(np.arange(0, max_y, tick_width_y))
         plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
 
-        self._add_creation_text()
+        self._add_creation_text(fig)

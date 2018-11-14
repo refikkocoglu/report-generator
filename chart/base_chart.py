@@ -48,12 +48,10 @@ class BaseChart(object):
 
         self.dataset = dataset
 
-        self._fig = None
         self._file_type = 'svg'
 
     def create(self):
 
-        self._initialize()
         self._draw()
         self._save()
         self._close()
@@ -63,18 +61,13 @@ class BaseChart(object):
         if isinstance(self.dataset, list):
             self.dataset.sort(key=key, reverse=reverse)
 
-    def _add_creation_text(self):
+    def _add_creation_text(self, fig):
 
-        self._fig.text(
+        #TODO: Get current figure of plot?
+        fig.text(
             0, 0, datetime.datetime.now().strftime('%Y-%m-%d - %X'),
             verticalalignment='bottom', horizontalalignment='left',
-                fontsize=8, transform=self._fig.transFigure)
-
-    @abc.abstractmethod
-    def _initialize(self):
-        raise NotImplementedError(
-            "Not implemented method: %s.%s" %
-            (self.__class__, sys._getframe().f_code.co_name))
+                fontsize=8, transform=fig.transFigure)
 
     @abc.abstractmethod
     def _draw(self):
@@ -86,5 +79,4 @@ class BaseChart(object):
         plt.savefig(self.file_path, type=self._file_type)
 
     def _close(self):
-        plt.close(self._fig)
-        self._fig = None
+        plt.close()
