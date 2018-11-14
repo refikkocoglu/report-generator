@@ -43,11 +43,16 @@ class UsagePieChart(BaseChart):
                                             x_label, y_label,
                                             file_path, dataset)
 
+        self._ax = None
+
         self._colors = None
 
         self.num_top_groups = num_top_groups
 
         self.storage_total_size = storage_total_size
+
+    def _initialize(self):
+        self._fig, self._ax = plt.subplots()
 
     def _draw(self):
 
@@ -76,8 +81,6 @@ class UsagePieChart(BaseChart):
         labels.append("others (" + nf.number_to_base_2(others_size) + ")")
         sizes.append(others_size)
 
-        self._fig, ax = plt.subplots()
-
         self._fig.suptitle(self.title, fontsize=18, fontweight='bold')
 
         total_size_pct_used = \
@@ -95,11 +98,12 @@ class UsagePieChart(BaseChart):
         self._init_colors(len(labels))
 
         patches, texts, auto_texts = \
-            ax.pie(sizes, labels=labels, colors=self._colors, shadow=False,
-                   autopct='%1.2f%%', pctdistance=0.8, startangle=90)
+            self._ax.pie(sizes, labels=labels,
+                         colors=self._colors, shadow=False,
+                         autopct='%1.2f%%', pctdistance=0.8, startangle=90)
 
         # Equal aspect ratio ensures that pie is drawn as a circle.
-        ax.axis('equal')
+        self._ax.axis('equal')
 
         for auto_text_item in auto_texts:
             auto_text_item.set_fontsize(10)
