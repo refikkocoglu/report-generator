@@ -41,11 +41,14 @@ class UsageQuotaBarChart(BaseChart):
                                                  x_label, y_label,
                                                  file_path, dataset)
 
+        self.num_groups = len(self.dataset)
+
+    def _init_figure_and_axis(self):
+        self._figure, self._ax = plt.subplots(figsize=(self.num_groups, 10))
+
     def _draw(self):
 
-        num_groups = len(self.dataset)
-
-        logging.debug("Number of Groups: %s" % num_groups)
+        logging.debug("Number of Groups: %s" % self.num_groups)
 
         self._sort_dataset(
             key=lambda group_info: group_info.quota, reverse=True)
@@ -71,27 +74,18 @@ class UsageQuotaBarChart(BaseChart):
             size_list_values.append(
                 int(group_info.size / number_format.TIB_DIVISIOR))
 
-        ind = np.arange(num_groups)  # the x locations for the groups
+        ind = np.arange(self.num_groups)  # the x locations for the groups
 
         bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 
-        fig_width = num_groups
-        fig_height = 10.0
+        p1 = self._ax.bar(ind, size_list_values, bar_width, color='blue')
 
-        fig = plt.figure(figsize=(fig_width, fig_height))
+        p2 = self._ax.bar(ind + bar_width, quota_list_values,
+                          bar_width, color='orange')
 
-        fig.suptitle(self.title, fontsize=18, fontweight='bold')
-        plt.title(self.sub_title)
+        self._ax.set_xticks(ind + bar_width / 2)
+        self._ax.set_xticklabels(group_names, rotation=45)
 
-        p1 = plt.bar(ind, size_list_values, bar_width, color='blue')
-        p2 = plt.bar(ind + bar_width, quota_list_values, bar_width, color='orange')
+        self._ax.set_yticks(np.arange(0, max_y, tick_width_y))
 
-        plt.xlabel(self.x_label)
-        plt.ylabel(self.y_label)
-
-        plt.xticks(ind + bar_width / 2, group_names)
-
-        plt.yticks(np.arange(0, max_y, tick_width_y))
-        plt.legend((p2[0], p1[0]), ('Quota', 'Used'))
-
-        self._add_creation_text(fig)
+        self._ax.legend((p2[0], p1[0]), ('Quota', 'Used'))

@@ -41,11 +41,14 @@ class QuotaPctBarChart(BaseChart):
                                                x_label, y_label,
                                                file_path, dataset)
 
+        self.num_groups = len(self.dataset)
+
+    def _init_figure_and_axis(self):
+        self._figure, self._ax = plt.subplots(figsize=(self.num_groups, 10))
+
     def _draw(self):
 
-        num_groups = len(self.dataset)
-
-        logging.debug("Number of Groups: %s" % num_groups)
+        logging.debug("Number of Groups: %s" % self.num_groups)
 
         self._sort_dataset(lambda group_info: group_info.name)
 
@@ -65,39 +68,24 @@ class QuotaPctBarChart(BaseChart):
 
             quota_used_pct_list.append(quota_used_pct)
 
-        ind = np.arange(num_groups)  # the x locations for the groups
+        ind = np.arange(self.num_groups)  # the x locations for the groups
 
         bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 
-        fig_width = num_groups
-        fig_height = 10.0
+        self._figure.subplots_adjust(top=0.80)
 
-        fig = plt.figure(figsize=(fig_width, fig_height))
+        self._ax.bar(ind, quota_used_pct_list, bar_width, color='blue')
 
-        fig.suptitle(self.title, fontsize=18, fontweight='bold')
-        plt.title(self.sub_title)
+        self._ax.set_xticks(ind)
+        self._ax.set_xticklabels(group_names, rotation=45)
 
-        fig.subplots_adjust(top=0.80)
+        self._ax.set_yticks(np.arange(0, 101, 10))
 
-        plt.bar(ind, quota_used_pct_list, bar_width, color='blue')
-
-        plt.xlabel(self.x_label)
-        plt.ylabel(self.y_label)
-
-        plt.xticks(ind, group_names)
-        plt.yticks(np.arange(0, 101, 10))
-
-        x = np.linspace(0, num_groups)
+        x = np.linspace(0, self.num_groups)
         y = np.linspace(100, 100)
 
-        plt.plot(x, y,
+        self._ax.plot(x, y,
                  linewidth=0.8, linestyle='dashed',
                  label='Quota Limit', color='red')
 
-        plt.legend()
-
-        self._add_creation_text(fig)
-
-    @staticmethod
-    def _sorted_group_info_list(group_info_list, sort_key):
-        return sorted(group_info_list, key=sort_key)
+        self._ax.legend()

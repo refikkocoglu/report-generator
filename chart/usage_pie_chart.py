@@ -36,18 +36,20 @@ class UsagePieChart(BaseChart):
                  file_path='', dataset=None,
                  storage_total_size=0, num_top_groups=8):
 
-        x_label = 'Group'
-        y_label = 'Quota Usage (%)'
-
-        super(UsagePieChart, self).__init__(title, sub_title,
-                                            x_label, y_label,
-                                            file_path, dataset)
+        super(UsagePieChart, self).__init__(title=title,
+                                            sub_title=sub_title,
+                                            file_path=file_path,
+                                            dataset=dataset)
 
         self._colors = None
 
         self.num_top_groups = num_top_groups
 
         self.storage_total_size = storage_total_size
+
+    def _init_figure_and_axis(self):
+        # self._figure, self._ax = plt.subplots(figsize=(self.num_groups, 10))
+        self._figure, self._ax = plt.subplots()
 
     def _draw(self):
 
@@ -76,10 +78,6 @@ class UsagePieChart(BaseChart):
         labels.append("others (" + nf.number_to_base_2(others_size) + ")")
         sizes.append(others_size)
 
-        fig, ax = plt.subplots()
-
-        fig.suptitle(self.title, fontsize=18, fontweight='bold')
-
         total_size_pct_used = \
             int((groups_total_size / self.storage_total_size) * Decimal(100))
 
@@ -88,26 +86,22 @@ class UsagePieChart(BaseChart):
             " of " + nf.number_to_base_2(self.storage_total_size) + \
             " Volume (" + str(total_size_pct_used) + "%)"
 
-        plt.title(self.sub_title, y=1.125, fontsize=14)
-
-        fig.subplots_adjust(top=0.80)
+        self._figure.subplots_adjust(top=0.80)
 
         self._init_colors(len(labels))
 
         patches, texts, auto_texts = \
-            ax.pie(sizes, labels=labels,
+            self._ax.pie(sizes, labels=labels,
                          colors=self._colors, shadow=False,
                          autopct='%1.2f%%', pctdistance=0.8, startangle=90)
 
         # Equal aspect ratio ensures that pie is drawn as a circle.
-        ax.axis('equal')
+        self._ax.axis('equal')
 
         for auto_text_item in auto_texts:
             auto_text_item.set_fontsize(10)
 
-        self._add_creation_text(fig)
-
-        fig.set_size_inches(10, 8)
+        self._figure.set_size_inches(10, 8)
 
     @staticmethod
     def _calc_groups_total_size(group_info_list):

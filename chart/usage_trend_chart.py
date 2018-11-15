@@ -18,25 +18,58 @@
 #
 
 
-from base_chart import BaseChart
-
-import logging
-import numpy as np
-from format import number_format
+import pandas as pd
 
 # Force matplotlib to not use any X window backend.
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
+from base_chart import BaseChart
+
 
 class UsageTrendChart(BaseChart):
 
-    def __init__(self, title='', sub_title='', file_path='', dataset=None):
+    def __init__(self, title='', sub_title='', file_path='',
+                 start_date=None, end_date=None, dataset=None):
 
         super(UsageTrendChart, self).__init__(title=title,
                                               file_path=file_path,
                                               dataset=dataset)
 
-    def _init_fig(self):
-        self._fig = plt.figure()
+        self._start_date = start_date
+        self._end_date = end_date
+
+    def _init_figure_and_axis(self):
+
+        num_groups = len(self.dataset.keys())
+
+        self._figure, self._ax = plt.subplots(figsize=(num_groups, 10))
+
+    def _draw(self):
+
+        date_interval = \
+            pd.date_range(self._start_date, self._end_date, freq='D')
+
+        data_frame = pd.DataFrame(index=date_interval)
+
+        #TODO: Data structure in dataset???
+        for group_name in self.dataset:
+
+            dates = pd.DatetimeIndex(
+                self.dataset[group_name][0], dtype='datetime64')
+
+            data_frame[group_name] = \
+                pd.Series(self.dataset[group_name][1], index=dates)
+
+        mean_weekly_summary = data_frame.resample('W').mean()
+
+        mean_weekly_summary = \
+            mean_weekly_summary.truncate(
+                before=self._start_date, after=self._end_date)
+
+        print(mean_weekly_summary)
+
+        mean_weekly_summary.plot(ax=self._ax)
+
+        self._ax.legend(title="Groups", fontsize='xx-small', loc='upper left')
