@@ -216,7 +216,15 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
                 group_item_dict[group_item.name][1].append(group_item.size)
 
     else:
-        pass
+
+        logging.debug('Weekly Run Mode: PRODUCTIVE')
+
+        ds.CONFIG = config
+
+        top_groups = ds.get_top_groups(4)
+
+        print(top_groups)
+
     #---------------------------------------------------------------------------
 
     purge_old_report_files(chart_dir)

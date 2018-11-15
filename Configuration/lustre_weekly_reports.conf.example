@@ -22,7 +22,6 @@ long_name = Lustre Nyx
 
 [base_chart]
 report_dir = /home/iannetti/tmp/reports/weekly
-num_top_groups = 8
 
 [usage_pie_chart]
 filename = usage_pie.svg

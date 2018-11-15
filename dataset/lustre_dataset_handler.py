@@ -177,12 +177,11 @@ def get_group_info_list(group_names):
     return group_info_list
 
 
-def get_top_group_sizes():
+def get_top_groups(limit):
 
     acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
-    num_top_groups = int(CONFIG.get('base_chart', 'num_top_groups'))
 
-    top_group_sizes = list()
+    grp_names_list = list()
 
     with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
                                  user=CONFIG.get('mysqld', 'user'),
@@ -192,20 +191,21 @@ def get_top_group_sizes():
 
         with closing(conn.cursor()) as cur:
 
-            sql = "SELECT gid, SUM(size) as group_size FROM %s " \
-                  "GROUP BY gid ORDER BY group_size DESC LIMIT %s" % \
-                  (acct_stat_table, num_top_groups)
+            sql = "SELECT T.gid FROM " \
+                  "(SELECT gid, SUM(size) as group_size FROM %s " \
+                  "GROUP BY gid ORDER BY group_size DESC) AS T LIMIT %s" % \
+                  (acct_stat_table, limit)
 
             logging.debug(sql)
             cur.execute(sql)
 
-            for item in cur.fetchall():
-                top_group_sizes.append(GroupSizeItem(item[0], item[1]))
+            for grp_name in cur.fetchall():
+                grp_names_list.append(grp_name)
 
-            if not top_group_sizes:
-                raise RuntimeError("Empty Group Sizes List!")
+            if not grp_names_list:
+                raise RuntimeError("Empty group list found!")
 
-    return top_group_sizes
+    return grp_names_list
 
 
 def create_dummy_group_info_list(number=None):
