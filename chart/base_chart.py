@@ -30,23 +30,24 @@ import matplotlib.pyplot as plt
 
 class BaseChart(object):
 
-    def __init__(self, title='', sub_title='',
-                 x_label='', y_label='',
-                 file_path='', dataset=None):
+    def __init__(self, title, dataset, file_path,
+                 sub_title='', width=20, height=10, x_label='', y_label=''):
 
         __metaclass__ = abc.ABCMeta
 
         super(BaseChart, self).__init__()
 
         self.title = title
+        self.dataset = dataset
+        self.file_path = file_path
+
         self.sub_title = sub_title
+
+        self.width = width
+        self.height = height
 
         self.x_label = x_label
         self.y_label = y_label
-
-        self.file_path = file_path
-
-        self.dataset = dataset
 
         self._file_type = 'svg'
 
@@ -55,7 +56,7 @@ class BaseChart(object):
 
     def create(self):
 
-        self._init_figure_and_axis()
+        self._figure, self._ax = plt.subplots(figsize=(self.width, self.height))
 
         self._draw()
 
@@ -78,15 +79,10 @@ class BaseChart(object):
             verticalalignment='bottom', horizontalalignment='left',
                 fontsize=8, transform=self._figure.transFigure)
 
-    @abc.abstractmethod
-    def _init_figure_and_axis(self):
-        raise NotImplementedError(
-            "Not implemented method: %s.%s" %
-            (self.__class__, sys._getframe().f_code.co_name))
-
     def _set_figure_and_axis_attr(self):
 
         self._figure.suptitle(self.title, fontsize=18, fontweight='bold')
+
         self._ax.set_title(self.sub_title, fontsize=12, y=1.15)
 
         self._ax.set_xlabel(self.x_label)

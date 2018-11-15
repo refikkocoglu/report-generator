@@ -32,24 +32,18 @@ import matplotlib.pyplot as plt
 
 class UsagePieChart(BaseChart):
 
-    def __init__(self, title='', sub_title='',
-                 file_path='', dataset=None,
-                 storage_total_size=0, num_top_groups=8):
+    def __init__(self, title, dataset, file_path, storage_total_size,
+                 num_top_groups=8):
 
         super(UsagePieChart, self).__init__(title=title,
-                                            sub_title=sub_title,
-                                            file_path=file_path,
-                                            dataset=dataset)
-
-        self._colors = None
-
-        self.num_top_groups = num_top_groups
+                                            dataset=dataset,
+                                            file_path=file_path)
 
         self.storage_total_size = storage_total_size
 
-    def _init_figure_and_axis(self):
-        # self._figure, self._ax = plt.subplots(figsize=(self.num_groups, 10))
-        self._figure, self._ax = plt.subplots()
+        self.num_top_groups = num_top_groups
+
+        self._colors = None
 
     def _draw(self):
 

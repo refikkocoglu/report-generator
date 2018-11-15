@@ -70,46 +70,30 @@ def purge_old_report_files(report_dir):
             os.remove(file_path)
 
 
-def create_usage_pie_chart(title, file_path,
-                           group_info_list, storage_total_size):
+def create_usage_pie_chart(title, group_info_list, file_path,
+                           storage_total_size):
 
-    chart = UsagePieChart(title=title,
-                          file_path=file_path,
-                          dataset=group_info_list,
-                          storage_total_size=storage_total_size)
-
+    chart = UsagePieChart(title, group_info_list, file_path, storage_total_size)
     chart.create()
 
 
-def create_quota_pct_bar_chart(title, file_path, group_info_list):
+def create_quota_pct_bar_chart(title, group_info_list, file_path):
 
-    chart = QuotaPctBarChart(title=title,
-                             file_path=file_path,
-                             dataset=group_info_list)
-
+    chart = QuotaPctBarChart(title, group_info_list, file_path)
     chart.create()
 
 
-def create_usage_quota_bar_chart(title, file_path, group_info_list):
+def create_usage_quota_bar_chart(title, group_info_list, file_path):
 
-    chart = UsageQuotaBarChart(
-        title=title,
-        file_path=file_path,
-        dataset=group_info_list)
-
+    chart = UsageQuotaBarChart(title, group_info_list, file_path)
     chart.create()
 
 
-def create_usage_trend_chart(title, file_path, start_date, end_date,
-                             group_item_list):
+def create_usage_trend_chart(title, group_item_list, file_path,
+                             start_date, end_date):
 
-    chart = UsageTrendChart(
-        title=title,
-        file_path=file_path,
-        start_date=start_date,
-        end_date=end_date,
-        dataset=group_item_list)
-
+    chart = UsageTrendChart(title, group_item_list, file_path,
+                            start_date, end_date)
     chart.create()
 
 
@@ -150,7 +134,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart_path = \
         chart_dir + os.path.sep + config.get('quota_pct_bar_chart', 'filename')
 
-    create_quota_pct_bar_chart(title, chart_path, group_info_list)
+    create_quota_pct_bar_chart(title, group_info_list, chart_path)
 
     reports_path_list.append(chart_path)
 
@@ -160,7 +144,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart_path = chart_dir + os.path.sep + \
                  config.get('usage_quota_bar_chart', 'filename')
 
-    create_usage_quota_bar_chart(title, chart_path, group_info_list)
+    create_usage_quota_bar_chart(title, group_info_list, chart_path)
 
     reports_path_list.append(chart_path)
 
@@ -170,7 +154,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart_path = \
         chart_dir + os.path.sep + config.get('usage_pie_chart', 'filename')
 
-    create_usage_pie_chart(title, chart_path, group_info_list,
+    create_usage_pie_chart(title, group_info_list, chart_path,
                            storage_total_size)
 
     reports_path_list.append(chart_path)
@@ -200,6 +184,7 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
         logging.debug('Monthly Run Mode: LOCAL/DEV')
 
         #TODO: Encapsulate the object structe into a seperate type!
+        # group_item = GroupDateSizeItem
         for group_item in ds.create_dummy_group_date_size_list(20):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
@@ -221,9 +206,25 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
         ds.CONFIG = config
 
-        top_groups = ds.get_top_groups(4)
+        top_groups = ds.get_top_groups(10)
 
-        print(top_groups)
+        # TODO: Encapsulate the object structe into a seperate type!
+        # group_item = GroupDateSizeItem
+        for group_item in ds.get_time_series_group_sizes(start_date, end_date,
+                                                         top_groups):
+
+            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
+            if group_item.name in group_item_dict:
+
+                group_item_dict[group_item.name][0].append(group_item.date)
+                group_item_dict[group_item.name][1].append(group_item.size)
+
+            else:
+
+                group_item_dict[group_item.name] = (list(), list())
+
+                group_item_dict[group_item.name][0].append(group_item.date)
+                group_item_dict[group_item.name][1].append(group_item.size)
 
     #---------------------------------------------------------------------------
 
@@ -235,8 +236,8 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     chart_path = \
         chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
 
-    create_usage_trend_chart(
-        title, chart_path, start_date, end_date, group_item_dict)
+    create_usage_trend_chart(title, group_item_dict, chart_path,
+                             start_date, end_date)
 
     reports_path_list.append(chart_path)
 

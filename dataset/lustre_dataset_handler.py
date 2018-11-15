@@ -56,10 +56,10 @@ class GroupInfoItem:
 
 class GroupDateSizeItem:
 
-    def __init__(self, name, date, size, date_format='%Y-%m-%d'):
+    def __init__(self, name, date, size):
 
         self.name = name
-        self.date = datetime.datetime.strptime(date, date_format).date()
+        self.date = date
         self.size = int(size)
 
 
@@ -67,7 +67,7 @@ def get_group_names():
 
     group_names = list()
 
-    rbh_acct_table = CONFIG.get('robinhood', 'acct_stat_table')
+    rbh_acct_table = CONFIG.get('robinhood', 'table')
 
     with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
                                  user=CONFIG.get('mysqld', 'user'),
@@ -97,7 +97,7 @@ def get_group_sizes(group_names):
 
     group_sizes = list()
 
-    acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
+    acct_stat_table = CONFIG.get('robinhood', 'table')
 
     with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
                                  user=CONFIG.get('mysqld', 'user'),
@@ -128,7 +128,7 @@ def get_groups_total_size():
 
     total_size = None
 
-    acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
+    acct_stat_table = CONFIG.get('robinhood', 'table')
 
     with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
                                  user=CONFIG.get('mysqld', 'user'),
@@ -179,7 +179,7 @@ def get_group_info_list(group_names):
 
 def get_top_groups(limit):
 
-    acct_stat_table = CONFIG.get('robinhood', 'acct_stat_table')
+    acct_stat_table = CONFIG.get('robinhood', 'table')
 
     grp_names_list = list()
 
@@ -200,13 +200,57 @@ def get_top_groups(limit):
             cur.execute(sql)
 
             for grp_name in cur.fetchall():
-                grp_names_list.append(grp_name)
+                grp_names_list.append(grp_name[0])
 
             if not grp_names_list:
                 raise RuntimeError("Empty group list found!")
 
     return grp_names_list
 
+
+def get_time_series_group_sizes(start_date, end_date, group_names=None):
+    """
+    Queries ACCT_STAT_HISTORY table for given group names
+    within a specific time interval filled with size consumption per day.
+    The size consumption is saved on base of TiB.
+    :param group_names: List of group names (optional).
+    :param start_date: Start date of the time interval.
+    :param end_date: End date of the time interval.
+    :return: A list of GroupDateSizeItem.
+    """
+
+    result_list = list()
+
+    table = CONFIG.get('report', 'table')
+
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('report', 'database'))) \
+            as conn:
+
+        with closing(conn.cursor()) as cur:
+
+            # TiB Divisor = '1099511627776'
+            sql = "SELECT gid, date, ROUND(SUM(size)/1099511627776) as size " \
+                  "FROM %s WHERE date between '%s' AND '%s'" % \
+                  (table, start_date, end_date)
+
+            if group_names:
+                sql += " AND gid IN (%s)" % str(group_names).strip('[]')
+
+            sql += ' GROUP BY gid, date'
+
+            logging.debug(sql)
+            cur.execute(sql)
+
+            for item in cur.fetchall():
+                result_list.append(GroupDateSizeItem(item[0], item[1], item[2]))
+
+            if not result_list:
+                raise RuntimeError("Found empty result list!")
+
+    return result_list
 
 def create_dummy_group_info_list(number=None):
 
@@ -315,6 +359,10 @@ def create_dummy_group_date_size_list(num_groups=3):
     for day in range(1, 31+1):
 
         for gid in range(num_groups):
+
+            # Data formatting could be that way...
+            # date_format = '%Y-%m-%d'
+            # datetime.datetime.strptime(date, date_format).date()
 
             group = "grp%s" % gid
             date = "2018-12-%s" % day

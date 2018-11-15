@@ -32,23 +32,17 @@ import matplotlib.pyplot as plt
 
 class UsageQuotaBarChart(BaseChart):
 
-    def __init__(self, title='', sub_title='', file_path='', dataset=None):
+    def __init__(self, title, dataset, file_path):
 
-        x_label = 'Group'
-        y_label = 'Disk Space / Quota Used (TiB)'
-
-        super(UsageQuotaBarChart, self).__init__(title, sub_title,
-                                                 x_label, y_label,
-                                                 file_path, dataset)
-
-        self.num_groups = len(self.dataset)
-
-    def _init_figure_and_axis(self):
-        self._figure, self._ax = plt.subplots(figsize=(self.num_groups, 10))
-
+        super(UsageQuotaBarChart, self).__init__(title, dataset, file_path,
+                                                 x_label='Group',
+                                                 y_label='Disk Space / Quota Used (TiB)')
+    
     def _draw(self):
-
-        logging.debug("Number of Groups: %s" % self.num_groups)
+        
+        num_groups = len(self.dataset)
+        
+        logging.debug("Number of Groups: %s" % num_groups)
 
         self._sort_dataset(
             key=lambda group_info: group_info.quota, reverse=True)
@@ -74,7 +68,7 @@ class UsageQuotaBarChart(BaseChart):
             size_list_values.append(
                 int(group_info.size / number_format.TIB_DIVISIOR))
 
-        ind = np.arange(self.num_groups)  # the x locations for the groups
+        ind = np.arange(num_groups)  # The x locations for the groups
 
         bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 

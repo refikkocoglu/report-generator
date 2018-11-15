@@ -32,23 +32,17 @@ import matplotlib.pyplot as plt
 
 class QuotaPctBarChart(BaseChart):
 
-    def __init__(self, title='', sub_title='', file_path='', dataset=None):
+    def __init__(self, title, dataset, file_path):
 
-        x_label = 'Group'
-        y_label = 'Quota Usage (%)'
-
-        super(QuotaPctBarChart, self).__init__(title, sub_title,
-                                               x_label, y_label,
-                                               file_path, dataset)
-
-        self.num_groups = len(self.dataset)
-
-    def _init_figure_and_axis(self):
-        self._figure, self._ax = plt.subplots(figsize=(self.num_groups, 10))
+        super(QuotaPctBarChart, self).__init__(title, dataset, file_path,
+                                               x_label='Group',
+                                               y_label='Quota Usage (%)')
 
     def _draw(self):
+        
+        num_groups = len(self.dataset)
 
-        logging.debug("Number of Groups: %s" % self.num_groups)
+        logging.debug("Number of Groups: %s" % num_groups)
 
         self._sort_dataset(lambda group_info: group_info.name)
 
@@ -68,7 +62,7 @@ class QuotaPctBarChart(BaseChart):
 
             quota_used_pct_list.append(quota_used_pct)
 
-        ind = np.arange(self.num_groups)  # the x locations for the groups
+        ind = np.arange(num_groups)  # the x locations for the groups
 
         bar_width = 0.35  # the width of the bars: can also be len(x) sequence
 
@@ -81,7 +75,7 @@ class QuotaPctBarChart(BaseChart):
 
         self._ax.set_yticks(np.arange(0, 101, 10))
 
-        x = np.linspace(0, self.num_groups)
+        x = np.linspace(0, num_groups)
         y = np.linspace(100, 100)
 
         self._ax.plot(x, y,

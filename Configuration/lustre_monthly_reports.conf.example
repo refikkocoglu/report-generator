@@ -14,7 +14,11 @@ password =
 
 [robinhood]
 database = robinhood_fs
-acct_stat_table = ACCT_STAT
+table = ACCT_STAT
+
+[report]
+database = report_fs
+table = ACCT_STAT_HISTORY
 
 [storage]
 filesystem = /lustre/fs

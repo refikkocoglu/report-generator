@@ -30,21 +30,12 @@ from base_chart import BaseChart
 
 class UsageTrendChart(BaseChart):
 
-    def __init__(self, title='', sub_title='', file_path='',
-                 start_date=None, end_date=None, dataset=None):
+    def __init__(self, title, dataset, file_path, start_date, end_date):
 
-        super(UsageTrendChart, self).__init__(title=title,
-                                              file_path=file_path,
-                                              dataset=dataset)
+        super(UsageTrendChart, self).__init__(title, dataset, file_path)
 
         self._start_date = start_date
         self._end_date = end_date
-
-    def _init_figure_and_axis(self):
-
-        num_groups = len(self.dataset.keys())
-
-        self._figure, self._ax = plt.subplots(figsize=(num_groups, 10))
 
     def _draw(self):
 
