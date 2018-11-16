@@ -33,7 +33,7 @@ import matplotlib.pyplot as plt
 class UsagePieChart(BaseChart):
 
     def __init__(self, title, dataset, file_path, storage_total_size,
-                 num_top_groups=8):
+                 num_top_groups):
 
         super(UsagePieChart, self).__init__(title=title,
                                             dataset=dataset,
@@ -41,10 +41,11 @@ class UsagePieChart(BaseChart):
 
         self.storage_total_size = storage_total_size
 
-        self.num_top_groups = num_top_groups
+        self.num_top_groups = int(num_top_groups)
 
         # Increment with 1 because of others label.
-        self._colors = BaseChart._create_colors('Spectral', num_top_groups + 1)
+        self._colors = BaseChart._create_colors('Spectral',
+                                                self.num_top_groups + 1)
 
     def _draw(self):
 

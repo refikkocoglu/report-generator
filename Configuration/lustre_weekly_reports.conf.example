@@ -25,6 +25,7 @@ report_dir = /home/iannetti/tmp/reports/weekly
 
 [usage_pie_chart]
 filename = usage_pie.svg
+num_top_groups = 8
 
 [usage_quota_bar_chart]
 filename = usage+quota_bar.svg

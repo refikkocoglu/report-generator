@@ -71,9 +71,10 @@ def purge_old_report_files(report_dir):
 
 
 def create_usage_pie_chart(title, group_info_list, file_path,
-                           storage_total_size):
+                           storage_total_size, num_top_groups):
 
-    chart = UsagePieChart(title, group_info_list, file_path, storage_total_size)
+    chart = UsagePieChart(title, group_info_list, file_path, storage_total_size,
+                          num_top_groups)
     chart.create()
 
 
@@ -154,8 +155,10 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart_path = \
         chart_dir + os.path.sep + config.get('usage_pie_chart', 'filename')
 
+    num_top_groups = config.get('usage_pie_chart', 'num_top_groups')
+
     create_usage_pie_chart(title, group_info_list, chart_path,
-                           storage_total_size)
+                           storage_total_size, num_top_groups)
 
     reports_path_list.append(chart_path)
 
