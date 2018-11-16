@@ -185,7 +185,7 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
         #TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
-        for group_item in ds.create_dummy_group_date_size_list(20):
+        for group_item in ds.create_dummy_group_date_size_list(50):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
             if group_item.name in group_item_dict:
@@ -206,12 +206,14 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
         ds.CONFIG = config
 
-        top_groups = ds.get_top_groups(10)
+        # groups = ds.get_top_groups(10)
+        groups = gf.filter_system_groups(ds.get_group_names())
+
 
         # TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
         for group_item in ds.get_time_series_group_sizes(start_date, end_date,
-                                                         top_groups):
+                                                         groups):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
             if group_item.name in group_item_dict:

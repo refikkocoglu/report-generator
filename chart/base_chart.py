@@ -88,6 +88,13 @@ class BaseChart(object):
         self._ax.set_xlabel(self.x_label)
         self._ax.set_ylabel(self.y_label)
 
+    @staticmethod
+    def _create_colors(name, n):
+
+        color_map = matplotlib.cm.get_cmap(name, n)
+
+        return [matplotlib.colors.rgb2hex(color_map(i)[:3]) for i in range(n)]
+
     @abc.abstractmethod
     def _draw(self):
         raise NotImplementedError(

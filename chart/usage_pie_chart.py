@@ -43,7 +43,8 @@ class UsagePieChart(BaseChart):
 
         self.num_top_groups = num_top_groups
 
-        self._colors = None
+        # Increment with 1 because of others label.
+        self._colors = BaseChart._create_colors('Spectral', num_top_groups + 1)
 
     def _draw(self):
 
@@ -82,8 +83,6 @@ class UsagePieChart(BaseChart):
 
         self._figure.subplots_adjust(top=0.80)
 
-        self._init_colors(len(labels))
-
         patches, texts, auto_texts = \
             self._ax.pie(sizes, labels=labels,
                          colors=self._colors, shadow=False,
@@ -106,10 +105,3 @@ class UsagePieChart(BaseChart):
             groups_total_size += group_info_item.size
 
         return groups_total_size
-
-    def _init_colors(self, len_labels):
-
-        cmap = cm.get_cmap('Spectral', len_labels)
-
-        self._colors = \
-            [matplotlib.colors.rgb2hex(cmap(i)[:3]) for i in range(len_labels)]

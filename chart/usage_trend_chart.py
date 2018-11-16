@@ -32,10 +32,31 @@ class UsageTrendChart(BaseChart):
 
     def __init__(self, title, dataset, file_path, start_date, end_date):
 
-        super(UsageTrendChart, self).__init__(title, dataset, file_path)
+        super(UsageTrendChart, self).__init__(title, dataset, file_path,
+                                              x_label='Time (Weeks)',
+                                              y_label='Disk Space Used (TiB)')
 
         self._start_date = start_date
         self._end_date = end_date
+
+        # Best color schemes so far:
+        # * brg
+        # * nipy_spectral
+        self._colors = \
+            BaseChart._create_colors('nipy_spectral', len(self.dataset.keys()))
+
+    def _add_legend(self):
+
+        import operator
+
+        handles, labels = self._ax.get_legend_handles_labels()
+
+        hl = sorted(zip(handles, labels), key=operator.itemgetter(1))
+
+        sorted_handles, sorted_labels = zip(*hl)
+
+        self._figure.legend(handles=sorted_handles, labels=sorted_labels,
+                            title="Groups", fontsize='small', loc='upper left')
 
     def _draw(self):
 
@@ -59,8 +80,16 @@ class UsageTrendChart(BaseChart):
             mean_weekly_summary.truncate(
                 before=self._start_date, after=self._end_date)
 
-        print(mean_weekly_summary)
+        line_style_def = ['-', '--', '-.', ':']
+        len_lsd = len(line_style_def)
+        line_styles = list()
 
-        mean_weekly_summary.plot(ax=self._ax)
+        for i in range(len(self.dataset.keys())):
+            line_styles.append(line_style_def[i % len_lsd])
 
-        self._ax.legend(title="Groups", fontsize='xx-small', loc='upper left')
+        self._ax.yaxis.set_major_locator(plt.MaxNLocator(14))
+
+        mean_weekly_summary.plot(ax=self._ax, legend=False, style=line_styles,
+                                 color=self._colors)
+
+        self._add_legend()
