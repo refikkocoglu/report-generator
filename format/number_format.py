@@ -31,7 +31,7 @@ B_DIVISIOR = Decimal(1.0)
 
 
 def number_to_base_2(number):
-    
+
     if not isinstance(number, Number):
         raise TypeError("Provided value is not a number: %s" % str(number))
 
