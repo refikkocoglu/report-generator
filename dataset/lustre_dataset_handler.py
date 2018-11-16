@@ -364,7 +364,7 @@ def create_dummy_group_date_size_list(num_groups=3):
             # date_format = '%Y-%m-%d'
             # datetime.datetime.strptime(date, date_format).date()
 
-            group = "grp%s" % gid
+            group = "group%s" % gid
             date = "2018-12-%s" % day
             size = random.randint(1, 200)
 

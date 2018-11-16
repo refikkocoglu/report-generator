@@ -39,9 +39,6 @@ class UsageTrendChart(BaseChart):
         self._start_date = start_date
         self._end_date = end_date
 
-        # Best color schemes so far:
-        # * brg
-        # * nipy_spectral
         self._colors = \
             BaseChart._create_colors('nipy_spectral', len(self.dataset.keys()))
 
@@ -56,7 +53,8 @@ class UsageTrendChart(BaseChart):
         sorted_handles, sorted_labels = zip(*hl)
 
         self._figure.legend(handles=sorted_handles, labels=sorted_labels,
-                            title="Groups", fontsize='small', loc='upper left')
+                            title="Groups", fontsize='small', loc='upper left',
+                            handlelength=3)
 
     def _draw(self):
 
@@ -87,7 +85,7 @@ class UsageTrendChart(BaseChart):
         for i in range(len(self.dataset.keys())):
             line_styles.append(line_style_def[i % len_lsd])
 
-        self._ax.yaxis.set_major_locator(plt.MaxNLocator(14))
+        self._ax.yaxis.set_major_locator(plt.MaxNLocator(12))
 
         mean_weekly_summary.plot(ax=self._ax, legend=False, style=line_styles,
                                  color=self._colors)

@@ -43,6 +43,8 @@ class UsagePieChart(BaseChart):
 
         self.num_top_groups = int(num_top_groups)
 
+        self.width = 14
+
         # Increment with 1 because of others label.
         self._colors = BaseChart._create_colors('Spectral',
                                                 self.num_top_groups + 1)
@@ -94,8 +96,6 @@ class UsagePieChart(BaseChart):
 
         for auto_text_item in auto_texts:
             auto_text_item.set_fontsize(10)
-
-        self._figure.set_size_inches(10, 8)
 
     @staticmethod
     def _calc_groups_total_size(group_info_list):
