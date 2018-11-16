@@ -31,6 +31,7 @@ B_DIVISIOR = Decimal(1.0)
 
 
 def number_to_base_2(number):
+    
     if not isinstance(number, Number):
         raise TypeError("Provided value is not a number: %s" % str(number))
 
@@ -42,27 +43,27 @@ def number_to_base_2(number):
         result = str(result) + "PiB"
 
     elif number >= TIB_DIVISIOR:
-        result = number / TIB_DIVISIOR
+        result = Decimal(number) / TIB_DIVISIOR
         result = round(result, 2)
         result = str(result) + "TiB"
 
     elif number >= GIB_DIVISIOR:
-        result = number / GIB_DIVISIOR
+        result = Decimal(number) / GIB_DIVISIOR
         result = round(result, 2)
         result = str(result) + "GiB"
 
     elif number >= MIB_DIVISIOR:
-        result = number / MIB_DIVISIOR
+        result = Decimal(number) / MIB_DIVISIOR
         result = round(result, 2)
         result = str(result) + "MiB"
 
     elif number >= KIB_DIVISIOR:
-        result = number / KIB_DIVISIOR
+        result = Decimal(number) / KIB_DIVISIOR
         result = round(result, 2)
         result = str(result) + "KiB"
 
     elif number >= B_DIVISIOR:
-        result = number / B_DIVISIOR
+        result = Decimal(number) / B_DIVISIOR
         result = str(result) + "B"
 
     else:
