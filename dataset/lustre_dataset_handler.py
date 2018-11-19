@@ -54,13 +54,13 @@ class GroupInfoItem:
         self.quota = Decimal(quota)
 
 
-class GroupDateSizeItem:
+class GroupDateValueItem:
 
-    def __init__(self, name, date, size):
+    def __init__(self, name, date, value):
 
         self.name = name
         self.date = date
-        self.size = int(size)
+        self.value = int(value)
 
 
 def get_group_names():
@@ -245,12 +245,27 @@ def get_time_series_group_sizes(start_date, end_date, group_names=None):
             cur.execute(sql)
 
             for item in cur.fetchall():
-                result_list.append(GroupDateSizeItem(item[0], item[1], item[2]))
+                result_list.append(
+                    GroupDateValueItem(item[0], item[1], item[2]))
 
             if not result_list:
                 raise RuntimeError("Found empty result list!")
 
     return result_list
+
+
+def get_time_series_group_quota(start_date, end_date, group_names=None):
+    """
+    Queries ACCT_STAT- and QUOTA-History table for given group names
+    within a specific time interval for quota consumption in percentage.
+    :param group_names: List of group names (optional).
+    :param start_date: Start date of the time interval.
+    :param end_date: End date of the time interval.
+    :return: A list of GroupDateValueItem.
+    """
+
+    pass
+
 
 def create_dummy_group_info_list(number=None):
 
@@ -369,6 +384,6 @@ def create_dummy_group_date_size_list(num_groups=3):
             size = random.randint(1, 200)
 
             group_date_size_item_list.append(
-                GroupDateSizeItem(group, date, size))
+                GroupDateValueItem(group, date, size))
 
     return group_date_size_item_list

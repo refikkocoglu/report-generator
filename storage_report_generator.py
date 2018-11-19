@@ -194,18 +194,18 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
             if group_item.name in group_item_dict:
 
                 group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.size)
+                group_item_dict[group_item.name][1].append(group_item.value)
 
             else:
 
                 group_item_dict[group_item.name] = (list(), list())
 
                 group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.size)
+                group_item_dict[group_item.name][1].append(group_item.value)
 
     else:
 
-        logging.debug('Weekly Run Mode: PRODUCTIVE')
+        logging.debug('Monthly Run Mode: PRODUCTIVE')
 
         ds.CONFIG = config
 
@@ -222,14 +222,14 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
             if group_item.name in group_item_dict:
 
                 group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.size)
+                group_item_dict[group_item.name][1].append(group_item.value)
 
             else:
 
                 group_item_dict[group_item.name] = (list(), list())
 
                 group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.size)
+                group_item_dict[group_item.name][1].append(group_item.value)
 
     #---------------------------------------------------------------------------
 
