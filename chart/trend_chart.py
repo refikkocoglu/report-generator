@@ -28,13 +28,15 @@ import matplotlib.pyplot as plt
 from base_chart import BaseChart
 
 
-class UsageTrendChart(BaseChart):
+class TrendChart(BaseChart):
 
-    def __init__(self, title, dataset, file_path, start_date, end_date):
+    def __init__(self, title, dataset, file_path,
+                 x_label, y_label, start_date, end_date):
 
-        super(UsageTrendChart, self).__init__(title, dataset, file_path,
-                                              x_label='Time (Weeks)',
-                                              y_label='Disk Space Used (TiB)')
+        sub_title = "Date from %s to %s" % (start_date, end_date)
+
+        super(TrendChart, self).__init__(title, dataset, file_path, sub_title,
+                                         x_label, y_label)
 
         self._start_date = start_date
         self._end_date = end_date
@@ -88,6 +90,8 @@ class UsageTrendChart(BaseChart):
         self._ax.yaxis.set_major_locator(plt.MaxNLocator(12))
 
         mean_weekly_summary.plot(ax=self._ax, legend=False, style=line_styles,
-                                 color=self._colors)
+                                 color=self._colors, grid=True)
+
+        self._ax.set_title(self.sub_title, fontsize=12)
 
         self._add_legend()

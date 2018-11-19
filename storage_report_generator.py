@@ -32,8 +32,7 @@ from lfs.disk_usage_info import lustre_total_size
 from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart
 from chart.usage_pie_chart import UsagePieChart
-from chart.usage_trend_chart import UsageTrendChart
-
+from chart.trend_chart import TrendChart
 
 def check_matplotlib_version():
 
@@ -90,11 +89,11 @@ def create_usage_quota_bar_chart(title, group_info_list, file_path):
     chart.create()
 
 
-def create_usage_trend_chart(title, group_item_list, file_path,
-                             start_date, end_date):
+def create_trend_chart(title, group_item_list, file_path,
+                       x_label, y_label, start_date, end_date):
 
-    chart = UsageTrendChart(title, group_item_list, file_path,
-                            start_date, end_date)
+    chart = TrendChart(title, group_item_list, file_path,
+                       x_label, y_label, start_date, end_date)
     chart.create()
 
 
@@ -168,11 +167,6 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
     date_format = config.get('time_series_chart', 'date_format')
-    start_date_str = config.get('time_series_chart', 'start_date')
-    end_date_str = config.get('time_series_chart', 'end_date')
-
-    start_date = datetime.datetime.strptime(start_date_str, date_format).date()
-    end_date = datetime.datetime.strptime(end_date_str, date_format).date()
 
     reports_path_list = list()
 
@@ -182,13 +176,19 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     # Dict could be interpreted as 3D data structure.
     group_item_dict = dict()
 
+    usage_trend_start_date = datetime.datetime.strptime(
+        config.get('usage_trend_chart', 'start_date'), date_format).date()
+
+    usage_trend_end_date = datetime.datetime.strptime(
+        config.get('usage_trend_chart', 'end_date'), date_format).date()
+
     if local_mode:
 
         logging.debug('Monthly Run Mode: LOCAL/DEV')
 
         #TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
-        for group_item in ds.create_dummy_group_date_size_list(50):
+        for group_item in ds.create_dummy_group_date_values(50, 1000):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
             if group_item.name in group_item_dict:
@@ -215,7 +215,7 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
         # TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
-        for group_item in ds.get_time_series_group_sizes(start_date, end_date,
+        for group_item in ds.get_time_series_group_sizes(usage_trend_start_date, usage_trend_end_date,
                                                          groups):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
@@ -241,8 +241,84 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     chart_path = \
         chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
 
-    create_usage_trend_chart(title, group_item_dict, chart_path,
-                             start_date, end_date)
+    create_trend_chart(title, group_item_dict, chart_path,
+                       'Time (Weeks)', 'Disk Space Used (TiB)',
+                       usage_trend_start_date, usage_trend_end_date)
+
+    reports_path_list.append(chart_path)
+
+    # Quota Trend Chart specific dataset preparation!
+    # ---------------------------------------------------------------------------
+
+    # Dict could be interpreted as 3D data structure.
+    group_item_dict = dict()
+
+    quota_trend_start_date = datetime.datetime.strptime(
+        config.get('quota_trend_chart', 'start_date'), date_format).date()
+
+    quota_trend_end_date = datetime.datetime.strptime(
+        config.get('quota_trend_chart', 'end_date'), date_format).date()
+
+    if local_mode:
+
+        logging.debug('Monthly Run Mode: LOCAL/DEV')
+
+        # TODO: Encapsulate the object structe into a seperate type!
+        # group_item = GroupDateSizeItem
+        for group_item in ds.create_dummy_group_date_values(50, 200):
+
+            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
+            if group_item.name in group_item_dict:
+
+                group_item_dict[group_item.name][0].append(group_item.date)
+                group_item_dict[group_item.name][1].append(group_item.value)
+
+            else:
+
+                group_item_dict[group_item.name] = (list(), list())
+
+                group_item_dict[group_item.name][0].append(group_item.date)
+                group_item_dict[group_item.name][1].append(group_item.value)
+
+    else:
+
+        logging.debug('Monthly Run Mode: PRODUCTIVE')
+
+        ds.CONFIG = config
+
+        # groups = ds.get_top_groups(10)
+        groups = gf.filter_system_groups(ds.get_group_names())
+
+        # TODO: Encapsulate the object structe into a seperate type!
+        # group_item = GroupDateSizeItem
+        for group_item in ds.get_time_series_group_quota(quota_trend_start_date,
+                                                         quota_trend_end_date,
+                                                         groups):
+
+            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
+            if group_item.name in group_item_dict:
+
+                group_item_dict[group_item.name][0].append(group_item.date)
+                group_item_dict[group_item.name][1].append(group_item.value)
+
+            else:
+
+                group_item_dict[group_item.name] = (list(), list())
+
+                group_item_dict[group_item.name][0].append(group_item.date)
+                group_item_dict[group_item.name][1].append(group_item.value)
+
+    # ---------------------------------------------------------------------------
+
+    # QUOTA-TREND-CHART
+    title = "Group Quota Trends on %s" % long_name
+
+    chart_path = \
+        chart_dir + os.path.sep + config.get('quota_trend_chart', 'filename')
+
+    create_trend_chart(title, group_item_dict, chart_path,
+                       'Time (Weeks)', 'Quota Used (%)',
+                       quota_trend_start_date, quota_trend_end_date)
 
     reports_path_list.append(chart_path)
 

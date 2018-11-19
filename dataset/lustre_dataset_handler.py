@@ -59,8 +59,14 @@ class GroupDateValueItem:
     def __init__(self, name, date, value):
 
         self.name = name
+
+        # TODO: Convertion to date???
         self.date = date
-        self.value = int(value)
+
+        if value:
+            self.value = int(value)
+        else:
+            self.value = None
 
 
 def get_group_names():
@@ -193,8 +199,8 @@ def get_top_groups(limit):
 
             sql = "SELECT T.gid FROM " \
                   "(SELECT gid, SUM(size) as group_size FROM %s " \
-                  "GROUP BY gid ORDER BY group_size DESC) AS T LIMIT %s" % \
-                  (acct_stat_table, limit)
+                  "GROUP BY gid ORDER BY group_size DESC) AS T LIMIT %s" \
+                  % (acct_stat_table, limit)
 
             logging.debug(sql)
             cur.execute(sql)
@@ -221,7 +227,7 @@ def get_time_series_group_sizes(start_date, end_date, group_names=None):
 
     result_list = list()
 
-    table = CONFIG.get('report', 'table')
+    table = CONFIG.get('report', 'acct_table')
 
     with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
                                  user=CONFIG.get('mysqld', 'user'),
@@ -233,8 +239,8 @@ def get_time_series_group_sizes(start_date, end_date, group_names=None):
 
             # TiB Divisor = '1099511627776'
             sql = "SELECT gid, date, ROUND(SUM(size)/1099511627776) as size " \
-                  "FROM %s WHERE date between '%s' AND '%s'" % \
-                  (table, start_date, end_date)
+                  "FROM %s WHERE date between '%s' AND '%s'" \
+                  % (table, start_date, end_date)
 
             if group_names:
                 sql += " AND gid IN (%s)" % str(group_names).strip('[]')
@@ -264,7 +270,40 @@ def get_time_series_group_quota(start_date, end_date, group_names=None):
     :return: A list of GroupDateValueItem.
     """
 
-    pass
+    result_list = list()
+
+    acct_table = CONFIG.get('report', 'acct_table')
+    quota_table = CONFIG.get('report', 'quota_table')
+
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('report', 'database'))) \
+            as conn:
+
+        with closing(conn.cursor()) as cur:
+
+            sql = "SELECT gid, date, ROUND((SUM(size) / quota) * 100, 0) " \
+                  "FROM %s JOIN %s USING(gid, date) " \
+                  "WHERE date between '%s' AND '%s'" \
+                  % (acct_table, quota_table, start_date, end_date)
+
+            if group_names:
+                sql += " AND gid IN (%s)" % str(group_names).strip('[]')
+
+            sql += ' GROUP BY gid, date'
+
+            logging.debug(sql)
+            cur.execute(sql)
+
+            for item in cur.fetchall():
+                result_list.append(
+                    GroupDateValueItem(item[0], item[1], item[2]))
+
+            if not result_list:
+                raise RuntimeError("Found empty result list!")
+
+    return result_list
 
 
 def create_dummy_group_info_list(number=None):
@@ -360,11 +399,12 @@ def create_dummy_group_info_list(number=None):
         return group_info_list
 
 
-def create_dummy_group_date_size_list(num_groups=3):
+def create_dummy_group_date_values(num_groups=3, max_value=100):
     """
-    Date interval is from 2018-12-01 to 2018-12-31.
-    :param num_groups: Optional parameter for specifiying number of groups.
-    :return: A list of GroupDataSizeItems.
+        Date interval is from 2018-12-01 to 2018-12-31.
+        :param num_groups: Specifies number of groups.
+        :param max_value: Specifies maximum value in value range.
+        :return: A list of GroupDataSizeItems.
     """
 
     import random
@@ -381,9 +421,9 @@ def create_dummy_group_date_size_list(num_groups=3):
 
             group = "group%s" % gid
             date = "2018-12-%s" % day
-            size = random.randint(1, 200)
+            value = random.randint(1, max_value)
 
             group_date_size_item_list.append(
-                GroupDateValueItem(group, date, size))
+                GroupDateValueItem(group, date, value))
 
     return group_date_size_item_list

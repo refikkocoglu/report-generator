@@ -18,7 +18,8 @@ table = ACCT_STAT
 
 [report]
 database = report_fs
-table = ACCT_STAT_HISTORY
+acct_table = ACCT_STAT_HISTORY
+quota_table = GROUP_QUOTA_HISTORY
 
 [storage]
 filesystem = /lustre/fs
@@ -29,8 +30,13 @@ report_dir = /home/iannetti/tmp/reports/monthly
 
 [time_series_chart]
 date_format = %Y-%m-%d
-start_date = 2018-12-01
-end_date = 2018-12-31
 
 [usage_trend_chart]
 filename = usage_trend.svg
+start_date = 2018-12-01
+end_date = 2018-12-31
+
+[quota_trend_chart]
+filename = soft_quota_trend.svg
+start_date = 2018-12-01
+end_date = 2018-12-31
