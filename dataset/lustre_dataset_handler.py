@@ -214,6 +214,70 @@ def get_top_groups(limit):
     return grp_names_list
 
 
+def get_groups_max_size(start_date, end_date, group_names=None):
+    """
+    Returns the maximum size for each group between a start and end date.
+    :param start_date: Specifies the start date.
+    :param end_date: Specifies the end date.
+    :param group_names: Specifies the group names to filter for.
+    :return: A list of GroupSizeItem is returned.
+    """
+
+    result_list = list()
+
+    table = CONFIG.get('report', 'acct_table')
+
+    with closing(MySQLdb.connect(host=CONFIG.get('mysqld', 'host'),
+                                 user=CONFIG.get('mysqld', 'user'),
+                                 passwd=CONFIG.get('mysqld', 'password'),
+                                 db=CONFIG.get('report', 'database'))) \
+            as conn:
+
+        with closing(conn.cursor()) as cur:
+
+            # TiB Divisor = '1099511627776'
+            sql = "SELECT gid, ROUND(MAX(sum_size)/1099511627776) as max_sum " \
+                  "FROM ( " \
+                  "SELECT gid, date, SUM(size) AS sum_size " \
+                  "FROM %s " \
+                  "WHERE date BETWEEN '%s' AND '%s' " \
+                  % (table, start_date, end_date)
+
+            if group_names:
+                sql += " AND gid IN (%s) " % str(group_names).strip('[]')
+
+            sql += "GROUP BY gid, date ) AS x " \
+                   "GROUP BY gid " \
+                   "ORDER BY max_sum DESC"
+
+            logging.debug(sql)
+            cur.execute(sql)
+
+            for item in cur.fetchall():
+                result_list.append(
+                    GroupSizeItem(item[0], item[1]))
+
+            if not result_list:
+                raise RuntimeError("Found empty result list!")
+
+    return result_list
+
+
+def split_groups_in_top_and_bottom_list(groups_size_list, threshold):
+
+    top_groups_list = list()
+    bottom_groups_list = list()
+
+    for item in groups_size_list:
+
+        if item.size >= threshold:
+            top_groups_list.append(item.name)
+        else:
+            bottom_groups_list.append(item.name)
+
+    return top_groups_list, bottom_groups_list
+
+
 def get_time_series_group_sizes(start_date, end_date, group_names=None):
     """
     Queries ACCT_STAT_HISTORY table for given group names
