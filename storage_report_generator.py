@@ -94,6 +94,7 @@ def create_trend_chart(title, group_item_list, file_path,
 
     chart = TrendChart(title, group_item_list, file_path,
                        x_label, y_label, start_date, end_date)
+
     chart.create()
 
 
@@ -212,11 +213,17 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
         # groups = ds.get_top_groups(10)
         groups = gf.filter_system_groups(ds.get_group_names())
 
+        threshold = config.get('usage_trend_chart', 'threshold')
+
+        filtered_group_names = \
+            ds.filter_groups_at_threshold_size(
+                usage_trend_start_date, usage_trend_end_date, threshold, groups)
+
         # TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
         for group_item in ds.get_time_series_group_sizes(usage_trend_start_date,
                                                          usage_trend_end_date,
-                                                         groups):
+                                                         filtered_group_names):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
             if group_item.name in group_item_dict:
@@ -236,7 +243,7 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     purge_old_report_files(chart_dir)
 
     # USAGE-TREND-CHART
-    title = "Group Usage Trends on %s" % long_name
+    title = "Top Groups Usage Trend on %s" % long_name
 
     chart_path = \
         chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
@@ -265,7 +272,7 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
         # TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
-        for group_item in ds.create_dummy_group_date_values(50, 200):
+        for group_item in ds.create_dummy_group_date_values(7, 200):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
             if group_item.name in group_item_dict:
@@ -291,9 +298,10 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
         # TODO: Encapsulate the object structe into a seperate type!
         # group_item = GroupDateSizeItem
-        for group_item in ds.get_time_series_group_quota(quota_trend_start_date,
-                                                         quota_trend_end_date,
-                                                         groups):
+        for group_item in ds.get_time_series_group_quota_usage(
+                quota_trend_start_date,
+                quota_trend_end_date,
+                groups):
 
             # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
             if group_item.name in group_item_dict:
@@ -311,7 +319,7 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     # --------------------------------------------------------------------------
 
     # QUOTA-TREND-CHART
-    title = "Group Quota Trends on %s" % long_name
+    title = "Group Quota Trend on %s" % long_name
 
     chart_path = \
         chart_dir + os.path.sep + config.get('quota_trend_chart', 'filename')
@@ -323,101 +331,6 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     reports_path_list.append(chart_path)
 
     return reports_path_list
-
-
-def create_top_and_bottom_usage_trend_charts(chart_dir, long_name, config):
-
-    ds.CONFIG = config
-
-    date_format = config.get('time_series_chart', 'date_format')
-
-    # Dict could be interpreted as 3D data structure.
-    group_item_dict = dict()
-
-    usage_trend_start_date = datetime.datetime.strptime(
-        config.get('usage_trend_chart', 'start_date'), date_format).date()
-
-    usage_trend_end_date = datetime.datetime.strptime(
-        config.get('usage_trend_chart', 'end_date'), date_format).date()
-
-    groups = gf.filter_system_groups(ds.get_group_names())
-
-    groups_max_size_list = \
-        ds.get_groups_max_size(
-            usage_trend_start_date, usage_trend_end_date, groups)
-
-    top_groups_list, bottom_groups_list = \
-        ds.split_groups_in_top_and_bottom_list(groups_max_size_list, 100)
-
-    # TOP GROUPS SECTION:
-
-    top_group_item_dict = dict()
-
-    # TODO: Encapsulate the object structe into a seperate type!
-    for group_item in ds.get_time_series_group_sizes(usage_trend_start_date,
-                                                     usage_trend_end_date,
-                                                     top_groups_list):
-
-        # TODO: Optimize by cached 'top_group_item_dict[group_item.name]' key object.
-        if group_item.name in top_group_item_dict:
-
-            top_group_item_dict[group_item.name][0].append(group_item.date)
-            top_group_item_dict[group_item.name][1].append(group_item.value)
-
-        else:
-
-            top_group_item_dict[group_item.name] = (list(), list())
-
-            top_group_item_dict[group_item.name][0].append(group_item.date)
-            top_group_item_dict[group_item.name][1].append(group_item.value)
-
-    # ---------------------------------------------------------------------------
-
-    # TOP GROUPS USAGE-TREND-CHART
-    title = "Top Groups Usage Trends on %s" % long_name
-
-    chart_path = \
-        chart_dir + os.path.sep + "top_groups_" + \
-        config.get('usage_trend_chart', 'filename')
-
-    create_trend_chart(title, top_group_item_dict, chart_path,
-                       'Time (Weeks)', 'Disk Space Used (TiB)',
-                       usage_trend_start_date, usage_trend_end_date)
-
-    # BOTTOM GROUPS SECTION:
-
-    bottom_group_item_dict = dict()
-
-    # TODO: Encapsulate the object structe into a seperate type!
-    for group_item in ds.get_time_series_group_sizes(usage_trend_start_date,
-                                                     usage_trend_end_date,
-                                                     bottom_groups_list):
-
-        # TODO: Optimize by cached 'bottom_group_item_dict[group_item.name]' key object.
-        if group_item.name in bottom_group_item_dict:
-
-            bottom_group_item_dict[group_item.name][0].append(group_item.date)
-            bottom_group_item_dict[group_item.name][1].append(group_item.value)
-
-        else:
-
-            bottom_group_item_dict[group_item.name] = (list(), list())
-
-            bottom_group_item_dict[group_item.name][0].append(group_item.date)
-            bottom_group_item_dict[group_item.name][1].append(group_item.value)
-
-    # ---------------------------------------------------------------------------
-
-    # TOP GROUPS USAGE-TREND-CHART
-    title = "Bottom Groups Usage Trends on %s" % long_name
-
-    chart_path = \
-        chart_dir + os.path.sep + "bottom_groups_" + \
-        config.get('usage_trend_chart', 'filename')
-
-    create_trend_chart(title, bottom_group_item_dict, chart_path,
-                       'Time (Weeks)', 'Disk Space Used (TiB)',
-                       usage_trend_start_date, usage_trend_end_date)
 
 
 def transfer_reports(run_mode, time_point, reports_path_list, config):
@@ -516,8 +429,6 @@ def main():
 
             reports_path_list = \
                 create_monthly_reports(local_mode, chart_dir, long_name, config)
-
-            create_top_and_bottom_usage_trend_charts(chart_dir, long_name, config)
 
         else:
             raise RuntimeError('Undefined run_mode detected: %s' % run_mode)

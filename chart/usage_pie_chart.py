@@ -45,9 +45,7 @@ class UsagePieChart(BaseChart):
 
         self.width = 14
 
-        # Increment with 1 because of others label.
-        self._colors = BaseChart._create_colors('Spectral',
-                                                self.num_top_groups + 1)
+        self.color_name = 'Spectral'
 
     def _draw(self):
 
@@ -88,9 +86,11 @@ class UsagePieChart(BaseChart):
 
         self._figure.subplots_adjust(top=0.80)
 
+        color_map = BaseChart._create_colors(self.color_name, len(labels))
+
         patches, texts, auto_texts = \
             self._ax.pie(sizes, labels=labels,
-                         colors=self._colors, shadow=False,
+                         colors=color_map, shadow=False,
                          autopct='%1.2f%%', pctdistance=0.8, startangle=90)
 
         # Equal aspect ratio ensures that pie is drawn as a circle.

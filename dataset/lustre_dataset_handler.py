@@ -214,13 +214,15 @@ def get_top_groups(limit):
     return grp_names_list
 
 
-def get_groups_max_size(start_date, end_date, group_names=None):
+def filter_groups_at_threshold_size(start_date, end_date, threshold,
+                                    group_names=None):
     """
-    Returns the maximum size for each group between a start and end date.
+    Returns a list of group names that reached a certain threshold at size.
     :param start_date: Specifies the start date.
     :param end_date: Specifies the end date.
+    :param threshold: Specifies the threshold for the size of groups.
     :param group_names: Specifies the group names to filter for.
-    :return: A list of GroupSizeItem is returned.
+    :return: A list of group names.
     """
 
     result_list = list()
@@ -235,8 +237,7 @@ def get_groups_max_size(start_date, end_date, group_names=None):
 
         with closing(conn.cursor()) as cur:
 
-            # TiB Divisor = '1099511627776'
-            sql = "SELECT gid, ROUND(MAX(sum_size)/1099511627776) as max_sum " \
+            sql = "SELECT DISTINCT(gid) " \
                   "FROM ( " \
                   "SELECT gid, date, SUM(size) AS sum_size " \
                   "FROM %s " \
@@ -246,36 +247,16 @@ def get_groups_max_size(start_date, end_date, group_names=None):
             if group_names:
                 sql += " AND gid IN (%s) " % str(group_names).strip('[]')
 
-            sql += "GROUP BY gid, date ) AS x " \
-                   "GROUP BY gid " \
-                   "ORDER BY max_sum DESC"
+            sql += "GROUP BY gid, date HAVING(sum_size >= %s) ) AS tmp_table" \
+                   % threshold
 
             logging.debug(sql)
             cur.execute(sql)
 
             for item in cur.fetchall():
-                result_list.append(
-                    GroupSizeItem(item[0], item[1]))
-
-            if not result_list:
-                raise RuntimeError("Found empty result list!")
+                result_list.append(item[0])
 
     return result_list
-
-
-def split_groups_in_top_and_bottom_list(groups_size_list, threshold):
-
-    top_groups_list = list()
-    bottom_groups_list = list()
-
-    for item in groups_size_list:
-
-        if item.size >= threshold:
-            top_groups_list.append(item.name)
-        else:
-            bottom_groups_list.append(item.name)
-
-    return top_groups_list, bottom_groups_list
 
 
 def get_time_series_group_sizes(start_date, end_date, group_names=None):
@@ -324,7 +305,7 @@ def get_time_series_group_sizes(start_date, end_date, group_names=None):
     return result_list
 
 
-def get_time_series_group_quota(start_date, end_date, group_names=None):
+def get_time_series_group_quota_usage(start_date, end_date, group_names=None):
     """
     Queries ACCT_STAT- and QUOTA-History table for given group names
     within a specific time interval for quota consumption in percentage.

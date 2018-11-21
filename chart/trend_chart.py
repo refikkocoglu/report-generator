@@ -41,8 +41,8 @@ class TrendChart(BaseChart):
         self._start_date = start_date
         self._end_date = end_date
 
-        self._colors = \
-            BaseChart._create_colors('nipy_spectral', len(self.dataset.keys()))
+        # No bright colors.
+        self.color_name = 'Dark2'
 
     def _add_legend(self):
 
@@ -89,8 +89,11 @@ class TrendChart(BaseChart):
 
         self._ax.yaxis.set_major_locator(plt.MaxNLocator(12))
 
+        color_map = \
+            BaseChart._create_colors(self.color_name, len(self.dataset.keys()))
+
         mean_weekly_summary.plot(ax=self._ax, legend=False, style=line_styles,
-                                 color=self._colors, grid=True)
+                                 color=color_map, grid=True)
 
         self._ax.set_title(self.sub_title, fontsize=12)
 
