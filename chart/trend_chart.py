@@ -44,19 +44,40 @@ class TrendChart(BaseChart):
         # No bright colors.
         self.color_name = 'Dark2'
 
-    def _add_legend(self):
+    def _add_sorted_legend(self, df_tail):
+        """
+        Adds a sorted legend to the figure sorted by the last values retrieved
+        from the given Pandas Data Frame last values.
+        :param df_tail: Tail from Pandas Data Frame.
+        """
+
+        len_col = len(df_tail.columns.values)
+        len_val = len(df_tail.values.tolist()[0])
+
+        if len_col != len_val:
+            raise RuntimeError("Number of columns is not equal last values"
+                               " from Pandas Data Frame tail: %s"
+                               % df_tail)
+
+        col_val_pairs = zip(df_tail.columns.values, df_tail.values.tolist()[0])
 
         import operator
 
+        col_val_pairs.sort(key=operator.itemgetter(1), reverse=True)
+
+        sorted_col_names = zip(*col_val_pairs)[0]
+
         handles, labels = self._ax.get_legend_handles_labels()
 
-        hl = sorted(zip(handles, labels), key=operator.itemgetter(1))
+        handle_label_pairs = zip(handles, labels)
 
-        sorted_handles, sorted_labels = zip(*hl)
+        handle_label_pairs.sort(key=lambda handle_label_pairs:
+                                sorted_col_names.index(handle_label_pairs[1]))
 
-        self._figure.legend(handles=sorted_handles, labels=sorted_labels,
-                            title="Groups", fontsize='small', loc='upper left',
-                            handlelength=3)
+        handles, labels = zip(*handle_label_pairs)
+
+        self._figure.legend(handles=handles, labels=labels, title="Groups",
+                            fontsize='small', loc='upper left', handlelength=5)
 
     def _draw(self):
 
@@ -97,4 +118,4 @@ class TrendChart(BaseChart):
 
         self._ax.set_title(self.sub_title, fontsize=12)
 
-        self._add_legend()
+        self._add_sorted_legend(mean_weekly_summary.tail(1))
