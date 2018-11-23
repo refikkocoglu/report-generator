@@ -152,91 +152,6 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     return reports_path_list
 
 
-def create_monthly_reports(local_mode, chart_dir, long_name, config):
-
-    reports_path_list = list()
-
-    date_format = config.get('time_series_chart', 'date_format')
-
-    # Quota Trend Chart specific dataset preparation!
-    # --------------------------------------------------------------------------
-
-    # Dict could be interpreted as 3D data structure.
-    group_item_dict = dict()
-
-    quota_trend_start_date = datetime.datetime.strptime(
-        config.get('quota_trend_chart', 'start_date'), date_format).date()
-
-    quota_trend_end_date = datetime.datetime.strptime(
-        config.get('quota_trend_chart', 'end_date'), date_format).date()
-
-    if local_mode:
-
-        logging.debug('Monthly Run Mode: LOCAL/DEV')
-
-        # TODO: Encapsulate the object structe into a seperate type!
-        # group_item = GroupDateSizeItem
-        for group_item in ds.create_dummy_group_date_values(7, 200):
-
-            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
-            if group_item.name in group_item_dict:
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-            else:
-
-                group_item_dict[group_item.name] = (list(), list())
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-    else:
-
-        logging.debug('Monthly Run Mode: PRODUCTIVE')
-
-        ds.CONFIG = config
-
-        # groups = ds.get_top_groups(10)
-        groups = gf.filter_system_groups(ds.get_group_names())
-
-        # TODO: Encapsulate the object structe into a seperate type!
-        # group_item = GroupDateSizeItem
-        for group_item in ds.get_time_series_group_quota_usage(
-                quota_trend_start_date,
-                quota_trend_end_date,
-                groups):
-
-            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
-            if group_item.name in group_item_dict:
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-            else:
-
-                group_item_dict[group_item.name] = (list(), list())
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-    # --------------------------------------------------------------------------
-
-    # QUOTA-TREND-CHART
-    title = "Group Quota Trend on %s" % long_name
-
-    chart_path = \
-        chart_dir + os.path.sep + config.get('quota_trend_chart', 'filename')
-
-    create_trend_chart(title, group_item_dict, chart_path,
-                       'Time (Weeks)', 'Quota Used (%)',
-                       quota_trend_start_date, quota_trend_end_date)
-
-    reports_path_list.append(chart_path)
-
-    return reports_path_list
-
-
 def main():
 
     parser = argparse.ArgumentParser(description='Storage Report Generator.')
@@ -286,9 +201,7 @@ def main():
                 transfer_report(run_mode, start_date, reports_path_list, config)
 
         elif run_mode == 'monthly':
-
-            reports_path_list = \
-                create_monthly_reports(local_mode, chart_dir, long_name, config)
+            pass
 
         else:
             raise RuntimeError('Undefined run_mode detected: %s' % run_mode)
