@@ -79,7 +79,6 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        run_mode = config.get('execution', 'mode')
         transfer_mode = config.get('execution', 'transfer')
 
         chart_dir = config.get('base_chart', 'report_dir')
@@ -135,7 +134,7 @@ def main():
         logging.debug("Created Lustre Usage Trend Report under: %s" % chart_path)
 
         if transfer_mode == 'on':
-            transfer_report(run_mode, run_date, chart_path, config)
+            transfer_report('monthly', run_date, chart_path, config)
 
         logging.info('END')
 
