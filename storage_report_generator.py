@@ -32,7 +32,6 @@ from lfs.disk_usage_info import lustre_total_size
 from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart
 from chart.usage_pie_chart import UsagePieChart
-from chart.trend_chart import TrendChart
 
 from utils.matplot import check_matplotlib_version
 from utils.rsync import transfer_report
@@ -58,20 +57,10 @@ def create_usage_quota_bar_chart(title, group_info_list, file_path):
     chart.create()
 
 
-def create_trend_chart(title, group_item_list, file_path,
-                       x_label, y_label, start_date, end_date):
-
-    chart = TrendChart(title, group_item_list, file_path,
-                       x_label, y_label, start_date, end_date)
-
-    chart.create()
-
-
 def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
     reports_path_list = list()
 
-    #TODO: Extract where the data comes from!!!
     group_info_list = None
     storage_total_size = 0
 
@@ -159,32 +148,22 @@ def main():
 
         check_matplotlib_version()
 
-        # Commandline parameter.
         local_mode = args.enable_local
 
-        # Config file parameter.
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        run_mode = config.get('execution', 'mode')
         transfer_mode = config.get('execution', 'transfer')
 
         chart_dir = config.get('base_chart', 'report_dir')
         long_name = config.get('storage', 'long_name')
 
-        if run_mode == 'weekly':
+        chart_path_list = create_weekly_reports(local_mode, chart_dir, long_name, config)
 
-            reports_path_list = \
-                create_weekly_reports(local_mode, chart_dir, long_name, config)
+        if transfer_mode == 'on':
 
-            if transfer_mode == 'on':
-                transfer_report(run_mode, start_date, reports_path_list, config)
-
-        elif run_mode == 'monthly':
-            pass
-
-        else:
-            raise RuntimeError('Undefined run_mode detected: %s' % run_mode)
+            for chart_path in chart_path_list:
+                transfer_report('weekly', start_date, chart_path, config)
 
         logging.info('END')
 
