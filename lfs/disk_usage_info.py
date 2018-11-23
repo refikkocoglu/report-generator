@@ -15,9 +15,9 @@ def lustre_total_size(path):
    
    try:
 
-      output = subprocess.check_output( ["lfs", "df", path], stderr=subprocess.STDOUT )
+      output = subprocess.check_output(["lfs", "df", path])
       
-      total_size_ost = Decimal( 0 )
+      total_size_ost = Decimal(0)
    
       if output:
          
@@ -31,12 +31,12 @@ def lustre_total_size(path):
                
                fields = line.split()
                
-               ost_size = Decimal( fields[1] ) * Decimal ( 1024.0 )
+               ost_size = Decimal(fields[1]) * Decimal(1024.0)
                
                total_size_ost += ost_size
                
             else:
-               logging.debug("Ignored line: %s" % line)
+               logging.debug("Ignored 'lfs df' line: %s" % line)
       
       if total_size_ost:
          return total_size_ost
@@ -45,6 +45,6 @@ def lustre_total_size(path):
    
    except subprocess.CalledProcessError as e:
 
-      logging.error( e.output )
+      logging.error(e.output)
       
-      raise RuntimeError( e.output )
+      raise RuntimeError(e.output)
