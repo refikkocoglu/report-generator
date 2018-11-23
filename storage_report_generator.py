@@ -38,26 +38,6 @@ from utils.matplot import check_matplotlib_version
 from utils.rsync import transfer_report
 
 
-def purge_old_report_files(report_dir):
-
-    pattern = ".svg"
-
-    if not os.path.isdir(report_dir):
-        raise RuntimeError("Directory does not exist under: %s" % report_dir)
-
-    file_list = os.listdir(report_dir)
-
-    for filename in file_list:
-
-        if pattern in filename:
-
-            file_path = os.path.join(report_dir, filename)
-
-            logging.debug("Removed old report file: %s" % file_path)
-
-            os.remove(file_path)
-
-
 def create_usage_pie_chart(title, group_info_list, file_path,
                            storage_total_size, num_top_groups):
 
