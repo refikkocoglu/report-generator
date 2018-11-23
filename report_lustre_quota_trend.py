@@ -36,7 +36,7 @@ from utils.rsync import transfer_report
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Storage Report Generator.')
+    parser = argparse.ArgumentParser(description='Lustre Quota Trend Report')
 
     parser.add_argument('-f', '--config-file', dest='config_file', type=str,
                         required=True, help='Path of the config file.')
