@@ -70,7 +70,7 @@ def main():
 
         check_matplotlib_version()
 
-        start_date = datetime.datetime.now()
+        run_date = datetime.datetime.now()
 
         # Commandline parameter.
         local_mode = args.enable_local
@@ -87,10 +87,10 @@ def main():
 
         date_format = config.get('time_series_chart', 'date_format')
 
-        usage_trend_start_date = datetime.datetime.strptime(
+        start_date = datetime.datetime.strptime(
             config.get('usage_trend_chart', 'start_date'), date_format).date()
 
-        usage_trend_end_date = datetime.datetime.strptime(
+        end_date = datetime.datetime.strptime(
             config.get('usage_trend_chart', 'end_date'), date_format).date()
 
         if local_mode:
@@ -111,11 +111,10 @@ def main():
 
             filtered_group_names = \
                 ds.filter_groups_at_threshold_size(
-                    usage_trend_start_date, usage_trend_end_date, threshold,
+                    start_date, end_date, threshold,
                     groups)
 
-            item_list = ds.get_time_series_group_sizes(usage_trend_start_date,
-                                                       usage_trend_end_date,
+            item_list = ds.get_time_series_group_sizes(start_date, end_date,
                                                        filtered_group_names)
 
         # TODO: Dict could be interpreted as 3D data structure.
@@ -129,14 +128,14 @@ def main():
 
         chart = TrendChart(title, group_item_dict, chart_path,
                            'Time (Weeks)', 'Disk Space Used (TiB)',
-                           usage_trend_start_date, usage_trend_end_date)
+                           start_date, end_date)
 
         chart.create()
 
         logging.debug("Created Lustre Usage Trend Report under: %s" % chart_path)
 
         if transfer_mode == 'on':
-            transfer_report(run_mode, start_date, chart_path, config)
+            transfer_report(run_mode, run_date, chart_path, config)
 
         logging.info('END')
 
