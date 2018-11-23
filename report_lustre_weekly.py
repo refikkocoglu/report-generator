@@ -37,26 +37,6 @@ from utils.matplot import check_matplotlib_version
 from utils.rsync import transfer_report
 
 
-def create_usage_pie_chart(title, group_info_list, file_path,
-                           storage_total_size, num_top_groups):
-
-    chart = UsagePieChart(title, group_info_list, file_path, storage_total_size,
-                          num_top_groups)
-    chart.create()
-
-
-def create_quota_pct_bar_chart(title, group_info_list, file_path):
-
-    chart = QuotaPctBarChart(title, group_info_list, file_path)
-    chart.create()
-
-
-def create_usage_quota_bar_chart(title, group_info_list, file_path):
-
-    chart = UsageQuotaBarChart(title, group_info_list, file_path)
-    chart.create()
-
-
 def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
     reports_path_list = list()
@@ -76,47 +56,33 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
         logging.debug('Weekly Run Mode: PRODUCTIVE')
 
         ds.CONFIG = config
-
-        group_info_list = \
-            gf.filter_group_info_items(
-                ds.get_group_info_list(
-                    gf.filter_system_groups(ds.get_group_names())))
-
-        storage_total_size = \
-            lustre_total_size(config.get('storage', 'filesystem'))
+        group_info_list = gf.filter_group_info_items(ds.get_group_info_list(gf.filter_system_groups(ds.get_group_names())))
+        storage_total_size = lustre_total_size(config.get('storage', 'filesystem'))
     
     # QUOTA-PCT-BAR-CHART
     title = "Group Quota Usage on %s" % long_name
-
-    chart_path = \
-        chart_dir + os.path.sep + config.get('quota_pct_bar_chart', 'filename')
-
-    create_quota_pct_bar_chart(title, group_info_list, chart_path)
-
+    chart_path = chart_dir + os.path.sep + config.get('quota_pct_bar_chart', 'filename')
+    chart = QuotaPctBarChart(title, group_info_list, chart_path)
+    chart.create()
     reports_path_list.append(chart_path)
+    logging.debug(chart_path)
 
     # USAGE-QUOTA-BAR-CHART
     title = "Quota and Disk Space Usage on %s" % long_name
-
-    chart_path = chart_dir + os.path.sep + \
-                 config.get('usage_quota_bar_chart', 'filename')
-
-    create_usage_quota_bar_chart(title, group_info_list, chart_path)
-
+    chart_path = chart_dir + os.path.sep + config.get('usage_quota_bar_chart', 'filename')
+    chart = UsageQuotaBarChart(title, group_info_list, chart_path)
+    chart.create()
     reports_path_list.append(chart_path)
+    logging.debug(chart_path)
 
     # USAGE-PIE-CHART
     title = "Storage Usage on %s" % long_name
-
-    chart_path = \
-        chart_dir + os.path.sep + config.get('usage_pie_chart', 'filename')
-
+    chart_path = chart_dir + os.path.sep + config.get('usage_pie_chart', 'filename')
     num_top_groups = config.get('usage_pie_chart', 'num_top_groups')
-
-    create_usage_pie_chart(title, group_info_list, chart_path,
-                           storage_total_size, num_top_groups)
-
+    chart = UsagePieChart(title, group_info_list, chart_path, storage_total_size, num_top_groups)
+    chart.create()
     reports_path_list.append(chart_path)
+    logging.debug(chart_path)
 
     return reports_path_list
 
