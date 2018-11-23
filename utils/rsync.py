@@ -28,7 +28,7 @@ def transfer_report(run_mode, time_point, path, config):
     logging.debug('Transferring Reports')
 
     if not path:
-        raise RuntimeError('Input reports path list is not set!')
+        raise RuntimeError('Empty path for report found!')
 
     remote_host = config.get('transfer', 'host')
     remote_path = config.get('transfer', 'path')
