@@ -46,14 +46,10 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
     if local_mode:
 
-        logging.debug('Weekly Run Mode: LOCAL/DEV')
-
         group_info_list = ds.create_dummy_group_info_list()
         storage_total_size = 18458963071860736
 
     else:
-
-        logging.debug('Weekly Run Mode: PRODUCTIVE')
 
         ds.CONFIG = config
         group_info_list = gf.filter_group_info_items(ds.get_group_info_list(gf.filter_system_groups(ds.get_group_names())))
@@ -64,16 +60,18 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart_path = chart_dir + os.path.sep + config.get('quota_pct_bar_chart', 'filename')
     chart = QuotaPctBarChart(title, group_info_list, chart_path)
     chart.create()
+    
+    logging.debug("Chart created: %s" % chart_path)
     reports_path_list.append(chart_path)
-    logging.debug(chart_path)
 
     # USAGE-QUOTA-BAR-CHART
     title = "Quota and Disk Space Usage on %s" % long_name
     chart_path = chart_dir + os.path.sep + config.get('usage_quota_bar_chart', 'filename')
     chart = UsageQuotaBarChart(title, group_info_list, chart_path)
     chart.create()
+
+    logging.debug("Chart created: %s" % chart_path)
     reports_path_list.append(chart_path)
-    logging.debug(chart_path)
 
     # USAGE-PIE-CHART
     title = "Storage Usage on %s" % long_name
@@ -81,8 +79,9 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     num_top_groups = config.get('usage_pie_chart', 'num_top_groups')
     chart = UsagePieChart(title, group_info_list, chart_path, storage_total_size, num_top_groups)
     chart.create()
+
+    logging.debug("Chart created: %s" % chart_path)
     reports_path_list.append(chart_path)
-    logging.debug(chart_path)
 
     return reports_path_list
 
@@ -115,6 +114,8 @@ def main():
         check_matplotlib_version()
 
         local_mode = args.enable_local
+
+        logging.debug("Local mode enabled: %s" % local_mode)
 
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)

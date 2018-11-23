@@ -25,8 +25,6 @@ import os
 
 def transfer_report(run_mode, time_point, path, config):
 
-    logging.debug('Transferring Reports')
-
     if not path:
         raise RuntimeError('Empty path for report found!')
 
@@ -49,14 +47,11 @@ def transfer_report(run_mode, time_point, path, config):
     if not os.path.isfile(path):
         raise RuntimeError('File was not found: %s' % path)
 
-    logging.debug('rsync %s %s' % (path, remote_target))
-
     try:
 
-        output = subprocess.check_output(
-            ["rsync", path, remote_target], stderr=subprocess.STDOUT)
+        subprocess.check_output(["rsync", path, remote_target])
 
-        logging.debug(output)
+        logging.debug('rsync %s - %s' % (path, remote_target))
 
     except subprocess.CalledProcessError as e:
         raise RuntimeError(e.output)

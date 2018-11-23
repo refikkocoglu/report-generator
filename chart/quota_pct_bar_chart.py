@@ -21,7 +21,6 @@
 from base_chart import BaseChart
 
 import numpy as np
-import logging
 
 # TODO: Check imports into base class...
 # Force matplotlib to not use any X window backend.
@@ -41,8 +40,6 @@ class QuotaPctBarChart(BaseChart):
     def _draw(self):
         
         num_groups = len(self.dataset)
-
-        logging.debug("Number of Groups: %s" % num_groups)
 
         self._sort_dataset(lambda group_info: group_info.name)
 

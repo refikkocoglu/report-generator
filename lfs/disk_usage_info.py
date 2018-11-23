@@ -14,6 +14,7 @@ from decimal import Decimal
 def lustre_total_size(path):
    
    try:
+
       output = subprocess.check_output( ["lfs", "df", path], stderr=subprocess.STDOUT )
       
       total_size_ost = Decimal( 0 )
@@ -35,7 +36,7 @@ def lustre_total_size(path):
                total_size_ost += ost_size
                
             else:
-               logging.debug( "Not processed line from Lustre disk usage call: %s" % line )
+               logging.debug("Ignored line: %s" % line)
       
       if total_size_ost:
          return total_size_ost

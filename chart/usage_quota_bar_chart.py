@@ -20,7 +20,6 @@
 
 from base_chart import BaseChart
 
-import logging
 import numpy as np
 from format import number_format
 
@@ -42,8 +41,6 @@ class UsageQuotaBarChart(BaseChart):
         
         num_groups = len(self.dataset)
         
-        logging.debug("Number of Groups: %s" % num_groups)
-
         self._sort_dataset(
             key=lambda group_info: group_info.quota, reverse=True)
 
@@ -57,8 +54,6 @@ class UsageQuotaBarChart(BaseChart):
                       number_format.TIB_DIVISIOR) + tick_width_y
 
         for group_info in self.dataset:
-            logging.debug("%s - %s - %s" % (
-                group_info.name, group_info.size, group_info.quota))
 
             group_names.append(group_info.name)
 

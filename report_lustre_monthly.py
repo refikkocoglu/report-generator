@@ -40,14 +40,9 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     end_date = datetime.datetime.strptime(config.get('usage_trend_chart', 'end_date'), date_format).date()
 
     if local_mode:
-
-        logging.debug('Monthly Run Mode: LOCAL/DEV')
-
         item_list = ds.create_dummy_group_date_values(50, 1000)
 
     else:
-
-        logging.debug('Monthly Run Mode: PRODUCTIVE')
 
         ds.CONFIG = config
 
@@ -69,8 +64,6 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
 
     chart.create()
 
-    logging.debug("Created Lustre Usage Trend Report under: %s" % chart_path)
-
     return chart_path
 
 
@@ -81,14 +74,9 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     end_date = datetime.datetime.strptime(config.get('quota_trend_chart', 'end_date'), date_format).date()
 
     if local_mode:
-
-        logging.debug('Monthly Run Mode: LOCAL/DEV')
-
         item_list = ds.create_dummy_group_date_values(7, 200)
 
     else:
-
-        logging.debug('Monthly Run Mode: PRODUCTIVE')
 
         ds.CONFIG = config
 
@@ -105,8 +93,6 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Quota Used (%)', start_date, end_date)
 
     chart.create()
-
-    logging.debug("Created Lustre Quota Trend Report under: %s" % chart_path)
 
     return chart_path
 
@@ -148,6 +134,8 @@ def main():
 
         local_mode = args.enable_local
 
+        logging.debug("Local mode enabled: %s" % local_mode)
+
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
@@ -161,9 +149,12 @@ def main():
         chart_path_list = list()
 
         chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, config)
+        logging.debug("Chart created: %s" % chart_path)
         chart_path_list.append(chart_path)
 
+
         chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, config)
+        logging.debug("Chart created: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         if transfer_mode == 'on':

@@ -80,8 +80,10 @@ def filter_group_info_items(group_info_list, size=0, quota=0):
         # TODO: Check list if contains instances of GorupInfoItem class.
 
         if group_info_item.size <= size and group_info_item.quota <= quota:
+
             logging.debug("Filtered group_info_item for group: %s"
                           % group_info_item.name)
+
             continue
 
         new_group_info_list.append(group_info_item)
