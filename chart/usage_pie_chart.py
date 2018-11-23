@@ -22,12 +22,9 @@ from base_chart import BaseChart
 import format.number_format as nf
 from decimal import Decimal
 
-# TODO: Check imports into base class...
-# Force matplotlib to not use any X window backend.
 import matplotlib
-from matplotlib import cm
+# Force matplotlib to not use any X window backend.
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 
 class UsagePieChart(BaseChart):

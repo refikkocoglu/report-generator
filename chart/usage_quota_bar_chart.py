@@ -23,10 +23,9 @@ from base_chart import BaseChart
 import numpy as np
 from format import number_format
 
-# Force matplotlib to not use any X window backend.
 import matplotlib
+# Force matplotlib to not use any X window backend.
 matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 
 
 class UsageQuotaBarChart(BaseChart):

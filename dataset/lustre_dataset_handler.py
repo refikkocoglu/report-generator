@@ -20,7 +20,6 @@
 
 import MySQLdb
 import logging
-import datetime
 
 from contextlib import closing
 from decimal import Decimal

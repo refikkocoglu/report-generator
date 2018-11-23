@@ -22,8 +22,8 @@ import abc
 import sys
 import datetime
 
-# Force matplotlib to not use any X window backend.
 import matplotlib
+# Force matplotlib to not use any X window backend.
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 

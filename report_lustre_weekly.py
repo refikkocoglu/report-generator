@@ -60,7 +60,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart_path = chart_dir + os.path.sep + config.get('quota_pct_bar_chart', 'filename')
     chart = QuotaPctBarChart(title, group_info_list, chart_path)
     chart.create()
-    
+
     logging.debug("Chart created: %s" % chart_path)
     reports_path_list.append(chart_path)
 
