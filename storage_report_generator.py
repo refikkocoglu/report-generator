@@ -34,19 +34,8 @@ from chart.usage_quota_bar_chart import UsageQuotaBarChart
 from chart.usage_pie_chart import UsagePieChart
 from chart.trend_chart import TrendChart
 
-def check_matplotlib_version():
-
-    import matplotlib
-
-    mplot_ver = matplotlib.__version__
-
-    logging.debug("Running with matplotlib version: %s" % mplot_ver)
-
-    major_version = int(mplot_ver.split('.')[0])
-
-    # Version of matplotlib could be extended by 3 etc., if tested!
-    if major_version != 2:
-        raise RuntimeError("Supported major matplotlib version should be 2!")
+from utils.matplot import check_matplotlib_version
+from utils.rsync import transfer_report
 
 
 def purge_old_report_files(report_dir):
@@ -126,9 +115,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
         storage_total_size = \
             lustre_total_size(config.get('storage', 'filesystem'))
-
-    purge_old_report_files(chart_dir)
-
+    
     # QUOTA-PCT-BAR-CHART
     title = "Group Quota Usage on %s" % long_name
 
@@ -167,92 +154,9 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
 def create_monthly_reports(local_mode, chart_dir, long_name, config):
 
-    date_format = config.get('time_series_chart', 'date_format')
-
     reports_path_list = list()
 
-    # Usage Trend Chart specific dataset preparation!
-    #---------------------------------------------------------------------------
-
-    # Dict could be interpreted as 3D data structure.
-    group_item_dict = dict()
-
-    usage_trend_start_date = datetime.datetime.strptime(
-        config.get('usage_trend_chart', 'start_date'), date_format).date()
-
-    usage_trend_end_date = datetime.datetime.strptime(
-        config.get('usage_trend_chart', 'end_date'), date_format).date()
-
-    if local_mode:
-
-        logging.debug('Monthly Run Mode: LOCAL/DEV')
-
-        #TODO: Encapsulate the object structe into a seperate type!
-        # group_item = GroupDateSizeItem
-        for group_item in ds.create_dummy_group_date_values(50, 1000):
-
-            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
-            if group_item.name in group_item_dict:
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-            else:
-
-                group_item_dict[group_item.name] = (list(), list())
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-    else:
-
-        logging.debug('Monthly Run Mode: PRODUCTIVE')
-
-        ds.CONFIG = config
-
-        # groups = ds.get_top_groups(10)
-        groups = gf.filter_system_groups(ds.get_group_names())
-
-        threshold = config.get('usage_trend_chart', 'threshold')
-
-        filtered_group_names = \
-            ds.filter_groups_at_threshold_size(
-                usage_trend_start_date, usage_trend_end_date, threshold, groups)
-
-        # TODO: Encapsulate the object structe into a seperate type!
-        # group_item = GroupDateSizeItem
-        for group_item in ds.get_time_series_group_sizes(usage_trend_start_date,
-                                                         usage_trend_end_date,
-                                                         filtered_group_names):
-
-            # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
-            if group_item.name in group_item_dict:
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-            else:
-
-                group_item_dict[group_item.name] = (list(), list())
-
-                group_item_dict[group_item.name][0].append(group_item.date)
-                group_item_dict[group_item.name][1].append(group_item.value)
-
-    #---------------------------------------------------------------------------
-
-    purge_old_report_files(chart_dir)
-
-    # USAGE-TREND-CHART
-    title = "Top Groups Usage Trend on %s" % long_name
-
-    chart_path = \
-        chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
-
-    create_trend_chart(title, group_item_dict, chart_path,
-                       'Time (Weeks)', 'Disk Space Used (TiB)',
-                       usage_trend_start_date, usage_trend_end_date)
-
-    reports_path_list.append(chart_path)
+    date_format = config.get('time_series_chart', 'date_format')
 
     # Quota Trend Chart specific dataset preparation!
     # --------------------------------------------------------------------------
@@ -333,49 +237,6 @@ def create_monthly_reports(local_mode, chart_dir, long_name, config):
     return reports_path_list
 
 
-def transfer_reports(run_mode, time_point, reports_path_list, config):
-
-    import subprocess
-
-    logging.debug('Transferring Reports')
-
-    if not reports_path_list:
-        raise RuntimeError('Input reports path list is not set!')
-
-    remote_host = config.get('transfer', 'host')
-    remote_path = config.get('transfer', 'path')
-    service_name = config.get('transfer', 'service')
-
-    remote_target = \
-        remote_host + "::" + remote_path + "/" + time_point.strftime('%Y') + "/"
-
-    if run_mode == 'weekly':
-        remote_target += run_mode + "/" + time_point.strftime('%V') + "/"
-    elif run_mode == 'monthly':
-        remote_target += run_mode + "/" + time_point.strftime('%m') + "/"
-    else:
-        raise RuntimeError('Undefined run_mode detected: %s' % run_mode)
-
-    remote_target += service_name + "/"
-
-    for report_path in reports_path_list:
-
-        if not os.path.isfile(report_path):
-            raise RuntimeError('Report file was not found: %s' % report_path)
-
-        logging.debug('rsync %s %s' % (report_path, remote_target))
-
-        try:
-
-            output = subprocess.check_output(
-                ["rsync", report_path, remote_target], stderr=subprocess.STDOUT)
-
-            logging.debug(output)
-
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(e.output)
-
-
 def main():
 
     parser = argparse.ArgumentParser(description='Storage Report Generator.')
@@ -422,8 +283,7 @@ def main():
                 create_weekly_reports(local_mode, chart_dir, long_name, config)
 
             if transfer_mode == 'on':
-                transfer_reports(
-                    run_mode, start_date, reports_path_list, config)
+                transfer_report(run_mode, start_date, reports_path_list, config)
 
         elif run_mode == 'monthly':
 

@@ -69,6 +69,28 @@ class GroupDateValueItem:
             self.value = None
 
 
+def create_group_date_value_item_dict(group_date_value_item_list):
+
+    item_dict = dict()
+
+    for item in group_date_value_item_list:
+
+        # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
+        if item.name in item_dict:
+
+            item_dict[item.name][0].append(item.date)
+            item_dict[item.name][1].append(item.value)
+
+        else:
+
+            item_dict[item.name] = (list(), list())
+
+            item_dict[item.name][0].append(item.date)
+            item_dict[item.name][1].append(item.value)
+
+    return item_dict
+
+
 def get_group_names():
 
     group_names = list()
@@ -267,7 +289,7 @@ def get_time_series_group_sizes(start_date, end_date, group_names=None):
     :param group_names: List of group names (optional).
     :param start_date: Start date of the time interval.
     :param end_date: End date of the time interval.
-    :return: A list of GroupDateSizeItem.
+    :return: A list of GroupDateValueItem.
     """
 
     result_list = list()
@@ -449,7 +471,7 @@ def create_dummy_group_date_values(num_groups=3, max_value=100):
         Date interval is from 2018-12-01 to 2018-12-31.
         :param num_groups: Specifies number of groups.
         :param max_value: Specifies maximum value in value range.
-        :return: A list of GroupDataSizeItems.
+        :return: A list of GroupDateValueItem.
     """
 
     import random

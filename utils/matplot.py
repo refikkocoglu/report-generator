@@ -1,0 +1,36 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+#
+# Copyright 2018 Gabriele Iannetti <g.iannetti@gsi.de>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
+import logging
+import matplotlib
+
+
+def check_matplotlib_version():
+
+    mplot_ver = matplotlib.__version__
+
+    logging.debug("Running with matplotlib version: %s" % mplot_ver)
+
+    major_version = int(mplot_ver.split('.')[0])
+
+    # Version of matplotlib could be extended by 3 etc., if tested!
+    if major_version != 2:
+        raise RuntimeError(
+            "Supported major matplotlib version should be 2!")
