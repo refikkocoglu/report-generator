@@ -40,7 +40,7 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     end_date = datetime.datetime.strptime(config.get('usage_trend_chart', 'end_date'), date_format).date()
 
     if local_mode:
-        item_list = ds.create_dummy_group_date_values(50, 1000)
+        item_list = ds.create_dummy_group_date_values(8, 1000)
 
     else:
 
