@@ -61,7 +61,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart = QuotaPctBarChart(title, group_info_list, chart_path)
     chart.create()
 
-    logging.debug("Chart created: %s" % chart_path)
+    logging.info("Created chart: %s" % chart_path)
     reports_path_list.append(chart_path)
 
     # USAGE-QUOTA-BAR-CHART
@@ -70,7 +70,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart = UsageQuotaBarChart(title, group_info_list, chart_path)
     chart.create()
 
-    logging.debug("Chart created: %s" % chart_path)
+    logging.info("Created chart: %s" % chart_path)
     reports_path_list.append(chart_path)
 
     # USAGE-PIE-CHART
@@ -80,7 +80,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart = UsagePieChart(title, group_info_list, chart_path, storage_total_size, num_top_groups)
     chart.create()
 
-    logging.debug("Chart created: %s" % chart_path)
+    logging.info("Created chart: %s" % chart_path)
     reports_path_list.append(chart_path)
 
     return reports_path_list

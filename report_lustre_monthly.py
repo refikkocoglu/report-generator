@@ -149,11 +149,11 @@ def main():
         chart_path_list = list()
 
         chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, config)
-        logging.debug("Chart created: %s" % chart_path)
+        logging.info("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, config)
-        logging.debug("Chart created: %s" % chart_path)
+        logging.info("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         if transfer_mode == 'on':
