@@ -152,7 +152,6 @@ def main():
         logging.debug("Chart created: %s" % chart_path)
         chart_path_list.append(chart_path)
 
-
         chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, config)
         logging.debug("Chart created: %s" % chart_path)
         chart_path_list.append(chart_path)
