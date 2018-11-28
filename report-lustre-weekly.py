@@ -110,7 +110,7 @@ def main():
 
         logging.info('START')
 
-        start_date = datetime.datetime.now()
+        date_now = datetime.datetime.now()
 
         check_matplotlib_version()
 
@@ -131,7 +131,7 @@ def main():
         if transfer_mode == 'on':
 
             for chart_path in chart_path_list:
-                transfer_report('weekly', start_date, chart_path, config)
+                transfer_report('weekly', date_now, chart_path, config)
 
         logging.info('END')
 

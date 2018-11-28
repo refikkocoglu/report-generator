@@ -27,20 +27,19 @@ import os
 
 import dataset.lustre_dataset_handler as ldh
 import dataset.item_handler as ih
+
 import filter.group_filter_handler as gf
 
 from chart.trend_chart import TrendChart
 
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
-
 from utils.pandas_ import create_data_frame
 
+import dateutil.relativedelta
 
-def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, config):
 
-    start_date = datetime.datetime.strptime(config.get('usage_trend_chart', 'start_date'), date_format).date()
-    end_date = datetime.datetime.strptime(config.get('usage_trend_chart', 'end_date'), date_format).date()
+def create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config):
 
     if local_mode:
         item_list = ih.create_dummy_group_date_values(8, 1000)
@@ -72,11 +71,7 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     return chart_path
 
 
-def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, config):
-
-    start_date = datetime.datetime.strptime(config.get('quota_trend_chart', 'start_date'), date_format).date()
-
-    end_date = datetime.datetime.strptime(config.get('quota_trend_chart', 'end_date'), date_format).date()
+def create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config):
 
     if local_mode:
         item_list = ih.create_dummy_group_date_values(50, 200)
@@ -135,7 +130,7 @@ def main():
 
         logging.info('START')
 
-        run_date = datetime.datetime.now()
+        date_now = datetime.datetime.now()
 
         check_matplotlib_version()
 
@@ -151,22 +146,33 @@ def main():
         chart_dir = config.get('base_chart', 'report_dir')
         long_name = config.get('storage', 'long_name')
 
-        date_format = config.get('time_series_chart', 'date_format')
+        date_format = config.get("time_series_chart", "date_format")
+        prev_months = int(config.get("time_series_chart", "prev_months"))
+
+        if prev_months <= 0:
+            raise RuntimeError("Config parameter 'prev_months' must be greater than 0!")
+
+        prev_date = date_now - dateutil.relativedelta.relativedelta(months=prev_months)
+
+        start_date = prev_date.strftime(date_format)
+        end_date = date_now.strftime(date_format)
+
+        logging.debug("Time series start date: %s" % start_date)
 
         chart_path_list = list()
 
-        chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, config)
+        chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
         logging.info("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
-        chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, config)
+        chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
         logging.info("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         if transfer_mode == 'on':
 
             for chart_path in chart_path_list:
-                transfer_report('monthly', run_date, chart_path, config)
+                transfer_report('monthly', date_now, chart_path, config)
 
         logging.info('END')
 
