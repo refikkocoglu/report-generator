@@ -77,7 +77,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     # USAGE-PIE-CHART
     title = "Storage Usage on %s" % long_name
     chart_path = chart_dir + os.path.sep + config.get('usage_pie_chart', 'filename')
-    num_top_groups = config.get('usage_pie_chart', 'num_top_groups')
+    num_top_groups = config.getint('usage_pie_chart', 'num_top_groups')
     chart = UsagePieChart(title, group_info_list, chart_path, storage_total_size, num_top_groups)
     chart.create()
 

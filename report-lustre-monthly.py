@@ -147,7 +147,7 @@ def main():
         long_name = config.get('storage', 'long_name')
 
         date_format = config.get("time_series_chart", "date_format")
-        prev_months = int(config.get("time_series_chart", "prev_months"))
+        prev_months = config.getint("time_series_chart", "prev_months")
 
         if prev_months <= 0:
             raise RuntimeError("Config parameter 'prev_months' must be greater than 0!")
