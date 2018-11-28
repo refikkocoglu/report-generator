@@ -25,7 +25,8 @@ import logging
 import sys
 import os
 
-import dataset.lustre_dataset_handler as ds
+import dataset.lustre_dataset_handler as ldh
+import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 from lfs.disk_usage_info import lustre_total_size
 
@@ -46,13 +47,13 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
     if local_mode:
 
-        group_info_list = ds.create_dummy_group_info_list()
+        group_info_list = ih.create_dummy_group_info_list()
         storage_total_size = 18458963071860736
 
     else:
 
-        ds.CONFIG = config
-        group_info_list = gf.filter_group_info_items(ds.get_group_info_list(gf.filter_system_groups(ds.get_group_names())))
+        ldh.CONFIG = config
+        group_info_list = gf.filter_group_info_items(ldh.get_group_info_list(gf.filter_system_groups(ldh.get_group_names())))
         storage_total_size = lustre_total_size(config.get('storage', 'filesystem'))
     
     # QUOTA-PCT-BAR-CHART

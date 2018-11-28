@@ -25,7 +25,8 @@ import logging
 import sys
 import os
 
-import dataset.lustre_dataset_handler as ds
+import dataset.lustre_dataset_handler as ldh
+import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 
 from chart.trend_chart import TrendChart
@@ -42,21 +43,21 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     end_date = datetime.datetime.strptime(config.get('usage_trend_chart', 'end_date'), date_format).date()
 
     if local_mode:
-        item_list = ds.create_dummy_group_date_values(8, 1000)
+        item_list = ih.create_dummy_group_date_values(8, 1000)
 
     else:
 
-        ds.CONFIG = config
+        ldh.CONFIG = config
 
-        groups = gf.filter_system_groups(ds.get_group_names())
+        groups = gf.filter_system_groups(ldh.get_group_names())
 
         threshold = config.get('usage_trend_chart', 'threshold')
 
-        filtered_group_names = ds.filter_groups_at_threshold_size(start_date, end_date, threshold, groups)
+        filtered_group_names = ldh.filter_groups_at_threshold_size(start_date, end_date, threshold, groups)
 
-        item_list = ds.get_time_series_group_sizes(start_date, end_date, filtered_group_names)
+        item_list = ldh.get_time_series_group_sizes(start_date, end_date, filtered_group_names)
 
-    group_item_dict = ds.create_group_date_value_item_dict(item_list)
+    group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
     data_frame = create_data_frame(group_item_dict)
 
@@ -78,17 +79,17 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     end_date = datetime.datetime.strptime(config.get('quota_trend_chart', 'end_date'), date_format).date()
 
     if local_mode:
-        item_list = ds.create_dummy_group_date_values(50, 200)
+        item_list = ih.create_dummy_group_date_values(50, 200)
 
     else:
 
-        ds.CONFIG = config
+        ldh.CONFIG = config
 
-        groups = gf.filter_system_groups(ds.get_group_names())
+        groups = gf.filter_system_groups(ldh.get_group_names())
 
-        item_list = ds.get_time_series_group_quota_usage(start_date, end_date, groups)
+        item_list = ldh.get_time_series_group_quota_usage(start_date, end_date, groups)
 
-    group_item_dict = ds.create_group_date_value_item_dict(item_list)
+    group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
     data_frame = create_data_frame(group_item_dict)
 
