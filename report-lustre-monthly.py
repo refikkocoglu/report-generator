@@ -33,6 +33,8 @@ from chart.trend_chart import TrendChart
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
 
+from utils.pandas_ import create_data_frame
+
 
 def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, config):
 
@@ -56,11 +58,13 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
 
     group_item_dict = ds.create_group_date_value_item_dict(item_list)
 
+    data_frame = create_data_frame(group_item_dict)
+
     title = "Top Groups Usage Trend on %s" % long_name
 
     chart_path = chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
 
-    chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Disk Space Used (TiB)')
+    chart = TrendChart(title, data_frame, chart_path, 'Time (Weeks)', 'Disk Space Used (TiB)')
 
     chart.create()
 
@@ -86,11 +90,13 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, conf
 
     group_item_dict = ds.create_group_date_value_item_dict(item_list)
 
+    data_frame = create_data_frame(group_item_dict)
+
     title = "Group Quota Trend on %s" % long_name
 
     chart_path = chart_dir + os.path.sep + config.get('quota_trend_chart', 'filename')
 
-    chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Quota Used (%)')
+    chart = TrendChart(title, data_frame, chart_path, 'Time (Weeks)', 'Quota Used (%)')
 
     chart.create()
 
