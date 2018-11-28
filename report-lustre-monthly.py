@@ -30,8 +30,8 @@ import filter.group_filter_handler as gf
 
 from chart.trend_chart import TrendChart
 
-from utils.matplot import check_matplotlib_version
-from utils.rsync import transfer_report
+from utils.matplotlib_ import check_matplotlib_version
+from utils.rsync_ import transfer_report
 
 
 def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, config):

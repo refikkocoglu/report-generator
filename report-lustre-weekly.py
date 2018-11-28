@@ -33,8 +33,8 @@ from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart
 from chart.usage_pie_chart import UsagePieChart
 
-from utils.matplot import check_matplotlib_version
-from utils.rsync import transfer_report
+from utils.matplotlib_ import check_matplotlib_version
+from utils.rsync_ import transfer_report
 
 
 def create_weekly_reports(local_mode, chart_dir, long_name, config):
