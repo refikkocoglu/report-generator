@@ -30,8 +30,7 @@ import matplotlib.pyplot as plt
 
 class BaseChart(object):
 
-    def __init__(self, title, dataset, file_path, sub_title='',
-                 x_label='', y_label='', width=20, height=10):
+    def __init__(self, title, dataset, file_path, x_label='', y_label='', width=20, height=10):
 
         __metaclass__ = abc.ABCMeta
 
@@ -40,8 +39,6 @@ class BaseChart(object):
         self.title = title
         self.dataset = dataset
         self.file_path = file_path
-
-        self.sub_title = sub_title
 
         self.width = width
         self.height = height

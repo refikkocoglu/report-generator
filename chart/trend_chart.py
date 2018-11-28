@@ -30,16 +30,9 @@ from base_chart import BaseChart
 
 class TrendChart(BaseChart):
 
-    def __init__(self, title, dataset, file_path,
-                 x_label, y_label, start_date, end_date):
+    def __init__(self, title, dataset, file_path, x_label, y_label):
 
-        sub_title = "Date from %s to %s" % (start_date, end_date)
-
-        super(TrendChart, self).__init__(title, dataset, file_path, sub_title,
-                                         x_label, y_label)
-
-        self._start_date = start_date
-        self._end_date = end_date
+        super(TrendChart, self).__init__(title, dataset, file_path, x_label, y_label)
 
         # No bright colors.
         self.color_name = 'Dark2'
@@ -81,25 +74,22 @@ class TrendChart(BaseChart):
 
     def _draw(self):
 
-        date_interval = \
-            pd.date_range(self._start_date, self._end_date, freq='D')
-
-        data_frame = pd.DataFrame(index=date_interval)
+        data_frame = pd.DataFrame()
 
         #TODO: Data structure in dataset???
+        # NO PASS DATA FRAME TO TREND_CHART !!!
         for group_name in self.dataset:
 
-            dates = pd.DatetimeIndex(
-                self.dataset[group_name][0], dtype='datetime64')
+            dates = pd.DatetimeIndex(self.dataset[group_name][0], dtype='datetime64')
 
-            data_frame[group_name] = \
-                pd.Series(self.dataset[group_name][1], index=dates)
+            data_frame[group_name] = pd.Series(self.dataset[group_name][1], index=dates)
+
+        start_date = data_frame.index.min().strftime('%Y-%m-%d')
+        end_date = data_frame.index.max().strftime('%Y-%m-%d')
 
         mean_weekly_summary = data_frame.resample('W').mean()
 
-        mean_weekly_summary = \
-            mean_weekly_summary.truncate(
-                before=self._start_date, after=self._end_date)
+        res_df = mean_weekly_summary.truncate(before=start_date, after=end_date)
 
         line_style_def = ['-', '--', '-.', ':']
         len_lsd = len(line_style_def)
@@ -113,9 +103,10 @@ class TrendChart(BaseChart):
         color_map = \
             BaseChart._create_colors(self.color_name, len(self.dataset.keys()))
 
-        mean_weekly_summary.plot(ax=self._ax, legend=False, style=line_styles,
-                                 color=color_map, grid=True)
+        res_df.plot(ax=self._ax, legend=False, style=line_styles, color=color_map, grid=True)
 
-        self._ax.set_title(self.sub_title, fontsize=12)
+        sub_title = "Date from %s to %s" % (start_date, end_date)
 
-        self._add_sorted_legend(mean_weekly_summary.tail(1))
+        self._ax.set_title(sub_title, fontsize=12)
+
+        self._add_sorted_legend(res_df.tail(1))

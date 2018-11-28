@@ -74,12 +74,12 @@ class UsagePieChart(BaseChart):
         total_size_pct_used = \
             int((groups_total_size / self.storage_total_size) * Decimal(100))
 
-        self.sub_title = \
+        sub_title = \
             "Used " + nf.number_to_base_2(groups_total_size) + \
             " of " + nf.number_to_base_2(self.storage_total_size) + \
             " Volume (" + str(total_size_pct_used) + "%)"
 
-        self._ax.set_title(self.sub_title, fontsize=12, y=1.15)
+        self._ax.set_title(sub_title, fontsize=12, y=1.15)
 
         self._figure.subplots_adjust(top=0.80)
 

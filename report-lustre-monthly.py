@@ -60,7 +60,7 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, date_format, conf
 
     chart_path = chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
 
-    chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Disk Space Used (TiB)', start_date, end_date)
+    chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Disk Space Used (TiB)')
 
     chart.create()
 
@@ -74,7 +74,7 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, conf
     end_date = datetime.datetime.strptime(config.get('quota_trend_chart', 'end_date'), date_format).date()
 
     if local_mode:
-        item_list = ds.create_dummy_group_date_values(7, 200)
+        item_list = ds.create_dummy_group_date_values(50, 200)
 
     else:
 
@@ -90,7 +90,7 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, date_format, conf
 
     chart_path = chart_dir + os.path.sep + config.get('quota_trend_chart', 'filename')
 
-    chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Quota Used (%)', start_date, end_date)
+    chart = TrendChart(title, group_item_dict, chart_path, 'Time (Weeks)', 'Quota Used (%)')
 
     chart.create()
 
