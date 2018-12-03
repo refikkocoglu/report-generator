@@ -30,6 +30,6 @@ def check_matplotlib_version():
 
     major_version = int(mplot_ver.split('.')[0])
 
-    # Version of matplotlib could be extended by 3 etc., if tested!
-    if major_version != 2:
-        raise RuntimeError("Supported major matplotlib version should be 2!")
+    # Exclude Version 1 of Matplotlib, since it is not supported!
+    if major_version == 1:
+        raise RuntimeError("Matplotlib Version 1 is not supported!")
