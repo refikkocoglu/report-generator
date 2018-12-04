@@ -21,26 +21,23 @@
 import ConfigParser
 import logging
 import argparse
+import smtplib
 import MySQLdb
 import time
 import sys
 import os
 
+import dataset.lustre_dataset_handler as ldh
+
 from contextlib import closing
 from lfs.retrieve_quota import retrieve_group_quota
-from dataset.lustre_dataset_handler import get_group_names
-
-
-def raise_option_not_found(section, option):
-   raise Exception("Option: %s not found in section: %s" % (option, section))
+from email.mime.text import MIMEText
 
 
 def create_group_quota_history_table(config):
 
     db = config.get('history', 'database')
-
-    group_quota_history_table = \
-        config.get('history', 'group_quota_history_table')
+    table = config.get('history', 'table')
 
     with closing(MySQLdb.connect(host=config.get('mysqld', 'host'),
                                  user=config.get('mysqld', 'user'),
@@ -57,7 +54,7 @@ def create_group_quota_history_table(config):
             cur.execute(sql)
 
             sql = """
-CREATE TABLE """ + group_quota_history_table + """ (
+CREATE TABLE """ + table + """ (
    date date NOT NULL,
    gid varbinary(127) NOT NULL DEFAULT 'unknown',
    quota bigint(20) unsigned DEFAULT '0',
@@ -70,19 +67,16 @@ CREATE TABLE """ + group_quota_history_table + """ (
 
 def save_group_quota_map(config, date, iter_items):
 
-    group_quota_history_table = \
-        config.get('history', 'group_quota_history_table')
+    table = config.get('history', 'table')
 
     with closing(MySQLdb.connect(host=config.get('mysqld', 'host'),
                                  user=config.get('mysqld', 'user'),
                                  passwd=config.get('mysqld', 'password'),
-                                 db=config.get('history', 'database'))) \
-        as conn:
+                                 db=config.get('history', 'database'))) as conn:
 
         with closing(conn.cursor()) as cur:
 
-            sql = "INSERT INTO %s (date, gid, quota) VALUES" % \
-                group_quota_history_table
+            sql = "INSERT INTO %s (date, gid, quota) VALUES" % table
 
             gid, quota = next(iter_items)
 
@@ -98,7 +92,7 @@ def save_group_quota_map(config, date, iter_items):
                 raise RuntimeError("Snapshot failed for date: %s." % date)
 
             logging.info("Inserted rows: %d into table: %s for date: %s"
-                         % (cur.rowcount, group_quota_history_table, date))
+                         % (cur.rowcount, table, date))
 
 
 def main():
@@ -135,8 +129,8 @@ def main():
     if args.enable_debug:
         logging_level = logging.DEBUG
 
-    logging.basicConfig(level=logging_level, 
-        format='%(asctime)s - %(levelname)s: %(message)s')
+    logging.basicConfig(level=logging_level,
+                        format='%(asctime)s - %(levelname)s: %(message)s')
 
     if not (args.run_mode == 'print' or args.run_mode == 'collect'):
         raise RuntimeError("Invalid run mode: %s" % args.run_mode)
@@ -151,18 +145,21 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
+        ldh.CONFIG = config
+
         if args.create_table:
 
             create_group_quota_history_table(config)
 
             logging.info('END')
-            return 0
+
+            exit(0)
 
         fs = config.get('lustre', 'file_system')
 
         group_quota_map = dict()
 
-        group_names = get_group_names(config)
+        group_names = ldh.get_group_names()
         
         for gid in group_names:
 
@@ -177,12 +174,11 @@ def main():
 
                 logging.error("Skipped quota for group: %s" % gid)
 
-                # TODO: Could be a util class for execption handling...
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
                 logging.error("Exception (type: %s): %s - %s (line: %s)" %
-                    (exc_type, str(e), filename, exc_tb.tb_lineno))
+                              (exc_type, str(e), filename, exc_tb.tb_lineno))
 
         if run_mode == 'print':
 
@@ -196,15 +192,41 @@ def main():
             save_group_quota_map(config, date_today, iter_items)
         
         logging.info('END')
-        return 0
+
+        exit(0)
         
     except Exception as e:
-    
+
         exc_type, exc_obj, exc_tb = sys.exc_info()
         filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-        logging.error("Exception (type: %s): %s - %s (line: %s)" %
-            (exc_type, str(e), filename, exc_tb.tb_lineno))
+        error_msg = "Caught exception (%s): %s - %s (line: %s)" % \
+                    (exc_type, str(e), filename, exc_tb.tb_lineno)
+
+        logging.error(error_msg)
+
+        try:
+
+            mail_server = config.get('mail', 'server')
+            mail_sender = config.get('mail', 'sender')
+            mail_recipient = config.get('mail', 'recipient')
+
+            msg = MIMEText(error_msg)
+            msg['Subject'] = __file__ + " - Error Occured!"
+            msg['From'] = mail_sender
+            msg['To'] = mail_recipient
+
+            smtp_conn = smtplib.SMTP(mail_server)
+            smtp_conn.sendmail(mail_sender, mail_recipient.split(','), msg.as_string())
+            smtp_conn.quit()
+
+        except Exception as e:
+
+            logging.error("Mail send failed: %s" % e)
+
+            exit(2)
+
+        exit(1)
 
 
 if __name__ == '__main__':

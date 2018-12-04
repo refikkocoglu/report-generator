@@ -1,0 +1,20 @@
+[lustre]
+file_system = /lustre/nyx
+
+[mysqld]
+host = lxrbh1.gsi.de
+user = robinhood
+password =
+
+[history]
+database = report_nyx
+table = ACCT_STAT_HISTORY
+
+[robinhood]
+database = robinhood_nyx
+table = ACCT_STAT
+
+[mail]
+server = localhost
+sender = hpc-data@gsi.de
+recipient = hpc-data@gsi.de
