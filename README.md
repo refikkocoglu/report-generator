@@ -7,3 +7,15 @@
 * matplotlib (tested with version 2, version 1 is not supported!)
 * pandas
 * getent
+
+## Executables
+
+### Lustre/Robinhood Specific
+
+#### Collect Scripts
+* collect-lfs-group-quota.py
+* collect-rbh-acct-stat.py
+
+#### Report Scripts
+* report-lustre-weekly.py
+* report-lustre-monthly.py
