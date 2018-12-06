@@ -89,7 +89,7 @@ def save_group_quota_map(config, date, iter_items):
             if not cur.rowcount:
                 raise RuntimeError("Snapshot failed for date: %s." % date)
 
-            logging.info("Inserted rows: %d into table: %s for date: %s"
+            logging.debug("Inserted rows: %d into table: %s for date: %s"
                          % (cur.rowcount, table, date))
 
 
@@ -136,7 +136,7 @@ def main():
         run_mode = args.run_mode
 
     try:
-        logging.info('START')
+        logging.debug('START')
 
         date_today = time.strftime('%Y-%m-%d')
         
@@ -149,7 +149,7 @@ def main():
 
             create_group_quota_history_table(config)
 
-            logging.info('END')
+            logging.debug('END')
 
             exit(0)
 
@@ -170,7 +170,7 @@ def main():
 
             except Exception as e:
 
-                logging.error("Skipped quota for group: %s" % gid)
+                logging.warning("Skipped quota for group: %s" % gid)
 
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
@@ -189,7 +189,7 @@ def main():
 
             save_group_quota_map(config, date_today, iter_items)
         
-        logging.info('END')
+        logging.debug('END')
 
         exit(0)
         
