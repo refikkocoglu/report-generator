@@ -21,7 +21,6 @@
 import ConfigParser
 import logging
 import argparse
-import smtplib
 import MySQLdb
 import time
 import sys
@@ -31,7 +30,6 @@ import dataset.lustre_dataset_handler as ldh
 
 from contextlib import closing
 from lfs.retrieve_quota import retrieve_group_quota
-from email.mime.text import MIMEText
 
 
 def create_group_quota_history_table(config):
@@ -204,27 +202,6 @@ def main():
                     (exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
-
-        try:
-
-            mail_server = config.get('mail', 'server')
-            mail_sender = config.get('mail', 'sender')
-            mail_recipient = config.get('mail', 'recipient')
-
-            msg = MIMEText(error_msg)
-            msg['Subject'] = __file__ + " - Error Occured!"
-            msg['From'] = mail_sender
-            msg['To'] = mail_recipient
-
-            smtp_conn = smtplib.SMTP(mail_server)
-            smtp_conn.sendmail(mail_sender, mail_recipient.split(','), msg.as_string())
-            smtp_conn.quit()
-
-        except Exception as e:
-
-            logging.error("Mail send failed: %s" % e)
-
-            exit(2)
 
         exit(1)
 
