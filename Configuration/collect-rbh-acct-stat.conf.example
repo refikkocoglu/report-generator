@@ -13,3 +13,8 @@ table = ACCT_STAT_HISTORY
 [robinhood]
 database = robinhood_nyx
 table = ACCT_STAT
+
+[mail]
+server = localhost
+sender = hpc-data@gsi.de
+recipient = hpc-data@gsi.de

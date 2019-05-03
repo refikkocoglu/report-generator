@@ -62,7 +62,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart = QuotaPctBarChart(title, group_info_list, chart_path)
     chart.create()
 
-    logging.debug("Created chart: %s" % chart_path)
+    logging.info("Created chart: %s" % chart_path)
     reports_path_list.append(chart_path)
 
     # USAGE-QUOTA-BAR-CHART
@@ -71,7 +71,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart = UsageQuotaBarChart(title, group_info_list, chart_path)
     chart.create()
 
-    logging.debug("Created chart: %s" % chart_path)
+    logging.info("Created chart: %s" % chart_path)
     reports_path_list.append(chart_path)
 
     # USAGE-PIE-CHART
@@ -81,7 +81,7 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     chart = UsagePieChart(title, group_info_list, chart_path, storage_total_size, num_top_groups)
     chart.create()
 
-    logging.debug("Created chart: %s" % chart_path)
+    logging.info("Created chart: %s" % chart_path)
     reports_path_list.append(chart_path)
 
     return reports_path_list
@@ -108,7 +108,7 @@ def main():
 
     try:
 
-        logging.debug('START')
+        logging.info('START')
 
         date_now = datetime.datetime.now()
 
@@ -133,7 +133,7 @@ def main():
             for chart_path in chart_path_list:
                 transfer_report('weekly', date_now, chart_path, config)
 
-        logging.debug('END')
+        logging.info('END')
 
         return 0
    
@@ -146,6 +146,24 @@ def main():
         exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
+
+        try:
+
+            mail_server = config.get('mail', 'server')
+            mail_sender = config.get('mail', 'sender')
+            mail_recipient = config.get('mail', 'recipient')
+
+            msg = MIMEText(error_msg)
+            msg['Subject'] = __file__ + " - Error Occured!"
+            msg['From'] = mail_sender
+            msg['To'] = mail_recipient
+
+            smtp_conn = smtplib.SMTP(mail_server)
+            smtp_conn.sendmail(mail_sender, mail_recipient.split(','), msg.as_string())
+            smtp_conn.quit()
+
+        except Exception as e:
+            logging.error("Mail send failed: %s" % e)
 
 
 if __name__ == '__main__':

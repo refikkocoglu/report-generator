@@ -131,7 +131,7 @@ def main():
 
     try:
 
-        logging.debug('START')
+        logging.info('START')
 
         date_now = datetime.datetime.now()
 
@@ -165,11 +165,11 @@ def main():
         chart_path_list = list()
 
         chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
-        logging.debug("Created chart: %s" % chart_path)
+        logging.info("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
-        logging.debug("Created chart: %s" % chart_path)
+        logging.info("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         if transfer_mode == 'on':
@@ -179,7 +179,7 @@ def main():
 
         raise RuntimeError('TEST')
 
-        logging.debug('END')
+        logging.info('END')
 
         return 0
 
@@ -191,6 +191,24 @@ def main():
         error_msg = "Caught exception (%s): %s - %s (line: %s)" % (exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
+
+        try:
+
+            mail_server = config.get('mail', 'server')
+            mail_sender = config.get('mail', 'sender')
+            mail_recipient = config.get('mail', 'recipient')
+
+            msg = MIMEText(error_msg)
+            msg['Subject'] = __file__ + " - Error Occured!"
+            msg['From'] = mail_sender
+            msg['To'] = mail_recipient
+
+            smtp_conn = smtplib.SMTP(mail_server)
+            smtp_conn.sendmail(mail_sender, mail_recipient.split(','), msg.as_string())
+            smtp_conn.quit()
+
+        except Exception as e:
+            logging.error("Mail send failed: %s" % e)
 
 
 if __name__ == '__main__':
