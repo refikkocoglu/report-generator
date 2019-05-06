@@ -64,7 +64,8 @@ def take_acct_stat_snapshot(cur, rbh_db, rbh_acct_table, history_db, history_acc
     if not cur.rowcount:
         raise RuntimeError("Snapshot failed for date: %s." % date)
    
-    logging.info("Inserted rows: %d into table: %s for date: %s" % (cur.rowcount, history_acct_table, date))
+    logging.debug("Inserted rows: %d into table: %s for date: %s" % 
+        (cur.rowcount, history_acct_table, date))
 
 
 def main():
@@ -94,7 +95,7 @@ def main():
 
         logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
 
-        logging.info('START')
+        logging.debug('START')
 
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
@@ -121,7 +122,7 @@ def main():
 
                 take_acct_stat_snapshot(cur, rbh_db, rbh_acct_table, history_db, history_acct_table, date_today)
 
-        logging.info('END')
+        logging.debug('END')
 
         exit(0)
    
@@ -130,7 +131,8 @@ def main():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-        error_msg = "Caught exception (%s): %s - %s (line: %s)" % (exc_type, str(e), filename, exc_tb.tb_lineno)
+        error_msg = "Caught exception (%s): %s - %s (line: %s)" % 
+            (exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
 

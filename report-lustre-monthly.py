@@ -131,7 +131,7 @@ def main():
 
     try:
 
-        logging.info('START')
+        logging.debug('START')
 
         date_now = datetime.datetime.now()
 
@@ -165,11 +165,11 @@ def main():
         chart_path_list = list()
 
         chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
-        logging.info("Created chart: %s" % chart_path)
+        logging.debug("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
-        logging.info("Created chart: %s" % chart_path)
+        logging.debug("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
         if transfer_mode == 'on':
@@ -179,7 +179,7 @@ def main():
 
         raise RuntimeError('TEST')
 
-        logging.info('END')
+        logging.debug('END')
 
         return 0
 
