@@ -22,11 +22,8 @@ import ConfigParser
 import datetime
 import argparse
 import logging
-import smtplib
 import sys
 import os
-
-from email.mime.text import MIMEText
 
 import dataset.lustre_dataset_handler as ldh
 import dataset.item_handler as ih
@@ -191,24 +188,6 @@ def main():
         error_msg = "Caught exception (%s): %s - %s (line: %s)" % (exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
-
-        try:
-
-            mail_server = config.get('mail', 'server')
-            mail_sender = config.get('mail', 'sender')
-            mail_recipient = config.get('mail', 'recipient')
-
-            msg = MIMEText(error_msg)
-            msg['Subject'] = __file__ + " - Error Occured!"
-            msg['From'] = mail_sender
-            msg['To'] = mail_recipient
-
-            smtp_conn = smtplib.SMTP(mail_server)
-            smtp_conn.sendmail(mail_sender, mail_recipient.split(','), msg.as_string())
-            smtp_conn.quit()
-
-        except Exception as e:
-            logging.error("Mail send failed: %s" % e)
 
 
 if __name__ == '__main__':

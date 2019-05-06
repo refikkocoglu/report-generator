@@ -6,11 +6,6 @@ host = www.hpc.gsi.de
 path = accounting/public
 service = nyx
 
-[mail]
-server =
-sender =
-recipient =
-
 [mysqld]
 host =
 user =
