@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 Gabriele Iannetti <g.iannetti@gsi.de>
+# Copyright 2019 Gabriele Iannetti <g.iannetti@gsi.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 
 from decimal import Decimal
 
+
+# TODO: Remove "Group" prefix to use it later for user as well...
+#       e.g. SizeItem, GroupItem, ...
 
 class GroupSizeItem:
 

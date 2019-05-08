@@ -17,6 +17,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# TODO: Rename to Datatabse Handler
+
 
 import MySQLdb
 import logging

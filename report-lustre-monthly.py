@@ -174,8 +174,6 @@ def main():
             for chart_path in chart_path_list:
                 transfer_report('monthly', date_now, chart_path, config)
 
-        raise RuntimeError('TEST')
-
         logging.debug('END')
 
         return 0
