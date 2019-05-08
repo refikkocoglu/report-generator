@@ -17,7 +17,7 @@ table = ACCT_STAT
 
 [storage]
 filesystem = /lustre/fs
-long_name = Lustre Nyx
+long_name = Lustre FS
 
 [base_chart]
 report_dir = /home/iannetti/tmp/reports/weekly
