@@ -25,7 +25,7 @@ import logging
 import sys
 import os
 
-import dataset.lustre_dataset_handler as ldh
+import dataset.rbh_dataset_handler as rdh
 import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 
@@ -53,8 +53,8 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 
     else:
 
-        ldh.CONFIG = config
-        group_info_list = gf.filter_group_info_items(ldh.get_group_info_list(gf.filter_system_groups(ldh.get_group_names())))
+        rdh.CONFIG = config
+        group_info_list = gf.filter_group_info_items(rdh.get_group_info_list(gf.filter_system_groups(rdh.get_group_names())))
         storage_total_size = lustre_total_size(config.get('storage', 'filesystem'))
     
     # QUOTA-PCT-BAR-CHART

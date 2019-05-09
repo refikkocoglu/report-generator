@@ -26,7 +26,7 @@ import time
 import sys
 import os
 
-import dataset.lustre_dataset_handler as ldh
+import dataset.rbh_dataset_handler as rdh
 
 from contextlib import closing
 from dataset.lfs_dataset_handler import retrieve_group_quota
@@ -143,7 +143,7 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        ldh.CONFIG = config
+        rdh.CONFIG = config
 
         if args.create_table:
 
@@ -157,7 +157,7 @@ def main():
 
         group_quota_map = dict()
 
-        group_names = ldh.get_group_names()
+        group_names = rdh.get_group_names()
         
         for gid in group_names:
 

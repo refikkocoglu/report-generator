@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 Gabriele Iannetti <g.iannetti@gsi.de>
+# Copyright 2019 Gabriele Iannetti <g.iannetti@gsi.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: Rename to Datatabse Handler
-
 
 import MySQLdb
 import logging
@@ -27,11 +25,6 @@ from contextlib import closing
 
 from dataset.lfs_dataset_handler import retrieve_group_quota
 from dataset.item_handler import GroupSizeItem, GroupInfoItem, GroupDateValueItem
-
-
-# TODO:
-# DATASOURCE SHOULD NOT KNOW ANYTHING ABOUT TOP GROUPS!!!
-# JUST PROVIDE GROUP INFORMATION AND RETURN NUMBER OF GROUP ITEMS!!!
 
 
 # TODO: Make Singleton Class?!

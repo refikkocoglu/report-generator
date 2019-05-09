@@ -25,7 +25,7 @@ import logging
 import sys
 import os
 
-import dataset.lustre_dataset_handler as ldh
+import dataset.rbh_dataset_handler as rdh
 import dataset.item_handler as ih
 
 import filter.group_filter_handler as gf
@@ -46,15 +46,15 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_d
 
     else:
 
-        ldh.CONFIG = config
+        rdh.CONFIG = config
 
-        groups = gf.filter_system_groups(ldh.get_group_names())
+        groups = gf.filter_system_groups(rdh.get_group_names())
 
         threshold = config.get('usage_trend_chart', 'threshold')
 
-        filtered_group_names = ldh.filter_groups_at_threshold_size(start_date, end_date, threshold, groups)
+        filtered_group_names = rdh.filter_groups_at_threshold_size(start_date, end_date, threshold, groups)
 
-        item_list = ldh.get_time_series_group_sizes(start_date, end_date, filtered_group_names)
+        item_list = rdh.get_time_series_group_sizes(start_date, end_date, filtered_group_names)
 
     group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
@@ -78,11 +78,11 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_d
 
     else:
 
-        ldh.CONFIG = config
+        rdh.CONFIG = config
 
-        groups = gf.filter_system_groups(ldh.get_group_names())
+        groups = gf.filter_system_groups(rdh.get_group_names())
 
-        item_list = ldh.get_time_series_group_quota_usage(start_date, end_date, groups)
+        item_list = rdh.get_time_series_group_quota_usage(start_date, end_date, groups)
 
     group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
