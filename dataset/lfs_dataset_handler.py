@@ -20,9 +20,12 @@
 
 import re
 import os
+import logging
 import subprocess
 
-from dataset.item_handler import GroupInfoItem
+from item_handler import GroupInfoItem
+
+from decimal import Decimal
 
 
 LFS_BIN = '/usr/bin/lfs'
@@ -32,6 +35,37 @@ def check_lfs_binary():
 
     if not os.path.isfile(LFS_BIN):
         raise RuntimeError("LFS binary was not found under: '%s'" % LFS_BIN)
+
+
+def lustre_total_size(path):
+
+    total_size_ost = Decimal(0)
+
+    output = subprocess.check_output(["lfs", "df", path])
+
+    if output:
+
+        lines = output.splitlines()
+
+        # TODO Check first line: UUID                   1K-blocks        Used   Available Use% Mounted on
+
+        for line in lines:
+
+            if 'OST' in line:
+
+                fields = line.split()
+
+                ost_size = Decimal(fields[1]) * Decimal(1024.0)
+
+                total_size_ost += ost_size
+
+            else:
+                logging.debug("Ignoring 'lfs df' line: %s" % line)
+
+    if total_size_ost:
+        return total_size_ost
+    else:
+        raise RuntimeError("Total OST size of '%s' is 0!" % path)
 
 
 def create_group_info_item(gid, fs):

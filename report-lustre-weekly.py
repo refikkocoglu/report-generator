@@ -28,7 +28,8 @@ import os
 import dataset.lustre_dataset_handler as ldh
 import dataset.item_handler as ih
 import filter.group_filter_handler as gf
-from lfs.disk_usage_info import lustre_total_size
+
+from dataset.lfs_dataset_handler import lustre_total_size
 
 from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart

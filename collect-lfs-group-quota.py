@@ -29,7 +29,7 @@ import os
 import dataset.lustre_dataset_handler as ldh
 
 from contextlib import closing
-from lfs.retrieve_quota import retrieve_group_quota
+from dataset.lfs_dataset_handler import retrieve_group_quota
 
 
 def create_group_quota_history_table(config):

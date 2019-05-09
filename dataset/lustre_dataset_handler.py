@@ -24,8 +24,8 @@ import MySQLdb
 import logging
 
 from contextlib import closing
-from lfs.retrieve_quota import retrieve_group_quota
 
+from dataset.lfs_dataset_handler import retrieve_group_quota
 from dataset.item_handler import GroupSizeItem, GroupInfoItem, GroupDateValueItem
 
 

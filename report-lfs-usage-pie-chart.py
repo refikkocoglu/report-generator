@@ -28,8 +28,8 @@ import os
 import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 
-from lfs.disk_usage_info import lustre_total_size
-from lfs.retrieve_quota import create_group_info_item
+from dataset.lfs_dataset_handler import lustre_total_size
+from dataset.lfs_dataset_handler import create_group_info_item
 
 from chart.usage_pie_chart import UsagePieChart
 
