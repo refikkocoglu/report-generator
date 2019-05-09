@@ -38,7 +38,7 @@ from utils.rsync_ import transfer_report
 from utils.getent_group import get_all_group_names
 
 
-def create_weekly_reports(local_mode, chart_dir, long_name, config):
+def create_report(local_mode, chart_dir, long_name, config):
 
     reports_path_list = list()
     group_info_items = None
@@ -123,7 +123,7 @@ def main():
         chart_dir = config.get('base_chart', 'report_dir')
         long_name = config.get('storage', 'long_name')
 
-        chart_path_list = create_weekly_reports(local_mode, chart_dir, long_name, config)
+        chart_path_list = create_report(local_mode, chart_dir, long_name, config)
 
         if transfer_mode == 'on':
 
