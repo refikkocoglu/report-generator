@@ -23,6 +23,11 @@ from decimal import Decimal
 
 # TODO: Remove "Group" prefix to use it later for user as well...
 #       e.g. SizeItem, GroupItem, ...
+# -> Refactor to one InfoItem class with default parameter!
+# But requires code changes to each object creater and caller.
+# HOW ABOUT CONSTRUCTOR OVERLOADING IN PYTHON???
+# OTHERWISE create the proper create funtions, no bad design!
+# BETTER set at least the quota=0 and files=0 so it is opional!
 
 class GroupSizeItem:
 
@@ -39,6 +44,16 @@ class GroupInfoItem:
         self.name = name
         self.size = Decimal(size)
         self.quota = Decimal(quota)
+
+
+class GroupFullInfoItem:
+
+    def __init__(self, name, size, quota, files):
+
+        self.name = name
+        self.size = Decimal(size)
+        self.quota = Decimal(quota)
+        self.files = Decimal(files)
 
 
 class GroupDateValueItem:

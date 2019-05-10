@@ -29,7 +29,7 @@ import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 
 from dataset.lfs_dataset_handler import lustre_total_size
-from dataset.lfs_dataset_handler import create_group_info_item
+from dataset.lfs_dataset_handler import create_group_info_item_list
 
 from chart.usage_pie_chart import UsagePieChart
 
@@ -57,19 +57,9 @@ def create_report(local_mode, chart_dir, long_name, config):
         
         group_names = gf.filter_system_groups(get_all_group_names())
 
-        buffered_group_info_items = list()
-        
-        # TODO: move filling of group_info_items to ldh,
-        #       but split the ldh from rbh stuff 
-        #       to be independent of mysql connector
-        for grp_name in group_names:
-            
-            # TODO: add lfs prefix!!!
-            buffered_group_info_items.append(
-                create_group_info_item(grp_name, fs_name))
-            
         group_info_items = \
-            gf.filter_group_info_items(buffered_group_info_items)
+            gf.filter_group_info_items( \
+                create_group_info_item_list(group_names, fs_name))
 
     # USAGE-PIE-CHART
     title = "Storage Usage on %s" % long_name

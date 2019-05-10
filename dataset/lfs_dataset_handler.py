@@ -23,7 +23,7 @@ import os
 import logging
 import subprocess
 
-from item_handler import GroupInfoItem
+from item_handler import GroupFullInfoItem
 
 from decimal import Decimal
 
@@ -76,8 +76,12 @@ def create_group_info_item(gid, fs):
     ## Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace
     ## /lustre/hebe 8183208892  107374182400 161061273600       - 2191882       0       0       -  
     
+    logging.debug("Querying Quota Information for Group: '%s'" % (gid))
+
     output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-g', gid, fs])
    
+    logging.debug("Quota Information Output:\n'%s'" % (output))
+    
     lines = output.rstrip().split('\n')
 
     if len(lines) != 3:
@@ -103,10 +107,20 @@ def create_group_info_item(gid, fs):
     kbytes_quota = int(fields[2])
     bytes_quota = kbytes_quota * 1024
 
-    return GroupInfoItem(gid, bytes_used, bytes_quota)
+    files = int(fields[5])
+
+    return GroupFullInfoItem(gid, bytes_used, bytes_quota, files)
 
 
-# TODO: Check group not exists...
+def create_group_info_item_list(group_names, fs):
+
+    group_info_item_list = list()
+
+    for grp_name in group_names:
+        group_info_item_list.append(create_group_info_item(grp_name, fs))
+
+    return group_info_item_list
+
 
 def retrieve_group_quota(gid, fs):
 
