@@ -68,6 +68,8 @@ class BaseChart(object):
 
         if isinstance(self.dataset, list):
             self.dataset.sort(key=key, reverse=reverse)
+        else:
+            raise RuntimeError("Operation not supported for not list type!")
 
     def _add_creation_text(self):
 
