@@ -84,8 +84,7 @@ def filter_group_info_items(group_info_list, size=0, quota=0):
             logging.debug("Filtered group_info_item for group: %s"
                           % group_info_item.name)
 
-            continue
-
-        new_group_info_list.append(group_info_item)
+        else:
+            new_group_info_list.append(group_info_item)
 
     return new_group_info_list

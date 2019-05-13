@@ -42,15 +42,15 @@ class UsageQuotaBarChart(BaseChart):
         
         self._sort_dataset(
             key=lambda group_info: group_info.quota, reverse=True)
+        
+        tick_width_y = 200
+        
+        max_y = float(self.dataset[0].quota /
+                      number_format.TIB_DIVISIOR) + tick_width_y
 
         group_names = list()
         quota_list_values = list()
         size_list_values = list()
-
-        tick_width_y = 200
-
-        max_y = float(self.dataset[0].quota /
-                      number_format.TIB_DIVISIOR) + tick_width_y
 
         for group_info in self.dataset:
 

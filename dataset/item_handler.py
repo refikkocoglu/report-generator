@@ -56,6 +56,15 @@ class GroupFullInfoItem:
         self.files = Decimal(files)
 
 
+class GroupFilesMigrationInfoItem:
+
+    def __init__(self, name, fs1_file_count, fs2_file_count):
+
+        self.name = name
+        self.fs1_file_count = Decimal(fs1_file_count)
+        self.fs2_file_count = Decimal(fs2_file_count)
+
+
 class GroupDateValueItem:
 
     def __init__(self, name, date, value):
@@ -175,10 +184,12 @@ def create_dummy_group_info_list(number=None):
         GroupInfoItem('psl', '12815424839', '107374182400'))
     group_info_list.append(
         GroupInfoItem('nustar', '5637091577', '107374182400'))
-    group_info_list.append(GroupInfoItem('vw', '24472895', '576716800'))
+    group_info_list.append(
+        GroupInfoItem('vw', '24472895', '576716800'))
     group_info_list.append(
         GroupInfoItem('astrum', '125315', '1099511627776'))
-    group_info_list.append(GroupInfoItem('bel', '4096', '10995116277760'))
+    group_info_list.append(
+        GroupInfoItem('bel', '4096', '10995116277760'))
 
     if number:
         return group_info_list[:number]
@@ -214,3 +225,27 @@ def create_dummy_group_date_values(num_groups=3, max_value=100):
                 GroupDateValueItem(group, date, value))
 
     return group_date_size_item_list
+
+
+def create_dummy_group_files_migration_info_list():
+
+    group_info_list = list()
+
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('asteg', '36022092', '34022092'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('alidata', '22634135', '20634135'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('hades', '34974617', '30074617'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('alice', '292229284', '202229284'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('fn', '1396443', '1096443'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('cbm', '50536512', '50036512'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('pbar', '27008494', '20888494'))
+    group_info_list.append(
+        GroupFilesMigrationInfoItem('afseg', '1102831', '1160031'))
+
+    return group_info_list
