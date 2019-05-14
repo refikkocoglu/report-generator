@@ -123,12 +123,10 @@ def get_groups_total_size():
     return total_size
 
 
-# TODO: Rename to create_group_info_item_list,
-#       so its is consitent to the lfs_dataset_handler.
-#
-#       In the next step an Abstract Dataset Handler 
-#       with common interface can be created.
-def get_group_info_list(group_names):
+#   TODO:
+#   In the next step an Abstract Dataset Handler 
+#   with common interface can be created.
+def create_group_info_list(group_names):
 
     group_info_list = list()
 
