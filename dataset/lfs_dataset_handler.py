@@ -45,11 +45,7 @@ def lustre_total_size(path):
 
     if output:
 
-        lines = output.splitlines()
-
-        # TODO Check first line: UUID                   1K-blocks        Used   Available Use% Mounted on
-
-        for line in lines:
+        for line in output.splitlines():
 
             if 'OST' in line:
 
@@ -75,13 +71,13 @@ def create_group_info_item(gid, fs):
     ## Disk quotas for grp rz (gid 1002):      
     ## Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace
     ## /lustre/hebe 8183208892  107374182400 161061273600       - 2191882       0       0       -  
-    
+
     logging.debug("Querying Quota Information for Group: '%s'" % (gid))
 
     output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-g', gid, fs])
-   
+
     logging.debug("Quota Information Output:\n'%s'" % (output))
-    
+
     lines = output.rstrip().split('\n')
 
     if len(lines) != 3:
@@ -89,13 +85,13 @@ def create_group_info_item(gid, fs):
             % output)
 
     fields_line = lines[2].strip()
-    
+
     # Replace multiple whitespaces with one to split the fields on whitespace.
     fields = re.sub(r'\s+', ' ', fields_line).split(' ')
 
     kbytes_field = fields[1]
     kbytes_used = None
-   
+
     # exclude '*' in kbytes field, if quota is exceeded!
     if kbytes_field[-1] == '*':
         kbytes_used = int(kbytes_field[:-1])
@@ -144,12 +140,12 @@ def _extract_soft_quota(output):
         raise RuntimeError("Output has more than 3 lines: %s" % output)
 
     fields_line = lines[2].strip()
-    
+
     # Replace multiple whitespaces with one to split the fields on whitespace.
     fields = re.sub(r'\s+', ' ', fields_line).split(' ')
 
     kbytes_quota = int(fields[2])
     bytes_quota = kbytes_quota * 1024
-    
+
     return bytes_quota
 
