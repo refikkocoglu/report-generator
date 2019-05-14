@@ -21,8 +21,8 @@ acct_table = ACCT_STAT_HISTORY
 quota_table = GROUP_QUOTA_HISTORY
 
 [storage]
-filesystem = /lustre/fs
-long_name = Lustre FS
+file_system = /lustre/fs
+fs_long_name = Lustre FS
 
 [base_chart]
 report_dir = /home/iannetti/tmp/reports/monthly

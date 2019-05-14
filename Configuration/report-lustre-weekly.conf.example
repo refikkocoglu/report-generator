@@ -4,7 +4,7 @@ transfer = off
 [transfer]
 host = www.hpc.gsi.de
 path = accounting/public
-service = nyx/hebe
+service = nyx
 
 [storage]
 file_system = /lustre/fs
