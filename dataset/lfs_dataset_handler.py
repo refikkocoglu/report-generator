@@ -112,7 +112,7 @@ def create_group_info_item(gid, fs):
     return GroupFullInfoItem(gid, bytes_used, bytes_quota, files)
 
 
-def create_group_info_item_list(group_names, fs):
+def create_group_info_list(group_names, fs):
 
     group_info_item_list = list()
 

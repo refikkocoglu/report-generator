@@ -25,11 +25,10 @@ import logging
 import sys
 import os
 
-import dataset.rbh_dataset_handler as rdh
+import dataset.lfs_dataset_handler as ldh
 import dataset.item_handler as ih
-import filter.group_filter_handler as gf
 
-from dataset.lfs_dataset_handler import lustre_total_size
+import filter.group_filter_handler as gf
 
 from chart.quota_pct_bar_chart import QuotaPctBarChart
 from chart.usage_quota_bar_chart import UsageQuotaBarChart
@@ -37,9 +36,17 @@ from chart.usage_pie_chart import UsagePieChart
 
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
+from utils.getent_group import get_all_group_names
 
 
-def create_weekly_reports(local_mode, chart_dir, long_name, config):
+def create_weekly_reports(local_mode,
+                          chart_dir,
+                          file_system,
+                          fs_long_name,
+                          quota_pct_bar_chart,
+                          usage_quota_bar_chart,
+                          usage_pie_chart,
+                          num_top_groups):
 
     reports_path_list = list()
 
@@ -52,14 +59,18 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
         storage_total_size = 18458963071860736
 
     else:
+        
+        group_names_list = gf.filter_system_groups(get_all_group_names())
 
-        rdh.CONFIG = config
-        group_info_list = gf.filter_group_info_items(rdh.get_group_info_list(gf.filter_system_groups(rdh.get_group_names())))
-        storage_total_size = lustre_total_size(config.get('storage', 'filesystem'))
+        group_info_list = \
+            gf.filter_group_info_items(
+                ldh.create_group_info_list(group_names_list, file_system))
+
+        storage_total_size = ldh.lustre_total_size(file_system)
     
     # QUOTA-PCT-BAR-CHART
-    title = "Group Quota Usage on %s" % long_name
-    chart_path = chart_dir + os.path.sep + config.get('quota_pct_bar_chart', 'filename')
+    title = "Group Quota Usage on %s" % fs_long_name
+    chart_path = chart_dir + os.path.sep + quota_pct_bar_chart
     chart = QuotaPctBarChart(title, group_info_list, chart_path)
     chart.create()
 
@@ -67,8 +78,8 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     reports_path_list.append(chart_path)
 
     # USAGE-QUOTA-BAR-CHART
-    title = "Quota and Disk Space Usage on %s" % long_name
-    chart_path = chart_dir + os.path.sep + config.get('usage_quota_bar_chart', 'filename')
+    title = "Quota and Disk Space Usage on %s" % fs_long_name
+    chart_path = chart_dir + os.path.sep + usage_quota_bar_chart
     chart = UsageQuotaBarChart(title, group_info_list, chart_path)
     chart.create()
 
@@ -76,10 +87,13 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
     reports_path_list.append(chart_path)
 
     # USAGE-PIE-CHART
-    title = "Storage Usage on %s" % long_name
-    chart_path = chart_dir + os.path.sep + config.get('usage_pie_chart', 'filename')
-    num_top_groups = config.getint('usage_pie_chart', 'num_top_groups')
-    chart = UsagePieChart(title, group_info_list, chart_path, storage_total_size, num_top_groups)
+    title = "Storage Usage on %s" % fs_long_name
+    chart_path = chart_dir + os.path.sep + usage_pie_chart
+    chart = UsagePieChart(title,
+                          group_info_list,
+                          chart_path,
+                          storage_total_size,
+                          num_top_groups)
     chart.create()
 
     logging.debug("Created chart: %s" % chart_path)
@@ -91,21 +105,31 @@ def create_weekly_reports(local_mode, chart_dir, long_name, config):
 def main():
 
     parser = argparse.ArgumentParser(description='Storage Report Generator.')
-    parser.add_argument('-f', '--config-file', dest='config_file', type=str, required=True, help='Path of the config file.')
-    parser.add_argument('-D', '--enable-debug', dest='enable_debug', required=False, action='store_true', help='Enables logging of debug messages.')
-    parser.add_argument('-L', '--enable-local_mode', dest='enable_local', required=False, action='store_true', help='Enables local_mode program execution.')
+    
+    parser.add_argument('-f', '--config-file', dest='config_file', 
+        type=str, required=True, help='Path of the config file.')
+    
+    parser.add_argument('-D', '--enable-debug', dest='enable_debug', 
+        required=False, action='store_true', 
+        help='Enables logging of debug messages.')
+    
+    parser.add_argument('-L', '--enable-local_mode', dest='enable_local', 
+        required=False, action='store_true', 
+        help='Enables local_mode program execution.')
 
     args = parser.parse_args()
 
     if not os.path.isfile(args.config_file):
-        raise IOError("The config file does not exist or is not a file: " + args.config_file)
+        raise IOError("The config file does not exist or is not a file: %s" % 
+            args.config_file)
 
     logging_level = logging.INFO
 
     if args.enable_debug:
         logging_level = logging.DEBUG
 
-    logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
+    logging.basicConfig(
+        level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
 
     try:
 
@@ -125,9 +149,25 @@ def main():
         transfer_mode = config.get('execution', 'transfer')
 
         chart_dir = config.get('base_chart', 'report_dir')
-        long_name = config.get('storage', 'long_name')
 
-        chart_path_list = create_weekly_reports(local_mode, chart_dir, long_name, config)
+        file_system = config.get('storage', 'file_system')
+        fs_long_name = config.get('storage', 'fs_long_name')
+        
+        quota_pct_bar_chart = config.get('quota_pct_bar_chart', 'filename')
+        usage_quota_bar_chart = config.get('usage_quota_bar_chart', 'filename')
+        usage_pie_chart = config.get('usage_pie_chart', 'filename')
+        
+        num_top_groups = config.getint('usage_pie_chart', 'num_top_groups')
+
+        chart_path_list = \
+            create_weekly_reports(local_mode,
+                                  chart_dir,
+                                  file_system,
+                                  fs_long_name,
+                                  quota_pct_bar_chart,
+                                  usage_quota_bar_chart,
+                                  usage_pie_chart,
+                                  num_top_groups)
 
         if transfer_mode == 'on':
 

@@ -4,20 +4,11 @@ transfer = off
 [transfer]
 host = www.hpc.gsi.de
 path = accounting/public
-service = nyx
-
-[mysqld]
-host =
-user =
-password =
-
-[robinhood]
-database = robinhood_fs
-table = ACCT_STAT
+service = nyx/hebe
 
 [storage]
-filesystem = /lustre/fs
-long_name = Lustre FS
+file_system = /lustre/fs
+fs_long_name = Lustre FS
 
 [base_chart]
 report_dir = /home/iannetti/tmp/reports/weekly
