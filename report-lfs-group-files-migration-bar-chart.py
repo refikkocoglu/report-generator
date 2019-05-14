@@ -53,6 +53,9 @@ def create_report(local_mode, chart_dir, fs1_name, fs2_name, config):
 
         group_names = gf.filter_system_groups(get_all_group_names())
 
+        files_threshold = int(config.get(
+            'group_files_migration_bar_chart', 'files_threshold'))
+
         fs1 = config.get('storage', 'file_system_1')
         fs2 = config.get('storage', 'file_system_2')
 
@@ -81,7 +84,7 @@ def create_report(local_mode, chart_dir, fs1_name, fs2_name, config):
                     fs2_files = group2_info_item.files
                     break
             
-            if fs1_files > 0 or fs2_files > 0:
+            if fs1_files > files_threshold or fs2_files > files_threshold:
 
                 logging.debug("Append GroupFilesMigrationInfoItem(%s, %s, %s)" % 
                     (gid, fs1_files, fs2_files))
