@@ -39,7 +39,14 @@ from utils.pandas_ import create_data_frame
 import dateutil.relativedelta
 
 
-def create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config):
+def create_usage_trend_chart(local_mode,
+                             fs_long_name,
+                             chart_dir,
+                             start_date,
+                             end_date,
+                             threshold,
+                             usage_trend_chart,
+                             config):
 
     if local_mode:
         item_list = ih.create_dummy_group_date_values(8, 1000)
@@ -50,28 +57,40 @@ def create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_d
 
         groups = gf.filter_system_groups(rdh.get_group_names())
 
-        threshold = config.get('usage_trend_chart', 'threshold')
+        filtered_group_names = \
+            rdh.filter_groups_at_threshold_size(
+                start_date, end_date, threshold, groups)
 
-        filtered_group_names = rdh.filter_groups_at_threshold_size(start_date, end_date, threshold, groups)
-
-        item_list = rdh.get_time_series_group_sizes(start_date, end_date, filtered_group_names)
+        item_list = \
+            rdh.get_time_series_group_sizes(
+                start_date, end_date, filtered_group_names)
 
     group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
     data_frame = create_data_frame(group_item_dict)
 
-    title = "Top Groups Usage Trend on %s" % long_name
+    title = "Top Groups Usage Trend on %s" % fs_long_name
 
-    chart_path = chart_dir + os.path.sep + config.get('usage_trend_chart', 'filename')
+    chart_path = chart_dir + os.path.sep + usage_trend_chart
 
-    chart = TrendChart(title, data_frame, chart_path, 'Time (Weeks)', 'Disk Space Used (TiB)')
+    chart = TrendChart(title,
+                       data_frame,
+                       chart_path,
+                       'Time (Weeks)',
+                       'Disk Space Used (TiB)')
 
     chart.create()
 
     return chart_path
 
 
-def create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config):
+def create_quota_trend_chart(local_mode,
+                             fs_long_name,
+                             chart_dir,
+                             start_date,
+                             end_date,
+                             quota_trend_chart,
+                             config):
 
     if local_mode:
         item_list = ih.create_dummy_group_date_values(50, 200)
@@ -82,17 +101,23 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_d
 
         groups = gf.filter_system_groups(rdh.get_group_names())
 
-        item_list = rdh.get_time_series_group_quota_usage(start_date, end_date, groups)
+        item_list = rdh.get_time_series_group_quota_usage(start_date, 
+                                                          end_date, 
+                                                          groups)
 
     group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
     data_frame = create_data_frame(group_item_dict)
 
-    title = "Group Quota Trend on %s" % long_name
+    title = "Group Quota Trend on %s" % fs_long_name
 
-    chart_path = chart_dir + os.path.sep + config.get('quota_trend_chart', 'filename')
+    chart_path = chart_dir + os.path.sep + quota_trend_chart
 
-    chart = TrendChart(title, data_frame, chart_path, 'Time (Weeks)', 'Quota Used (%)')
+    chart = TrendChart(title,
+                       data_frame,
+                       chart_path,
+                       'Time (Weeks)',
+                       'Quota Used (%)')
 
     chart.create()
 
@@ -101,7 +126,8 @@ def create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_d
 
 def main():
 
-    parser = argparse.ArgumentParser(description='Lustre Monthly Report Generator')
+    parser = argparse.ArgumentParser(
+        description='Lustre Monthly Report Generator')
 
     parser.add_argument('-f', '--config-file', dest='config_file', type=str,
                         required=True, help='Path of the config file.')
@@ -117,14 +143,16 @@ def main():
     args = parser.parse_args()
 
     if not os.path.isfile(args.config_file):
-        raise IOError("The config file does not exist or is not a file: %s" % args.config_file)
+        raise IOError("The config file does not exist or is not a file: %s" % 
+            args.config_file)
 
     logging_level = logging.INFO
 
     if args.enable_debug:
         logging_level = logging.DEBUG
 
-    logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
+    logging.basicConfig(
+        level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
 
     try:
 
@@ -144,15 +172,22 @@ def main():
         transfer_mode = config.get('execution', 'transfer')
 
         chart_dir = config.get('base_chart', 'report_dir')
-        long_name = config.get('storage', 'long_name')
+        fs_long_name = config.get('storage', 'fs_long_name')
 
         date_format = config.get("time_series_chart", "date_format")
         prev_months = config.getint("time_series_chart", "prev_months")
+        
+        usage_trend_chart = config.get('usage_trend_chart', 'filename')
+        threshold = config.get('usage_trend_chart', 'threshold')
+        
+        quota_trend_chart = config.get('quota_trend_chart', 'filename')
 
         if prev_months <= 0:
-            raise RuntimeError("Config parameter 'prev_months' must be greater than 0!")
+            raise RuntimeError(
+                "Config parameter 'prev_months' must be greater than 0!")
 
-        prev_date = date_now - dateutil.relativedelta.relativedelta(months=prev_months)
+        prev_date = date_now - \
+            dateutil.relativedelta.relativedelta(months = prev_months)
 
         start_date = prev_date.strftime(date_format)
         end_date = date_now.strftime(date_format)
@@ -161,11 +196,26 @@ def main():
 
         chart_path_list = list()
 
-        chart_path = create_usage_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
+        chart_path = create_usage_trend_chart(local_mode,
+                                              fs_long_name,
+                                              chart_dir,
+                                              start_date,
+                                              end_date,
+                                              threshold,
+                                              quota_trend_chart,
+                                              config)
+
         logging.debug("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
-        chart_path = create_quota_trend_chart(local_mode, long_name, chart_dir, start_date, end_date, config)
+        chart_path = create_quota_trend_chart(local_mode,
+                                              fs_long_name,
+                                              chart_dir,
+                                              start_date,
+                                              end_date,
+                                              quota_trend_chart,
+                                              config)
+
         logging.debug("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
 
@@ -183,7 +233,8 @@ def main():
         exc_type, exc_obj, exc_tb = sys.exc_info()
         filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-        error_msg = "Caught exception (%s): %s - %s (line: %s)" % (exc_type, str(e), filename, exc_tb.tb_lineno)
+        error_msg = "Caught exception (%s): %s - %s (line: %s)" % \
+            (exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
 
