@@ -64,6 +64,16 @@ def lustre_total_size(path):
         raise RuntimeError("Total OST size of '%s' is 0!" % path)
 
 
+def create_group_info_list(group_names, fs):
+
+    group_info_item_list = list()
+
+    for grp_name in group_names:
+        group_info_item_list.append(create_group_info_item(grp_name, fs))
+
+    return group_info_item_list
+
+
 def create_group_info_item(gid, fs):
 
     # Example output of 'lfs quota' for group 'rz':
@@ -106,16 +116,6 @@ def create_group_info_item(gid, fs):
     files = int(fields[5])
 
     return GroupFullInfoItem(gid, bytes_used, bytes_quota, files)
-
-
-def create_group_info_list(group_names, fs):
-
-    group_info_item_list = list()
-
-    for grp_name in group_names:
-        group_info_item_list.append(create_group_info_item(grp_name, fs))
-
-    return group_info_item_list
 
 
 def retrieve_group_quota(gid, fs):

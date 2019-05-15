@@ -26,8 +26,10 @@ import time
 import sys
 import os
 
+import dataset.lfs_dataset_handler as ldh
+
 from contextlib import closing
-from dataset.lfs_dataset_handler import retrieve_group_quota
+from utils.getent_group import get_user_groups
 
 
 def create_group_quota_history_table(config):
@@ -53,9 +55,9 @@ def create_group_quota_history_table(config):
 CREATE TABLE """ + table + """ (
    date date NOT NULL,
    gid varbinary(127) NOT NULL DEFAULT 'unknown',
+   used bigint(20) unsigned DEFAULT NULL,
    quota bigint(20) unsigned DEFAULT '0',
    files bigint(20) unsigned DEFAULT '0',
-   used bigint(20) unsigned DEFAULT NULL,
    PRIMARY KEY (gid,date)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 """
@@ -63,25 +65,31 @@ CREATE TABLE """ + table + """ (
             cur.execute(sql)
 
 
-def save_group_quota_map(config, date, iter_items):
+def store_group_quota(config, date, group_info_list):
 
     table = config.get('history', 'table')
 
     with closing(MySQLdb.connect(host=config.get('mysqld', 'host'),
                                  user=config.get('mysqld', 'user'),
                                  passwd=config.get('mysqld', 'password'),
-                                 db=config.get('history', 'database'))) as conn:
+                                 db=config.get('history', 'database'))) \
+                                    as conn:
 
         with closing(conn.cursor()) as cur:
 
-            sql = "INSERT INTO %s (date, gid, quota) VALUES" % table
+            sql = "INSERT INTO %s (date, gid, used, quota, files) VALUES" \
+                % table
+            
+            iter_list = iter(group_info_list)
 
-            gid, quota = next(iter_items)
+            item = next(iter_list)
 
-            sql += "('%s', '%s', %s)" % (date, gid, quota)
+            sql += "('%s', '%s', %s, %s, %s)" \
+                % (date, item.name, item.size, item.quota, item.files)
 
-            for gid, quota in iter_items:
-                sql += ", ('%s', '%s', %s)" % (date, gid, quota)
+            for item in iter_list:
+                sql += ", ('%s', '%s', %s, %s, %s)" \
+                    % (date, item.name, item.size, item.quota, item.files)
 
             logging.debug(sql)
             cur.execute(sql)
@@ -89,8 +97,8 @@ def save_group_quota_map(config, date, iter_items):
             if not cur.rowcount:
                 raise RuntimeError("Snapshot failed for date: %s." % date)
 
-            logging.debug("Inserted rows: %d into table: %s for date: %s"
-                         % (cur.rowcount, table, date))
+            logging.debug("Inserted rows: %d into table: %s for date: %s" \
+                % (cur.rowcount, table, date))
 
 
 def main():
@@ -153,44 +161,26 @@ def main():
 
         fs = config.get('lustre', 'file_system')
 
-        group_quota_map = dict()
-
-        group_names = get_group_names()
-        
-        for gid in group_names:
-
-            try:
-                quota = retrieve_group_quota(gid, fs)
-
-                logging.debug("GID: %s - Quota: %d" % (gid, quota))
-
-                group_quota_map[gid] = quota
-
-            except Exception as e:
-
-                logging.warning("Skipped quota for group: %s" % gid)
-
-                exc_type, exc_obj, exc_tb = sys.exc_info()
-                filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-
-                logging.error("Exception (type: %s): %s - %s (line: %s)" %
-                              (exc_type, str(e), filename, exc_tb.tb_lineno))
+        group_info_list = ldh.create_group_info_list(get_user_groups(), fs)
 
         if run_mode == 'print':
 
-            for key, value in group_quota_map.iteritems():
-                print("%s:%s" % (key, value))
+            for group_info in group_info_list:
+
+                logging.info(
+                    "Group: '%s' - Used: '%s' - Quota: '%s' - Files: '%s'" \
+                        % (group_info.name,
+                           group_info.size, 
+                           group_info.quota, 
+                           group_info.files))
 
         if run_mode == 'collect':
+            store_group_quota(config, date_today, group_info_list)
 
-            iter_items = group_quota_map.iteritems()
-
-            save_group_quota_map(config, date_today, iter_items)
-        
         logging.debug('END')
 
         exit(0)
-        
+
     except Exception as e:
 
         exc_type, exc_obj, exc_tb = sys.exc_info()
