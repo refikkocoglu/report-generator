@@ -26,8 +26,6 @@ import time
 import sys
 import os
 
-import dataset.rbh_dataset_handler as rdh
-
 from contextlib import closing
 from dataset.lfs_dataset_handler import retrieve_group_quota
 
@@ -56,6 +54,8 @@ CREATE TABLE """ + table + """ (
    date date NOT NULL,
    gid varbinary(127) NOT NULL DEFAULT 'unknown',
    quota bigint(20) unsigned DEFAULT '0',
+   files bigint(20) unsigned DEFAULT '0',
+   used bigint(20) unsigned DEFAULT NULL,
    PRIMARY KEY (gid,date)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1
 """
@@ -143,8 +143,6 @@ def main():
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
 
-        rdh.CONFIG = config
-
         if args.create_table:
 
             create_group_quota_history_table(config)
@@ -157,7 +155,7 @@ def main():
 
         group_quota_map = dict()
 
-        group_names = rdh.get_group_names()
+        group_names = get_group_names()
         
         for gid in group_names:
 
