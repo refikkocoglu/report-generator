@@ -33,7 +33,10 @@ class TrendChart(BaseChart):
     def __init__(self, title, dataset, file_path, x_label, y_label):
 
         if type(dataset) != pd.DataFrame:
-            raise RuntimeError("As dataset a Pandas Data Frame is required!")
+            raise RuntimeError('As dataset a Pandas Data Frame is required!')
+
+        if not len(dataset):
+            raise RuntimeError('Retrieved an empty Pandas Data Frame!')
 
         super(TrendChart, self).__init__(title, dataset, file_path, x_label, y_label)
 

@@ -31,17 +31,11 @@ from decimal import Decimal
 LFS_BIN = '/usr/bin/lfs'
 
 
-def check_lfs_binary():
-
-    if not os.path.isfile(LFS_BIN):
-        raise RuntimeError("LFS binary was not found under: '%s'" % LFS_BIN)
-
-
 def lustre_total_size(path):
 
     total_size_ost = Decimal(0)
 
-    output = subprocess.check_output(["lfs", "df", path])
+    output = subprocess.check_output([LFS_BIN, "df", path])
 
     if output:
 
@@ -117,35 +111,4 @@ def create_group_info_item(gid, fs):
 
     return GroupFullInfoItem(gid, bytes_used, bytes_quota, files)
 
-
-def retrieve_group_quota(gid, fs):
-
-    output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-g', gid, fs])
-    
-    return _extract_soft_quota(output)
-
-
-def retrieve_user_quota(uid, fs):
-
-    output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-u', uid, fs])
-
-    return _extract_soft_quota(output)
-
-
-def _extract_soft_quota(output):
-
-    lines = output.rstrip().split('\n')
-
-    if len(lines) != 3:
-        raise RuntimeError("Output has more than 3 lines: %s" % output)
-
-    fields_line = lines[2].strip()
-
-    # Replace multiple whitespaces with one to split the fields on whitespace.
-    fields = re.sub(r'\s+', ' ', fields_line).split(' ')
-
-    kbytes_quota = int(fields[2])
-    bytes_quota = kbytes_quota * 1024
-
-    return bytes_quota
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 Gabriele Iannetti <g.iannetti@gsi.de>
+# Copyright 2019 Gabriele Iannetti <g.iannetti@gsi.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,18 +25,17 @@ import logging
 import sys
 import os
 
-import dataset.rbh_dataset_handler as rdh
-import dataset.item_handler as ih
+import dateutil.relativedelta
 
+import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 
 from chart.trend_chart import TrendChart
-
+from dataset.lfsdb_quota_history import QuotaHistoryTable
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
-from utils.pandas_ import create_data_frame
-
-import dateutil.relativedelta
+from utils.pandas_ import create_data_frame_weekly
+from utils.getent_group import get_user_groups
 
 
 def create_usage_trend_chart(local_mode,
@@ -46,28 +45,30 @@ def create_usage_trend_chart(local_mode,
                              end_date,
                              threshold,
                              usage_trend_chart,
-                             config):
+                             quota_history_table):
 
     if local_mode:
         item_list = ih.create_dummy_group_date_values(8, 1000)
 
     else:
 
-        rdh.CONFIG = config
+        groups = get_user_groups()
 
-        groups = gf.filter_system_groups(rdh.get_group_names())
-
-        filtered_group_names = \
-            rdh.filter_groups_at_threshold_size(
-                start_date, end_date, threshold, groups)
+        filtered_groups = \
+            quota_history_table.filter_groups_at_threshold(start_date,
+                                                           end_date,
+                                                           threshold,
+                                                           groups)
 
         item_list = \
-            rdh.get_time_series_group_sizes(
-                start_date, end_date, filtered_group_names)
+            quota_history_table.get_time_series_group_sizes(
+                start_date,
+                end_date,
+                filtered_groups)
 
     group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
-    data_frame = create_data_frame(group_item_dict)
+    data_frame = create_data_frame_weekly(group_item_dict)
 
     title = "Top Groups Usage Trend on %s" % fs_long_name
 
@@ -90,24 +91,23 @@ def create_quota_trend_chart(local_mode,
                              start_date,
                              end_date,
                              quota_trend_chart,
-                             config):
+                             quota_history_table):
 
     if local_mode:
         item_list = ih.create_dummy_group_date_values(50, 200)
 
     else:
 
-        rdh.CONFIG = config
+        groups = get_user_groups()
 
-        groups = gf.filter_system_groups(rdh.get_group_names())
-
-        item_list = rdh.get_time_series_group_quota_usage(start_date, 
-                                                          end_date, 
-                                                          groups)
+        item_list = \
+            quota_history_table.get_time_series_group_quota_usage(start_date, 
+                                                                  end_date, 
+                                                                  groups)
 
     group_item_dict = ih.create_group_date_value_item_dict(item_list)
 
-    data_frame = create_data_frame(group_item_dict)
+    data_frame = create_data_frame_weekly(group_item_dict)
 
     title = "Group Quota Trend on %s" % fs_long_name
 
@@ -151,7 +151,7 @@ def main():
     if args.enable_debug:
         logging_level = logging.DEBUG
 
-    logging.basicConfig(
+    logging.basicConfig( 
         level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
 
     try:
@@ -182,8 +182,15 @@ def main():
         
         quota_trend_chart = config.get('quota_trend_chart', 'filename')
 
+        quota_history_table = \
+            QuotaHistoryTable(config.get('mysqld', 'host'),
+                              config.get('mysqld', 'user'),
+                              config.get('mysqld', 'passwd'),
+                              config.get('mysqld', 'db'),
+                              config.get('report', 'history_table'))
+
         if prev_months <= 0:
-            raise RuntimeError(
+            raise RuntimeError( \
                 "Config parameter 'prev_months' must be greater than 0!")
 
         prev_date = date_now - \
@@ -202,8 +209,8 @@ def main():
                                               start_date,
                                               end_date,
                                               threshold,
-                                              quota_trend_chart,
-                                              config)
+                                              usage_trend_chart,
+                                              quota_history_table)
 
         logging.debug("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)
@@ -214,7 +221,7 @@ def main():
                                               start_date,
                                               end_date,
                                               quota_trend_chart,
-                                              config)
+                                              quota_history_table)
 
         logging.debug("Created chart: %s" % chart_path)
         chart_path_list.append(chart_path)

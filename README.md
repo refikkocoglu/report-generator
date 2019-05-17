@@ -14,7 +14,6 @@
 
 #### Collect Scripts
 * collect-lfs-group-quota.py
-* collect-rbh-acct-stat.py
 
 #### Report Scripts
 * report-lustre-weekly.py

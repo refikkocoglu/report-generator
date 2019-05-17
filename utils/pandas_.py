@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 Gabriele Iannetti <g.iannetti@gsi.de>
+# Copyright 2019 Gabriele Iannetti <g.iannetti@gsi.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -18,22 +18,56 @@
 #
 
 
+import logging
 import pandas as pd
 
 
-def create_data_frame(item_dict):
+THRESHOLD_DAYS = 28
+
+
+def create_data_frame_weekly(item_dict):
 
     data_frame = pd.DataFrame()
 
     for group_name in item_dict:
+        
+        if len(item_dict[group_name][0]) >= THRESHOLD_DAYS:
 
-        dates = pd.DatetimeIndex(item_dict[group_name][0], dtype='datetime64')
+            dates = pd.DatetimeIndex(
+                item_dict[group_name][0], dtype='datetime64')
 
-        data_frame[group_name] = pd.Series(item_dict[group_name][1], index=dates)
+            date_delta = dates.date[-1] - dates.date[0]
 
-    start_date = data_frame.index.min().strftime('%Y-%m-%d')
-    end_date = data_frame.index.max().strftime('%Y-%m-%d')
+            if date_delta.days >= THRESHOLD_DAYS:
 
-    mean_weekly_summary = data_frame.resample('W').mean()
+                data_frame[group_name] = \
+                    pd.Series(item_dict[group_name][1], index=dates)
 
-    return mean_weekly_summary.truncate(before=start_date, after=end_date)
+                logging.debug("Added group to data frame with data points: " \
+                    "'%s' - '%s'" % (group_name, date_delta))
+
+            else:
+
+                logging.warning(
+                    "Ignoring group with to small date delta: '%s'" 
+                        % group_name)
+
+        else:
+
+            logging.warning(
+                "Ignoring group with insufficient data points: '%s'" 
+                    % group_name)
+
+            continue
+
+    if len(data_frame):
+
+        start_date = data_frame.index.min().strftime('%Y-%m-%d')
+        end_date = data_frame.index.max().strftime('%Y-%m-%d')
+
+        mean_weekly_summary = data_frame.resample('W').mean()
+
+        return mean_weekly_summary.truncate(before=start_date, after=end_date)
+
+    else:
+        return pd.DataFrame()

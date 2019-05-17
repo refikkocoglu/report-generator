@@ -9,16 +9,11 @@ service = nyx
 [mysqld]
 host =
 user =
-password =
-
-[robinhood]
-database = robinhood_fs
-table = ACCT_STAT
+passwd =
+db = report_fs
 
 [report]
-database = report_fs
-acct_table = ACCT_STAT_HISTORY
-quota_table = GROUP_QUOTA_HISTORY
+history_table = GROUP_QUOTA_HISTORY
 
 [storage]
 file_system = /lustre/fs
