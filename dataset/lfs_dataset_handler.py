@@ -23,7 +23,7 @@ import os
 import logging
 import subprocess
 
-from item_handler import GroupFullInfoItem
+from item_handler import GroupInfoItem
 
 from decimal import Decimal
 
@@ -109,6 +109,6 @@ def create_group_info_item(gid, fs):
 
     files = int(fields[5])
 
-    return GroupFullInfoItem(gid, bytes_used, bytes_quota, files)
+    return GroupInfoItem(gid, bytes_used, bytes_quota, files)
 
 

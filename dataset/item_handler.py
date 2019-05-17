@@ -18,37 +18,14 @@
 #
 
 
+import datetime
+
 from decimal import Decimal
-
-
-# TODO: Remove "Group" prefix to use it later for user as well...
-#       e.g. SizeItem, GroupItem, ...
-# -> Refactor to one InfoItem class with default parameter!
-# But requires code changes to each object creater and caller.
-# HOW ABOUT CONSTRUCTOR OVERLOADING IN PYTHON???
-# OTHERWISE create the proper create funtions, no bad design!
-# BETTER set at least the quota=0 and files=0 so it is opional!
-
-class GroupSizeItem:
-
-    def __init__(self, name, size):
-
-        self.name = name
-        self.size = Decimal(size)
 
 
 class GroupInfoItem:
 
-    def __init__(self, name, size, quota):
-
-        self.name = name
-        self.size = Decimal(size)
-        self.quota = Decimal(quota)
-
-
-class GroupFullInfoItem:
-
-    def __init__(self, name, size, quota, files):
+    def __init__(self, name, size=0, quota=0, files=0):
 
         self.name = name
         self.size = Decimal(size)
@@ -69,15 +46,15 @@ class GroupDateValueItem:
 
     def __init__(self, name, date, value):
 
+        if type(name) != str:
+            raise RuntimeError("Parameter name is not a string!")
+
+        if type(date) != datetime.date:
+            raise RuntimeError("Parameter date is not a datetime.date!")
+
         self.name = name
-
-        # TODO: Convertion to date???
         self.date = date
-
-        if value:
-            self.value = int(value)
-        else:
-            self.value = None
+        self.value = value
 
 
 def create_group_date_value_item_dict(group_date_value_item_list):

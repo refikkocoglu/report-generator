@@ -60,16 +60,16 @@ class QuotaHistoryTable:
     
             with closing(conn.cursor()) as cur:
     
-                sql = "SELECT gid " \
-                      "FROM %s " \
-                      "WHERE date BETWEEN '%s' AND '%s' " \
+                sql = "SELECT gid "\
+                      "FROM %s "\
+                      "WHERE date BETWEEN '%s' AND '%s' "\
                       % (self._table, start_date, end_date)
     
                 if groups:
-                    sql += " AND gid IN (%s) " % str(groups).strip('[]')
+                    sql += "AND gid IN (%s) " % str(groups).strip('[]')
     
-                sql += "AND used >= %s " \
-                       "GROUP BY gid" \
+                sql += "AND used >= %s "\
+                       "GROUP BY gid"\
                        % threshold
     
                 logging.debug(sql)
@@ -102,24 +102,30 @@ class QuotaHistoryTable:
             with closing(conn.cursor()) as cur:
 
                 # TiB Divisor = '1099511627776'
-                sql = "SELECT gid, \
-                              date, \
-                              ROUND(used/1099511627776) as used " \
-                      "FROM %s WHERE date between '%s' AND '%s'" \
+                sql = "SELECT gid, "\
+                      "       date, "\
+                      "       ROUND(used/1099511627776) as used "\
+                      "FROM %s WHERE date between '%s' AND '%s' "\
                       % (self._table, start_date, end_date)
 
                 if groups:
-                    sql += " AND gid IN (%s)" % str(groups).strip('[]')
+                    sql += "AND gid IN (%s) " % str(groups).strip('[]')
     
-                sql += ' GROUP BY gid, date'
+                sql += 'GROUP BY gid, date'
 
                 logging.debug(sql)
                 cur.execute(sql)
 
                 for item in cur.fetchall():
-                    
-                    results.append(
-                        GroupDateValueItem(item[0], item[1], item[2]))
+
+                    name = item[0]
+                    date = item[1]
+                    used = None
+
+                    if item[2]:
+                        used = int(item[2])
+
+                    results.append(GroupDateValueItem(name, date, used))
 
                 if not results:
                     raise RuntimeError("Found empty result list!")
@@ -149,7 +155,9 @@ class QuotaHistoryTable:
     
             with closing(conn.cursor()) as cur:
     
-                sql = "SELECT gid, date, ROUND((used / quota) * 100, 0) " \
+                sql = "SELECT gid, "\
+                      "       date, "\
+                      "       ROUND((used / quota) * 100, 0) as ratio " \
                       "FROM %s " \
                       "WHERE date between '%s' AND '%s' " \
                       % (self._table, start_date, end_date)
@@ -163,10 +171,16 @@ class QuotaHistoryTable:
                 cur.execute(sql)
 
                 for item in cur.fetchall():
-                    
-                    results.append(
-                        GroupDateValueItem(item[0], item[1], item[2]))
-    
+
+                    name = item[0]
+                    date = item[1]
+                    ratio = None
+
+                    if item[2]:
+                        ratio = int(item[2])
+
+                    results.append(GroupDateValueItem(name, date, ratio))
+
                 if not results:
                     raise RuntimeError("Found empty result list!")
     
