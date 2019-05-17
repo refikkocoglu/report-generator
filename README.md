@@ -10,7 +10,7 @@
 
 ## Executables
 
-### Lustre/Robinhood Specific
+### Lustre Specific
 
 #### Collect Scripts
 * collect-lfs-group-quota.py
