@@ -84,14 +84,14 @@ def main():
         if not os.path.isfile(args.config_file):
             raise IOError("The config file does not exist or is not a file: %s" % args.config_file)
 
-        logging_level = logging.INFO
+        logging_level = logging.ERROR
 
         if args.enable_debug:
             logging_level = logging.DEBUG
 
         logging.basicConfig(level=logging_level, format='%(asctime)s - %(levelname)s: %(message)s')
 
-        logging.debug('START')
+        logging.info('START')
 
         config = ConfigParser.ConfigParser()
         config.read(args.config_file)
@@ -118,7 +118,7 @@ def main():
 
                 take_acct_stat_snapshot(cur, rbh_db, rbh_acct_table, history_db, history_acct_table, date_today)
 
-        logging.debug('END')
+        logging.info('END')
 
         exit(0)
    

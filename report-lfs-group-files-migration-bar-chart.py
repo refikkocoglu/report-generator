@@ -121,7 +121,7 @@ def main():
     if not os.path.isfile(args.config_file):
         raise IOError("The config file does not exist or is not a file: " + args.config_file)
 
-    logging_level = logging.INFO
+    logging_level = logging.ERROR
 
     if args.enable_debug:
         logging_level = logging.DEBUG
@@ -130,7 +130,7 @@ def main():
 
     try:
 
-        logging.debug('START')
+        logging.info('START')
 
         date_now = datetime.datetime.now()
 
@@ -158,7 +158,7 @@ def main():
             for chart_path in chart_path_list:
                 transfer_report('weekly', date_now, chart_path, config)
 
-        logging.debug('END')
+        logging.info('END')
 
         return 0
    

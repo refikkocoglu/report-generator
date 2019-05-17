@@ -130,7 +130,7 @@ def main():
         raise IOError("The config file does not exist or is not a file: %s" 
             % args.config_file)
     
-    logging_level = logging.INFO
+    logging_level = logging.ERROR
 
     if args.enable_debug:
         logging_level = logging.DEBUG
@@ -144,7 +144,7 @@ def main():
         run_mode = args.run_mode
 
     try:
-        logging.debug('START')
+        logging.info('START')
 
         date_today = time.strftime('%Y-%m-%d')
         
@@ -155,7 +155,7 @@ def main():
 
             create_group_quota_history_table(config)
 
-            logging.debug('END')
+            logging.info('END')
 
             exit(0)
 
@@ -177,7 +177,7 @@ def main():
         if run_mode == 'collect':
             store_group_quota(config, date_today, group_info_list)
 
-        logging.debug('END')
+        logging.info('END')
 
         exit(0)
 
