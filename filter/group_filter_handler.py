@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 #
-# Copyright 2018 Gabriele Iannetti <g.iannetti@gsi.de>
+# Copyright 2019 Gabriele Iannetti <g.iannetti@gsi.de>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,53 +21,7 @@ import logging
 import getent
 
 
-# TODO: Check neccessary...
-GID_CACHE_DICT = dict()
-
-
-def filter_system_groups(group_names):
-    """
-    Filters system groups from given list.
-    :param group_names: A list of strings containing the group names.
-    :return: A new list without system groups.
-    """
-
-    #TODO: Check base Class for GroupItem or something that the object have at least the gid in the strucutre!
-
-    non_system_group_list = list()
-
-    for group_name in group_names:
-
-        group_id = None
-
-        if group_name in GID_CACHE_DICT:
-            group_id = GID_CACHE_DICT[group_name]
-        else:
-
-            group_info = getent.group(group_name)
-
-            if group_info is not None:
-
-                GID_CACHE_DICT[group_name] = group_info.gid
-
-                group_id = group_info.gid
-
-            else:
-                group_id = None
-
-        if group_id is not None and group_id > 999:
-
-            non_system_group_list.append(group_name)
-
-            logging.debug("Found non-system GID: %s for Group: %s" %
-                          (group_id, group_name))
-
-        else:
-            logging.debug("Ignoring System Group: %s" % group_name)
-
-    return non_system_group_list
-
-
+# TODO: Check list if contains instances of GorupInfoItem class.
 def filter_group_info_items(group_info_list, size=0, quota=0):
 
     new_group_info_list = list()
@@ -76,8 +30,6 @@ def filter_group_info_items(group_info_list, size=0, quota=0):
         raise RuntimeError("Empty group_info_list found!")
 
     for group_info_item in group_info_list:
-
-        # TODO: Check list if contains instances of GorupInfoItem class.
 
         if group_info_item.size <= size and group_info_item.quota <= quota:
 

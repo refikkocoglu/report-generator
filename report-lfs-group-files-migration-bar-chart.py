@@ -29,12 +29,12 @@ import dataset.item_handler as ih
 import filter.group_filter_handler as gf
 
 from dataset.lfs_dataset_handler import lustre_total_size
-from dataset.lfs_dataset_handler import create_group_info_item_list
+from dataset.lfs_dataset_handler import create_group_info_list
 from chart.group_files_migration_bar_chart import GroupFilesMigrationBarChart
 
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
-from utils.getent_group import get_all_group_names
+from utils.getent_group import get_user_groups
 
 from decimal import Decimal
 
@@ -51,7 +51,7 @@ def create_report(local_mode, chart_dir, fs1_name, fs2_name, config):
 
     else:
 
-        group_names = gf.filter_system_groups(get_all_group_names())
+        group_names = get_user_groups()
 
         files_threshold = int(config.get(
             'group_files_migration_bar_chart', 'files_threshold'))
@@ -59,8 +59,8 @@ def create_report(local_mode, chart_dir, fs1_name, fs2_name, config):
         fs1 = config.get('storage', 'file_system_1')
         fs2 = config.get('storage', 'file_system_2')
 
-        g1_info_list = create_group_info_item_list(group_names, fs1)
-        g2_info_list = create_group_info_item_list(group_names, fs2)
+        g1_info_list = create_group_info_list(group_names, fs1)
+        g2_info_list = create_group_info_list(group_names, fs2)
 
         group1_info_items = gf.filter_group_info_items(g1_info_list)
         group2_info_items = gf.filter_group_info_items(g2_info_list)

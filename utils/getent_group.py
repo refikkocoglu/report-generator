@@ -44,16 +44,3 @@ def get_user_groups():
     return user_groups
 
 
-def get_all_group_names():
-
-    output = subprocess.check_output(['getent', 'group'])
-
-    input_group_names = output.strip().split('\n')
-
-    group_names = list()
-
-    for line in input_group_names:
-        group_names.append(line.split(':', 1)[0])
-
-    return group_names
-

@@ -36,7 +36,7 @@ from chart.usage_pie_chart import UsagePieChart
 
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
-from utils.getent_group import get_all_group_names
+from utils.getent_group import get_user_groups
 
 
 def create_weekly_reports(local_mode,
@@ -60,7 +60,7 @@ def create_weekly_reports(local_mode,
 
     else:
         
-        group_names_list = gf.filter_system_groups(get_all_group_names())
+        group_names_list = get_user_groups()
 
         group_info_list = \
             gf.filter_group_info_items(
