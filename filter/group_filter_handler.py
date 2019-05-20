@@ -18,7 +18,6 @@
 #
 
 import logging
-import getent
 
 
 # TODO: Check list if contains instances of GorupInfoItem class.
