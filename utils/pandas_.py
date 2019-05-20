@@ -34,7 +34,7 @@ def create_data_frame_weekly(item_dict):
         if len(item_dict[group_name][0]) >= THRESHOLD_DAYS:
 
             dates = pd.DatetimeIndex(
-                item_dict[group_name][0], dtype='datetime64')
+                item_dict[group_name][0], dtype='datetime64[ns]')
 
             date_delta = dates.date[-1] - dates.date[0]
 
