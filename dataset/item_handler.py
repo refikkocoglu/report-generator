@@ -190,12 +190,11 @@ def create_dummy_group_date_values(num_groups=3, max_value=100):
 
         for gid in range(num_groups):
 
-            # Data formatting could be that way...
-            # date_format = '%Y-%m-%d'
-            # datetime.datetime.strptime(date, date_format).date()
-
             group = "group%s" % gid
-            date = "2018-12-%s" % day
+
+            new_date = "2018-12-%s" % day
+            date = datetime.datetime.strptime(new_date, '%Y-%m-%d').date()
+
             value = random.randint(1, max_value)
 
             group_date_size_item_list.append(
