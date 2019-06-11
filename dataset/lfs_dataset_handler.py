@@ -98,7 +98,7 @@ def create_group_info_item(gid, fs):
     lines = output.rstrip().split('\n')
 
     if len(lines) != 3:
-        raise RuntimeError("'lfs quota' output did not return not 3 lines: %s" 
+        raise RuntimeError("'lfs quota' returned unexpected output:\n%s"
             % output)
 
     fields_line = lines[2].strip()
