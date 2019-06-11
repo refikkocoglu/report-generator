@@ -20,6 +20,7 @@
 
 import re
 import os
+import sys
 import logging
 import subprocess
 
@@ -63,7 +64,19 @@ def create_group_info_list(group_names, fs):
     group_info_item_list = list()
 
     for grp_name in group_names:
-        group_info_item_list.append(create_group_info_item(grp_name, fs))
+
+        try:
+            group_info_item_list.append(create_group_info_item(grp_name, fs))
+        except Exception as e:
+            
+            logging.warning(
+                "Skipped creation of GroupInfoItem for group: %s" % grp_name)
+
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+
+            logging.error("Caught exception (%s): %s - %s (line: %s)" % \
+                (exc_type, str(e), filename, exc_tb.tb_lineno))
 
     return group_info_item_list
 
@@ -76,11 +89,11 @@ def create_group_info_item(gid, fs):
     ## Filesystem  kbytes   quota   limit   grace   files   quota   limit   grace
     ## /lustre/hebe 8183208892  107374182400 161061273600       - 2191882       0       0       -  
 
-    logging.debug("Querying Quota Information for Group: '%s'" % (gid))
+    logging.debug("Querying Quota Information for Group: %s" % (gid))
 
     output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-g', gid, fs])
 
-    logging.debug("Quota Information Output:\n'%s'" % (output))
+    logging.debug("Quota Information Output:\n%s" % (output))
 
     lines = output.rstrip().split('\n')
 

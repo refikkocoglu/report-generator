@@ -168,7 +168,7 @@ def main():
             for group_info in group_info_list:
 
                 logging.debug(
-                    "Group: '%s' - Used: '%s' - Quota: '%s' - Files: '%s'" \
+                    "Group: %s - Used: %s - Quota: %s - Files: %s" \
                         % (group_info.name,
                            group_info.size, 
                            group_info.quota, 
