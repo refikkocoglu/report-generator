@@ -167,12 +167,11 @@ def main():
 
             for group_info in group_info_list:
 
-                logging.debug(
-                    "Group: %s - Used: %s - Quota: %s - Files: %s" \
-                        % (group_info.name,
-                           group_info.size, 
-                           group_info.quota, 
-                           group_info.files))
+                print("Group: %s - Used: %s - Quota: %s - Files: %s" \
+                    % (group_info.name,
+                       group_info.size, 
+                       group_info.quota, 
+                       group_info.files))
 
         if run_mode == 'collect':
             store_group_quota(config, date_today, group_info_list)
