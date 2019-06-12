@@ -68,14 +68,14 @@ def create_group_info_list(group_names, fs):
         try:
             group_info_item_list.append(create_group_info_item(grp_name, fs))
         except Exception as e:
-            
-            logging.warning(
+
+            logging.error(
                 "Skipped creation of GroupInfoItem for group: %s" % grp_name)
 
             exc_type, exc_obj, exc_tb = sys.exc_info()
             filename = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
 
-            logging.error("Caught exception (%s): %s - %s (line: %s)" % \
+            logging.error("Caught exception (%s):\n%s\n%s (line: %s)" % 
                 (exc_type, str(e), filename, exc_tb.tb_lineno))
 
     return group_info_item_list
