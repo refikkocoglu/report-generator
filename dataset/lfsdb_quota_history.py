@@ -157,7 +157,8 @@ class QuotaHistoryTable:
     
                 sql = "SELECT gid, "\
                       "       date, "\
-                      "       ROUND((used / quota) * 100, 0) as ratio " \
+                      "       IF(quota=0, 0, ROUND((used / quota) * 100, 0)) "\
+                      "         as ratio " \
                       "FROM %s " \
                       "WHERE date between '%s' AND '%s' " \
                       % (self._table, start_date, end_date)
