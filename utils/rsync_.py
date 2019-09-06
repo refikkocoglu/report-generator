@@ -49,7 +49,7 @@ def transfer_report(run_mode, time_point, path, config):
 
     try:
 
-        subprocess.check_output(["rsync", path, remote_target])
+        subprocess.check_output(["rsync", path, remote_target]).decode()
 
         logging.debug('rsync %s - %s' % (path, remote_target))
 

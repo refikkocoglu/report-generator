@@ -35,7 +35,7 @@ def lustre_total_size(path):
 
     total_size_ost = Decimal(0)
 
-    output = subprocess.check_output([LFS_BIN, "df", path])
+    output = subprocess.check_output([LFS_BIN, "df", path]).decode()
 
     if output:
 
@@ -90,7 +90,8 @@ def create_group_info_item(gid, fs):
 
     logging.debug("Querying Quota Information for Group: %s" % (gid))
 
-    output = subprocess.check_output(['sudo', LFS_BIN, 'quota', '-g', gid, fs])
+    output = subprocess.check_output(\
+        ['sudo', LFS_BIN, 'quota', '-g', gid, fs]).decode()
 
     logging.debug("Quota Information Output:\n%s" % (output))
 

@@ -26,7 +26,8 @@ import os
 def get_user_groups():
 
     user_groups = list()
-    output = subprocess.check_output(['getent', 'group'])
+    output = subprocess.check_output(['getent', 'group']).decode()
+
     output_lines = output.strip().split('\n')
 
     for line in output_lines:
