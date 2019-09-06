@@ -24,7 +24,7 @@ import sys
 import logging
 import subprocess
 
-from item_handler import GroupInfoItem
+from dataset.item_handler import GroupInfoItem
 
 from decimal import Decimal
 
