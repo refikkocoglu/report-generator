@@ -23,10 +23,9 @@ import os
 import sys
 import logging
 import subprocess
+from decimal import Decimal
 
 from dataset.item_handler import GroupInfoItem
-
-from decimal import Decimal
 
 
 LFS_BIN = '/usr/bin/lfs'

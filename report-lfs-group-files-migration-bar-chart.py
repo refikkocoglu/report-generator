@@ -24,6 +24,7 @@ import argparse
 import logging
 import sys
 import os
+from decimal import Decimal
 
 import dataset.item_handler as ih
 import filter.group_filter_handler as gf
@@ -35,8 +36,6 @@ from chart.group_files_migration_bar_chart import GroupFilesMigrationBarChart
 from utils.matplotlib_ import check_matplotlib_version
 from utils.rsync_ import transfer_report
 from utils.getent_group import get_user_groups
-
-from decimal import Decimal
 
 
 # TODO: Remove config parameter...
