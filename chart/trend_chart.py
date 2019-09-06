@@ -25,7 +25,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from base_chart import BaseChart
+from chart.base_chart import BaseChart
 
 
 class TrendChart(BaseChart):

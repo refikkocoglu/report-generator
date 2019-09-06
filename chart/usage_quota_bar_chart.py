@@ -18,7 +18,7 @@
 #
 
 
-from base_chart import BaseChart
+from chart.base_chart import BaseChart
 
 import numpy as np
 from format import number_format

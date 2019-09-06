@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from base_chart import BaseChart
+from chart.base_chart import BaseChart
 
 import format.number_format as nf
 from decimal import Decimal
