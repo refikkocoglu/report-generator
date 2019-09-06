@@ -166,7 +166,7 @@ def main():
 
         logging.debug("Local mode enabled: %s" % local_mode)
 
-        config = configparser.ConfigParser()
+        config = configparser.ConfigParser(interpolation=None)
         config.read(args.config_file)
 
         transfer_mode = config.get('execution', 'transfer')
