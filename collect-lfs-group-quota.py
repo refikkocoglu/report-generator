@@ -148,7 +148,7 @@ def main():
 
         date_today = time.strftime('%Y-%m-%d')
         
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(args.config_file)
 
         if args.create_table:
