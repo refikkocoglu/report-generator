@@ -18,7 +18,7 @@
 #
 
 
-import ConfigParser
+import configparser
 import logging
 import argparse
 import MySQLdb

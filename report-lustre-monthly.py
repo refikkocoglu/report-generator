@@ -18,7 +18,7 @@
 #
 
 
-import ConfigParser
+import configparser
 import datetime
 import argparse
 import logging
