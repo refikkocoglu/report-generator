@@ -2,10 +2,10 @@
 
 ## Prerequisite
 
-* Python2
+* Python3
 * MySQLdb
-* matplotlib (tested with version 2, version 1 is not supported!)
-* pandas (0.24.2)
+* matplotlib (3.1.1)
+* pandas (0.25.1)
 * getent (external binary)
 * lfs quota (external binary)
 
