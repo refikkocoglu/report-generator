@@ -76,7 +76,7 @@ class QuotaHistoryTable:
                 cur.execute(sql)
     
                 for item in cur.fetchall():
-                    results.append(item[0])
+                    results.append(item[0].decode())
     
         return results
 
@@ -118,7 +118,7 @@ class QuotaHistoryTable:
 
                 for item in cur.fetchall():
 
-                    name = item[0]
+                    name = item[0].decode()
                     date = item[1]
                     used = None
 
@@ -173,7 +173,7 @@ class QuotaHistoryTable:
 
                 for item in cur.fetchall():
 
-                    name = item[0]
+                    name = item[0].decode()
                     date = item[1]
                     ratio = None
 
