@@ -53,30 +53,22 @@ class TrendChart(BaseChart):
         :param df_tail: Tail from Pandas Data Frame.
         """
 
-        len_col = len(df_tail.columns.values)
-        len_val = len(df_tail.values.tolist()[0])
-
-        if len_col != len_val:
-            raise RuntimeError("Number of columns is not equal last values"
-                               " from Pandas Data Frame tail: %s"
-                               % df_tail)
-
-        col_val_pairs = zip(df_tail.columns.values, df_tail.values.tolist()[0])
+        df_tail_labels = df_tail.columns.values
+        df_tail_values = df_tail.values.tolist()[0]
+        df_pairs = zip(df_tail_labels, df_tail_values)
 
         import operator
+        sorted_df_pairs = \
+            sorted(df_pairs, key=operator.itemgetter(1), reverse=True)
 
-        col_val_pairs.sort(key=operator.itemgetter(1), reverse=True)
+        sorted_labels = [ item[0] for item in sorted_df_pairs ]
 
-        sorted_col_names = zip(*col_val_pairs)[0]
+        ax_handles, ax_labels = self._ax.get_legend_handles_labels()
 
-        handles, labels = self._ax.get_legend_handles_labels()
+        ax_pairs = list(zip(ax_handles, ax_labels))
+        ax_pairs.sort(key=lambda ax_pairs: sorted_labels.index(ax_pairs[1]))
 
-        handle_label_pairs = zip(handles, labels)
-
-        handle_label_pairs.sort(key=lambda handle_label_pairs:
-                                sorted_col_names.index(handle_label_pairs[1]))
-
-        handles, labels = zip(*handle_label_pairs)
+        handles, labels = zip(*ax_pairs)
 
         self._figure.legend(handles=handles, labels=labels, title="Groups",
                             fontsize='small', loc='upper left', handlelength=5)
