@@ -82,8 +82,12 @@ case "$1" in
         build ${LUSTRE_MIGRATION_REPORT_EXE}
     ;;
 
+    clean)
+        $(rm -r "$TARGET_DIR")
+    ;;
+
     *)
-        echo "Usage: $0 {all|quota_collect|weekly_reports|monthly_reports|migration_report}"
+        echo "Usage: $0 {all|quota_collect|weekly_reports|monthly_reports|migration_report|clean}"
         exit 1
     ;;
 
