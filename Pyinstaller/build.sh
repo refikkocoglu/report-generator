@@ -68,19 +68,19 @@ case "$1" in
         build ${LUSTRE_MIGRATION_REPORT_EXE}
     ;;
 
-    quota_collect)
+    quota-collect)
         build ${LUSTRE_GROUP_QUOTA_COLLECT_EXE}
     ;;
 
-    weekly_reports)
+    weekly-reports)
         build ${LUSTRE_WEEKLY_REPORTS_EXE}
     ;;
 
-    monthly_reports)
+    monthly-reports)
         build ${LUSTRE_MONTHLY_REPORTS_EXE}
     ;;
 
-    migration_report)
+    migration-report)
         build ${LUSTRE_MIGRATION_REPORT_EXE}
     ;;
 
@@ -89,7 +89,7 @@ case "$1" in
     ;;
 
     *)
-        echo "Usage: $0 {all|quota_collect|weekly_reports|monthly_reports|migration_report|clean}"
+        echo "Usage: $0 {all|quota-collect|weekly-reports|monthly-reports|migration-report|clean}"
         exit 1
     ;;
 
