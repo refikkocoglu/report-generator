@@ -47,8 +47,10 @@ function build() {
     $(pyinstaller --onefile --name ${EXE} $SOURCE_DIR/${EXE})
 
     if [ -f "dist/${EXE}" ]; then
+        echo ""
         echo ">>> SUCCESSFUL BUILD: dist/${EXE}"
     else
+        echo ""
         echo ">>> FAILED BUILD: dist/${EXE}"
     fi
 
