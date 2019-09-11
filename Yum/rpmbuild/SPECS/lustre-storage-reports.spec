@@ -19,9 +19,9 @@ Lustre Storage Reports Generator
 mkdir -p %{buildroot}/%{_sbindir}
 
 install -m 755 %{__distdir}/lustre-group-quota-collect.py %{buildroot}/%{_sbindir}/lustre-group-quota-collect.py
-install -m 755 %{__distdir}/lustre-group-quota-collect.py %{buildroot}/%{_sbindir}/lustre-migration-report.py
-install -m 755 %{__distdir}/lustre-group-quota-collect.py %{buildroot}/%{_sbindir}/lustre-monthly-reports.py
-install -m 755 %{__distdir}/lustre-group-quota-collect.py %{buildroot}/%{_sbindir}/lustre-weekly-reports.py
+install -m 755 %{__distdir}/lustre-migration-report.py %{buildroot}/%{_sbindir}/lustre-migration-report.py
+install -m 755 %{__distdir}/lustre-monthly-reports.py %{buildroot}/%{_sbindir}/lustre-monthly-reports.py
+install -m 755 %{__distdir}/lustre-weekly-reports.py %{buildroot}/%{_sbindir}/lustre-weekly-reports.py
 
 %clean
 rm -rf %{buildroot}
