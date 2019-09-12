@@ -54,7 +54,8 @@ def create_weekly_reports(local_mode,
     storage_total_size = 0
 
     if local_mode:
-
+        
+        # TODO: create dummy list with variable parameter
         group_info_list = ih.create_dummy_group_info_list()
         storage_total_size = 18458963071860736
 
