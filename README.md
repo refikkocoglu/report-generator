@@ -45,4 +45,4 @@ __mysqlclient:__
 
 ## Report Examples
 
-**TODO** - add local created reports for showing examples
+![soft\_quota\_pcnt.svg](Images/soft_quota_pcnt.svg)
