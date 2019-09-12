@@ -2,18 +2,16 @@
 
 ## Prerequisite
 
-### Python
+Required:  
+* **python36** - Python runtime
+* **matplotlib** (3.1.1) - for plotting
+* **pandas** (0.25.1) - for time series plots
 
-* Python36
-* pip3 
-* mysqlclient (1.4.4)
-* matplotlib (3.1.1)
-* pandas (0.25.1)
-
-### External Binaries
-
-* getent
-* lfs quota
+Optional:  
+* pip3 - installation of Python packages
+* mysqlclient (1.4.4) - collecting and retrieving data from MySQL-DB
+* getent - group resolution
+* lfs quota - determining Lustre FS group quotas
 
 ### Build Tools Dependencies
 
