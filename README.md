@@ -47,8 +47,9 @@ __mysqlclient:__
 
 #### Snapshot Plots
 
-Example for QuotaPctBarChart class.  
+Example for **QuotaPctBarChart** class  
 Shows percentage quota usage for each group:  
+  
 ![soft\_quota\_pcnt.svg](Images/soft_quota_pcnt.svg)
 
 Example for UsageQuotaBarChart class.  
