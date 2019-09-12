@@ -52,20 +52,24 @@ Shows percentage quota usage for each group:
   
 ![soft\_quota\_pcnt.svg](Images/soft_quota_pcnt.svg)
 
-Example for UsageQuotaBarChart class.  
+Example for **UsageQuotaBarChart** class  
 Shows disk usage and quota consumption for each group:  
+  
 ![usage+quota\_bar.svg](Images/usage+quota_bar.svg)
 
-Esxample for UsagePieChart class.  
+Example for **UsagePieChart** class  
 Shows usage pie with storage consumption of top groups:  
+  
 ![usage\_pie.svg](Images/usage_pie.svg)
 
 #### Time Series Plots
 
-Examples for TrendChart class.  
-
-Shows treand for quota consumption of all groups:  
+Examples for **TrendChart** class  
+  
+Shows trend for quota consumption of all groups:  
+  
 ![soft\_quota\_trend.svg](Images/soft_quota_trend.svg)
-
-Shwos treand for disk space usage of top groups:  
+  
+Shows trend for disk space usage of top groups:  
+  
 ![usage\_trend.svg](Images/usage_trend.svg)
