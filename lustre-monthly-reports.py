@@ -169,7 +169,7 @@ def main():
         config = configparser.ConfigParser(interpolation=None)
         config.read(args.config_file)
 
-        transfer_mode = config.get('execution', 'transfer')
+        transfer_mode = config.get('transfer', 'mode')
 
         chart_dir = config.get('base_chart', 'report_dir')
         fs_long_name = config.get('storage', 'fs_long_name')

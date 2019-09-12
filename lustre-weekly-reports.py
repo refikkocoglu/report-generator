@@ -146,7 +146,7 @@ def main():
         config = configparser.ConfigParser()
         config.read(args.config_file)
 
-        transfer_mode = config.get('execution', 'transfer')
+        transfer_mode = config.get('transfer', 'mode')
 
         chart_dir = config.get('base_chart', 'report_dir')
 

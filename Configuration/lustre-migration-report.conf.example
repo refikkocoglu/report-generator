@@ -1,7 +1,5 @@
-[execution]
-transfer = on
-
 [transfer]
+mode = off
 host = www.hpc.gsi.de
 path = accounting/public
 service = hebe
