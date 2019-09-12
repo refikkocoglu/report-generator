@@ -3,7 +3,7 @@ Version:    0.4.1
 Release:    1
 Summary:    Report Generator for Lustre FS
 License:    GPLv3
-URL:        https://git.gsi.de/hpc/data/report-generator/
+URL:        https://github.com/gabrieleiannetti/report-generator
 
 %description
 Report Generator for Lustre FS
