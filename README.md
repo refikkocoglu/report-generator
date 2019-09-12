@@ -40,3 +40,7 @@ __mysqlclient:__
 * lustre-weekly-reports.py
 * lustre-monthly-reports.py
 * lustre-migration-report.py
+
+#### Dependency Matrix
+
+**TODO** - which component depends on what module
