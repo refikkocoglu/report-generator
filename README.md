@@ -1,4 +1,4 @@
-# Storage Report Generator
+# Report Generator
 
 ## Prerequisite
 
@@ -27,7 +27,7 @@ __mysqlclient:__
 
 ## Executables
 
-### Lustre Specific
+### Lustre Reports
 
 #### Collect Scripts
 
