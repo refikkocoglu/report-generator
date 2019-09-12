@@ -39,10 +39,11 @@ rm -rf %{buildroot}
 /usr/sbin/lustre-weekly-reports.py
 
 %changelog
-* 0.1             Stable version with weekly created reports.
-* 0.2             Trend Charts included.
-* 0.2.1           Updated executables and config files.
-* 0.2.2           Trend Chart with prev_months number.
-* 0.3             Use 'lfs'-based data source.
-* 0.4             Migration to Python36
-* 0.4.1           Configuration refactored with transfer mode option
+* Thu Sep 12 2019 Gabriele Iannetti <g.iannetti@gsi.de> 0.4.1
+- Configuration refactored with transfer mode option
+
+* Tue Sep 10 2019 Gabriele Iannetti <g.iannetti@gsi.de> 0.4
+- Migration to Python36
+
+* Mon May 20 2019 Gabriele Iannetti <g.iannetti@gsi.de> 0.3
+- Use 'lfs'-based data source
