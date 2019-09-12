@@ -1,12 +1,18 @@
-Name:       lustre-storage-reports
-Version:    0.4
-Release:    0
-Summary:    Lustre Storage Reports Generator Scripts at HPC-GSI
+Name:       lustre-reports
+Version:    0.4.1
+Release:    1
+Summary:    Report Generator for Lustre FS
 License:    GPLv3
-URL:        https://git.gsi.de/hpc/data/storage-report-generator/
+URL:        https://git.gsi.de/hpc/data/report-generator/
 
 %description
-Lustre Storage Reports Generator
+Report Generator for Lustre FS
+
+Consists of the following programs:
+* lustre-group-quota-collect.py
+* lustre-migration-report.py
+* lustre-monthly-reports.py
+* lustre-weekly-reports.py
 
 %prep
 # no prep
@@ -33,4 +39,10 @@ rm -rf %{buildroot}
 /usr/sbin/lustre-weekly-reports.py
 
 %changelog
-# TODO
+* 0.1             Stable version with weekly created reports.
+* 0.2             Trend Charts included.
+* 0.2.1           Updated executables and config files.
+* 0.2.2           Trend Chart with prev_months number.
+* 0.3             Use 'lfs'-based data source.
+* 0.4             Migration to Python36
+* 0.4.1           Configuration refactored with transfer mode option
