@@ -39,10 +39,6 @@ __mysqlclient:__
 * lustre-monthly-reports.py
 * lustre-migration-report.py
 
-## Dependency Matrix
-
-**TODO** - which component depends on what module
-
 ## Report Examples
 
 #### Snapshot Plots
@@ -73,3 +69,7 @@ Shows trend for quota consumption of all groups:
 Shows trend for disk space usage of top groups:  
   
 ![usage\_trend.svg](Images/usage_trend.svg)
+
+## Dependency Matrix
+
+**TODO** - which component depends on what module
