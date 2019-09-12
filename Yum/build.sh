@@ -22,4 +22,4 @@ DIST_PATH=${PWD}/../Pyinstaller/pybuild/dist/
 rpmbuild -bb \
     --define "__distdir ${DIST_PATH}"\
     --define "_topdir ${PWD}/rpmbuild"\
-    rpmbuild/SPECS/lustre-storage-reports.spec
+    rpmbuild/SPECS/lustre-reports.spec
