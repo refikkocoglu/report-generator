@@ -1,15 +1,11 @@
 [lustre]
-file_system = /lustre/nyx
+file_system = /lustre
 
 [mysqld]
-host = lxrbh1.gsi.de
-user = robinhood
+host = db_server
+user = db_user
 password =
 
 [history]
-database = report_nyx
+database = report_lustre
 table = GROUP_QUOTA_HISTORY
-
-[robinhood]
-database = robinhood_nyx
-table = ACCT_STAT

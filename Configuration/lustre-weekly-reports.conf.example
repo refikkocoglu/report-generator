@@ -1,15 +1,15 @@
 [transfer]
 mode = off
-host = www.hpc.gsi.de
+host = www.web-server.de
 path = accounting/public
-service = nyx
+service = lustre
 
 [storage]
-file_system = /lustre/fs
-fs_long_name = Lustre FS
+file_system = /lustre
+fs_long_name = Lustre
 
 [base_chart]
-report_dir = /home/iannetti/tmp/reports/weekly
+report_dir = /tmp/
 
 [usage_pie_chart]
 filename = usage_pie.svg

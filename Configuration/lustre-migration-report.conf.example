@@ -2,16 +2,16 @@
 mode = off
 host = www.hpc.gsi.de
 path = accounting/public
-service = hebe
+service = lustre
 
 [storage]
-file_system_1 = /lustre/nyx
-file_system_2 = /lustre/hebe
-file_system_name_1 = Nyx
-file_system_name_2 = Hebe
+file_system_1 = /lustre/a
+file_system_2 = /lustre/b
+file_system_name_1 = A
+file_system_name_2 = B
 
 [base_chart]
-report_dir = /home/lfsmon/Reports/weekly/
+report_dir = /tmp
 
 [group_files_migration_bar_chart]
 filename = nyx_hebe_group_files_migration.svg

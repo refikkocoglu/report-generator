@@ -1,24 +1,24 @@
 [transfer]
 mode = off
-host = www.hpc.gsi.de
+host = www.web-server.de
 path = accounting/public
-service = nyx
+service = lustre
 
 [mysqld]
 host =
 user =
 passwd =
-db = report_fs
+db = report_lustre
 
 [report]
 history_table = GROUP_QUOTA_HISTORY
 
 [storage]
-file_system = /lustre/fs
-fs_long_name = Lustre FS
+file_system = /lustre
+fs_long_name = Lustre
 
 [base_chart]
-report_dir = /home/iannetti/tmp/reports/monthly
+report_dir = /tmp
 
 [time_series_chart]
 date_format = %Y-%m-%d
