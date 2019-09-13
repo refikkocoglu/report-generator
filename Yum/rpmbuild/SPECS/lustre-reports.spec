@@ -1,5 +1,5 @@
 Name:       lustre-reports
-Version:    0.4.1
+Version:    0.4.2
 Release:    1
 Summary:    Report Generator for Lustre FS
 License:    GPLv3
@@ -13,12 +13,6 @@ Consists of the following programs:
 * lustre-migration-report.py
 * lustre-monthly-reports.py
 * lustre-weekly-reports.py
-
-%prep
-# no prep
-
-%build
-# no build
 
 %install
 
@@ -38,12 +32,3 @@ rm -rf %{buildroot}
 /usr/sbin/lustre-monthly-reports.py
 /usr/sbin/lustre-weekly-reports.py
 
-%changelog
-* Thu Sep 12 2019 Gabriele Iannetti <g.iannetti@gsi.de> 0.4.1
-- Configuration refactored with transfer mode option
-
-* Tue Sep 10 2019 Gabriele Iannetti <g.iannetti@gsi.de> 0.4
-- Migration to Python36
-
-* Mon May 20 2019 Gabriele Iannetti <g.iannetti@gsi.de> 0.3
-- Use 'lfs'-based data source
