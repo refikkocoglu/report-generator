@@ -155,7 +155,7 @@ def main():
 
             create_group_quota_history_table(config)
             logging.info('END')
-            exit(0)
+            sys.exit(0)
 
         fs = config.get('lustre', 'file_system')
 
@@ -175,8 +175,7 @@ def main():
             store_group_quota(config, date_today, group_info_list)
 
         logging.info('END')
-
-        exit(0)
+        sys.exit(0)
 
     except Exception as e:
 
@@ -187,8 +186,7 @@ def main():
                     (exc_type, str(e), filename, exc_tb.tb_lineno)
 
         logging.error(error_msg)
-
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
