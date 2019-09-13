@@ -31,11 +31,19 @@ from dataset.item_handler import GroupInfoItem
 LFS_BIN = '/usr/bin/lfs'
 
 
-def lustre_total_size(path):
+def check_path_exists(path):
+
+    if not os.path.exists(path):
+        raise RuntimeError("File path does not exist: %s" % path)
+
+
+def lustre_total_size(fs):
+
+    check_path_exists(fs)
 
     total_size_ost = Decimal(0)
 
-    output = subprocess.check_output([LFS_BIN, "df", path]).decode()
+    output = subprocess.check_output([LFS_BIN, "df", fs]).decode()
 
     if output:
 
@@ -55,10 +63,12 @@ def lustre_total_size(path):
     if total_size_ost:
         return total_size_ost
     else:
-        raise RuntimeError("Total OST size of '%s' is 0!" % path)
+        raise RuntimeError("Total OST size of '%s' is 0!" % fs)
 
 
 def create_group_info_list(group_names, fs):
+
+    check_path_exists(fs)
 
     group_info_item_list = list()
 
@@ -81,6 +91,8 @@ def create_group_info_list(group_names, fs):
 
 
 def create_group_info_item(gid, fs):
+
+    check_path_exists(fs)
 
     # Example output of 'lfs quota' for group 'rz':
     #

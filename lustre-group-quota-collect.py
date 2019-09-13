@@ -154,9 +154,7 @@ def main():
         if args.create_table:
 
             create_group_quota_history_table(config)
-
             logging.info('END')
-
             exit(0)
 
         fs = config.get('lustre', 'file_system')
