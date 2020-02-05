@@ -66,15 +66,21 @@ def create_group_date_value_item_dict(group_date_value_item_list):
         # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
         if item.name in item_dict:
 
-            item_dict[item.name][0].append(item.date)
-            item_dict[item.name][1].append(item.value)
+            item_dict[item.name][0].append(item.num_groups)
+            item_dict[item.name][1].append(item.max_value)
+            item_dict[item.name][2].append(item.start_date)
+            item_dict[item.name][3].append(item.end_date)
+
 
         else:
 
-            item_dict[item.name] = (list(), list())
+            item_dict[item.name] = (list(), list(), list(), list())
 
-            item_dict[item.name][0].append(item.date)
-            item_dict[item.name][1].append(item.value)
+            item_dict[item.name][0].append(item.num_groups)
+            item_dict[item.name][1].append(item.max_value)
+            item_dict[item.name][2].append(item.start_date)
+            item_dict[item.name][3].append(item.end_date)
+
 
     return item_dict
 
@@ -130,7 +136,7 @@ def create_dummy_group_info_list(number=None):
         return group_info_list
 
 
-def create_dummy_group_date_values(num_groups=3, max_value=100, start_date, 
+def create_dummy_group_date_values(num_groups=3, max_value=100,
         start_date='2018-12-01', end_date='2018-12-31'):
     """
         Date interval is from 2018-12-01 to 2018-12-31.
