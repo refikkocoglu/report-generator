@@ -66,20 +66,16 @@ def create_group_date_value_item_dict(group_date_value_item_list):
         # TODO: Optimize by cached 'group_item_dict[group_item.name]' key object.
         if item.name in item_dict:
 
-            item_dict[item.name][0].append(item.num_groups)
-            item_dict[item.name][1].append(item.max_value)
-            item_dict[item.name][2].append(item.start_date)
-            item_dict[item.name][3].append(item.end_date)
+            item_dict[item.name][0].append(item.date)
+            item_dict[item.name][1].append(item.value)
 
 
         else:
 
-            item_dict[item.name] = (list(), list(), list(), list())
+            item_dict[item.name] = (list(), list())
 
-            item_dict[item.name][0].append(item.num_groups)
-            item_dict[item.name][1].append(item.max_value)
-            item_dict[item.name][2].append(item.start_date)
-            item_dict[item.name][3].append(item.end_date)
+            item_dict[item.name][0].append(item.date)
+            item_dict[item.name][1].append(item.value)
 
 
     return item_dict
