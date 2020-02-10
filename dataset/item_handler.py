@@ -132,8 +132,7 @@ def create_dummy_group_info_list(number=None):
         return group_info_list
 
 
-def create_dummy_group_date_values(num_groups=3, max_value=100,
-        start_date='2018-12-01', end_date='2018-12-31'):
+def create_dummy_group_date_values(num_groups=3, max_value=100):
     """
         Date interval is from 2018-12-01 to 2018-12-31.
         :param num_groups: Specifies number of groups.
